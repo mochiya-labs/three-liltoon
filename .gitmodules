@@ -1,0 +1,3 @@
+[submodule "vendor/lilToon"]
+	path = vendor/lilToon
+	url = https://github.com/lilxyzw/lilToon
