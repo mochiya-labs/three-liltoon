@@ -1,0 +1,578 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "vert",
+            "mode" : "vert"
+        }
+    ],
+    "types" : {
+        "_17" : {
+            "name" : "type.$Globals",
+            "members" : [
+                {
+                    "name" : "uModelMatrix",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uModelMatrixInverse",
+                    "type" : "mat4",
+                    "offset" : 64,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uViewMatrix",
+                    "type" : "mat4",
+                    "offset" : 128,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uProjectionMatrix",
+                    "type" : "mat4",
+                    "offset" : 192,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uViewProjectionMatrix",
+                    "type" : "mat4",
+                    "offset" : 256,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uCameraPosition",
+                    "type" : "vec4",
+                    "offset" : 320
+                },
+                {
+                    "name" : "uScreenParams",
+                    "type" : "vec4",
+                    "offset" : 336
+                },
+                {
+                    "name" : "uProjectionParams",
+                    "type" : "vec4",
+                    "offset" : 352
+                },
+                {
+                    "name" : "uOrthoParams",
+                    "type" : "vec4",
+                    "offset" : 368
+                },
+                {
+                    "name" : "uWorldTransformParams",
+                    "type" : "vec4",
+                    "offset" : 384
+                },
+                {
+                    "name" : "uTime",
+                    "type" : "vec4",
+                    "offset" : 400
+                },
+                {
+                    "name" : "uMainLightColor",
+                    "type" : "vec4",
+                    "offset" : 416
+                },
+                {
+                    "name" : "uMainLightDirection",
+                    "type" : "vec4",
+                    "offset" : 432
+                },
+                {
+                    "name" : "uAmbientColor",
+                    "type" : "vec4",
+                    "offset" : 448
+                },
+                {
+                    "name" : "unity_SHAr",
+                    "type" : "vec4",
+                    "offset" : 464
+                },
+                {
+                    "name" : "unity_SHAg",
+                    "type" : "vec4",
+                    "offset" : 480
+                },
+                {
+                    "name" : "unity_SHAb",
+                    "type" : "vec4",
+                    "offset" : 496
+                },
+                {
+                    "name" : "unity_SHBr",
+                    "type" : "vec4",
+                    "offset" : 512
+                },
+                {
+                    "name" : "unity_SHBg",
+                    "type" : "vec4",
+                    "offset" : 528
+                },
+                {
+                    "name" : "unity_SHBb",
+                    "type" : "vec4",
+                    "offset" : 544
+                },
+                {
+                    "name" : "unity_SHC",
+                    "type" : "vec4",
+                    "offset" : 560
+                },
+                {
+                    "name" : "unity_4LightPosX0",
+                    "type" : "vec4",
+                    "offset" : 576
+                },
+                {
+                    "name" : "unity_4LightPosY0",
+                    "type" : "vec4",
+                    "offset" : 592
+                },
+                {
+                    "name" : "unity_4LightPosZ0",
+                    "type" : "vec4",
+                    "offset" : 608
+                },
+                {
+                    "name" : "unity_4LightAtten0",
+                    "type" : "vec4",
+                    "offset" : 624
+                },
+                {
+                    "name" : "unity_LightColor",
+                    "type" : "vec4",
+                    "array" : [
+                        4
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 640,
+                    "array_stride" : 16
+                },
+                {
+                    "name" : "unity_SpecCube0_HDR",
+                    "type" : "vec4",
+                    "offset" : 704
+                },
+                {
+                    "name" : "unity_SpecCube1_HDR",
+                    "type" : "vec4",
+                    "offset" : 720
+                },
+                {
+                    "name" : "unity_SpecCube0_BoxMin",
+                    "type" : "vec4",
+                    "offset" : 736
+                },
+                {
+                    "name" : "unity_SpecCube0_BoxMax",
+                    "type" : "vec4",
+                    "offset" : 752
+                },
+                {
+                    "name" : "unity_SpecCube0_ProbePosition",
+                    "type" : "vec4",
+                    "offset" : 768
+                },
+                {
+                    "name" : "unity_SpecCube1_BoxMin",
+                    "type" : "vec4",
+                    "offset" : 784
+                },
+                {
+                    "name" : "unity_SpecCube1_BoxMax",
+                    "type" : "vec4",
+                    "offset" : 800
+                },
+                {
+                    "name" : "unity_SpecCube1_ProbePosition",
+                    "type" : "vec4",
+                    "offset" : 816
+                },
+                {
+                    "name" : "uMainShadowMatrix",
+                    "type" : "mat4",
+                    "offset" : 832,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uShadowMapSize",
+                    "type" : "vec4",
+                    "offset" : 896
+                },
+                {
+                    "name" : "uShadowBias",
+                    "type" : "float",
+                    "offset" : 912
+                },
+                {
+                    "name" : "uShadowNormalBias",
+                    "type" : "float",
+                    "offset" : 916
+                },
+                {
+                    "name" : "unity_LightShadowBias",
+                    "type" : "vec4",
+                    "offset" : 928
+                },
+                {
+                    "name" : "unity_FogColor",
+                    "type" : "vec4",
+                    "offset" : 944
+                },
+                {
+                    "name" : "uBindMatrix",
+                    "type" : "mat4",
+                    "offset" : 960,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uBindMatrixInverse",
+                    "type" : "mat4",
+                    "offset" : 1024,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "uBoneTextureSize",
+                    "type" : "vec4",
+                    "offset" : 1088
+                },
+                {
+                    "name" : "uSkinningEnabled",
+                    "type" : "uint",
+                    "offset" : 1104
+                },
+                {
+                    "name" : "uMorphTargetsTextureSize",
+                    "type" : "vec4",
+                    "offset" : 1120
+                },
+                {
+                    "name" : "uMorphTargetInfluences",
+                    "type" : "float",
+                    "array" : [
+                        64
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 1136,
+                    "array_stride" : 16
+                },
+                {
+                    "name" : "uMorphTargetCount",
+                    "type" : "uint",
+                    "offset" : 2160
+                },
+                {
+                    "name" : "uMorphVertexDataStride",
+                    "type" : "uint",
+                    "offset" : 2164
+                },
+                {
+                    "name" : "uMorphHasPositions",
+                    "type" : "uint",
+                    "offset" : 2168
+                },
+                {
+                    "name" : "uMorphHasNormals",
+                    "type" : "uint",
+                    "offset" : 2172
+                },
+                {
+                    "name" : "uMorphTargetsRelative",
+                    "type" : "uint",
+                    "offset" : 2176
+                },
+                {
+                    "name" : "uMorphTargetBaseInfluence",
+                    "type" : "float",
+                    "offset" : 2180
+                },
+                {
+                    "name" : "_lilBackgroundTexture_TexelSize",
+                    "type" : "vec4",
+                    "offset" : 2192
+                },
+                {
+                    "name" : "_LightDirectionOverride",
+                    "type" : "vec4",
+                    "offset" : 2208
+                },
+                {
+                    "name" : "_BackfaceColor",
+                    "type" : "vec4",
+                    "offset" : 2224
+                },
+                {
+                    "name" : "_Color",
+                    "type" : "vec4",
+                    "offset" : 2240
+                },
+                {
+                    "name" : "_MainTex_ST",
+                    "type" : "vec4",
+                    "offset" : 2256
+                },
+                {
+                    "name" : "_OutlineColor",
+                    "type" : "vec4",
+                    "offset" : 2272
+                },
+                {
+                    "name" : "_OutlineLitColor",
+                    "type" : "vec4",
+                    "offset" : 2288
+                },
+                {
+                    "name" : "_OutlineTex_ST",
+                    "type" : "vec4",
+                    "offset" : 2304
+                },
+                {
+                    "name" : "_AsUnlit",
+                    "type" : "float",
+                    "offset" : 2320
+                },
+                {
+                    "name" : "_Cutoff",
+                    "type" : "float",
+                    "offset" : 2324
+                },
+                {
+                    "name" : "_SubpassCutoff",
+                    "type" : "float",
+                    "offset" : 2328
+                },
+                {
+                    "name" : "_FlipNormal",
+                    "type" : "float",
+                    "offset" : 2332
+                },
+                {
+                    "name" : "_ShiftBackfaceUV",
+                    "type" : "float",
+                    "offset" : 2336
+                },
+                {
+                    "name" : "_VertexLightStrength",
+                    "type" : "float",
+                    "offset" : 2340
+                },
+                {
+                    "name" : "_LightMinLimit",
+                    "type" : "float",
+                    "offset" : 2344
+                },
+                {
+                    "name" : "_LightMaxLimit",
+                    "type" : "float",
+                    "offset" : 2348
+                },
+                {
+                    "name" : "_MonochromeLighting",
+                    "type" : "float",
+                    "offset" : 2352
+                },
+                {
+                    "name" : "_AAStrength",
+                    "type" : "float",
+                    "offset" : 2356
+                },
+                {
+                    "name" : "_EnvRimBorder",
+                    "type" : "float",
+                    "offset" : 2360
+                },
+                {
+                    "name" : "_EnvRimBlur",
+                    "type" : "float",
+                    "offset" : 2364
+                },
+                {
+                    "name" : "_AlphaBoostFA",
+                    "type" : "float",
+                    "offset" : 2368
+                },
+                {
+                    "name" : "_lilShadowCasterBias",
+                    "type" : "float",
+                    "offset" : 2372
+                },
+                {
+                    "name" : "_OutlineLitScale",
+                    "type" : "float",
+                    "offset" : 2376
+                },
+                {
+                    "name" : "_OutlineLitOffset",
+                    "type" : "float",
+                    "offset" : 2380
+                },
+                {
+                    "name" : "_OutlineWidth",
+                    "type" : "float",
+                    "offset" : 2384
+                },
+                {
+                    "name" : "_OutlineEnableLighting",
+                    "type" : "float",
+                    "offset" : 2388
+                },
+                {
+                    "name" : "_OutlineVectorScale",
+                    "type" : "float",
+                    "offset" : 2392
+                },
+                {
+                    "name" : "_OutlineFixWidth",
+                    "type" : "float",
+                    "offset" : 2396
+                },
+                {
+                    "name" : "_OutlineZBias",
+                    "type" : "float",
+                    "offset" : 2400
+                },
+                {
+                    "name" : "_Cull",
+                    "type" : "uint",
+                    "offset" : 2404
+                },
+                {
+                    "name" : "_OutlineCull",
+                    "type" : "uint",
+                    "offset" : 2408
+                },
+                {
+                    "name" : "_OutlineVertexR2Width",
+                    "type" : "uint",
+                    "offset" : 2412
+                },
+                {
+                    "name" : "_OutlineVectorUVMode",
+                    "type" : "uint",
+                    "offset" : 2416
+                },
+                {
+                    "name" : "_Invisible",
+                    "type" : "uint",
+                    "offset" : 2420
+                },
+                {
+                    "name" : "_OutlineLitApplyTex",
+                    "type" : "uint",
+                    "offset" : 2424
+                },
+                {
+                    "name" : "_OutlineLitShadowReceive",
+                    "type" : "uint",
+                    "offset" : 2428
+                },
+                {
+                    "name" : "_OutlineDeleteMesh",
+                    "type" : "uint",
+                    "offset" : 2432
+                },
+                {
+                    "name" : "_OutlineDisableInVR",
+                    "type" : "uint",
+                    "offset" : 2436
+                },
+                {
+                    "name" : "_UdonForceSceneLighting",
+                    "type" : "uint",
+                    "offset" : 2440
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec4",
+            "name" : "in.var.POSITION",
+            "location" : 0
+        },
+        {
+            "type" : "vec2",
+            "name" : "in.var.TEXCOORD0",
+            "location" : 1
+        },
+        {
+            "type" : "vec2",
+            "name" : "in.var.TEXCOORD1",
+            "location" : 2
+        },
+        {
+            "type" : "vec2",
+            "name" : "in.var.TEXCOORD2",
+            "location" : 3
+        },
+        {
+            "type" : "vec2",
+            "name" : "in.var.TEXCOORD3",
+            "location" : 4
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "out.var.TEXCOORD0",
+            "location" : 0
+        },
+        {
+            "type" : "vec4",
+            "name" : "out.var.TEXCOORD1",
+            "location" : 1
+        },
+        {
+            "type" : "vec3",
+            "name" : "out.var.TEXCOORD3",
+            "location" : 2
+        },
+        {
+            "type" : "vec3",
+            "name" : "out.var.TEXCOORD4",
+            "location" : 3
+        },
+        {
+            "type" : "vec3",
+            "name" : "out.var.TEXCOORD6",
+            "location" : 4
+        },
+        {
+            "type" : "vec3",
+            "name" : "out.var.TEXCOORD7",
+            "location" : 5
+        },
+        {
+            "type" : "vec3",
+            "name" : "out.var.TEXCOORD8",
+            "location" : 6
+        },
+        {
+            "type" : "float",
+            "name" : "out.var.TEXCOORD9",
+            "location" : 7
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_17",
+            "name" : "type.$Globals",
+            "block_size" : 2444,
+            "set" : 0,
+            "binding" : 0
+        }
+    ]
+}

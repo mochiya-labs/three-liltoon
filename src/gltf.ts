@@ -1,0 +1,8 @@
+export { GLTFLilToonExtension } from "./loaders/GLTFLilToonExtension.js";
+export type { GLTFLilToonExtensionOptions } from "./loaders/GLTFLilToonExtension.js";
+export { LilToonMaterialLoader } from "./loaders/LilToonMaterialLoader.js";
+export { LILTOON_GLTF_EXTENSION } from "./loaders/types.js";
+export type {
+  GLTFLilToonMaterialDefinition,
+  GLTFLilToonTextureInfo,
+} from "./loaders/types.js";

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.tmp/
+coverage/
+playwright-report/
+test-results/
+test/parity/three-output/
+test/parity/diff/
+tools/bin/
+*.log
+*.spvasm
+.DS_Store

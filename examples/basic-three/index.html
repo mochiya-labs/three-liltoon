@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>three-liltoon WebGL2 example</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; overflow: hidden; background: #171813; color: #f5f5ef; }
+      canvas { display: block; width: 100vw; height: 100vh; }
+      .panel {
+        position: fixed; inset: 1rem auto auto 1rem; max-width: 22rem; padding: .8rem 1rem;
+        border: 1px solid #ffffff20; border-radius: .75rem; background: #151610d9;
+        box-shadow: 0 1rem 3rem #0008; backdrop-filter: blur(12px); pointer-events: none;
+      }
+      h1 { margin: 0 0 .3rem; font-size: 1rem; }
+      p { margin: 0; color: #c8c8bd; font-size: .8rem; line-height: 1.45; }
+      #status { margin-top: .5rem; color: #d9efad; font-family: ui-monospace, monospace; }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene" aria-label="Rotating lilToon sphere rendered with WebGL2"></canvas>
+    <section class="panel">
+      <h1>three-liltoon</h1>
+      <p>Upstream lilToon HLSL → DXC → SPIR-V → WebGL2 GLSL. Drag to orbit.</p>
+      <p id="status" role="status">Starting WebGL2…</p>
+    </section>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

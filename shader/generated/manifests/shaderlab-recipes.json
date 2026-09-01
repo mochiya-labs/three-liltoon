@@ -1,0 +1,3982 @@
+{
+  "opaque": {
+    "source": "ltspass_opaque.shader",
+    "passes": {
+      "forward": {
+        "name": "FORWARD",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_Cull"
+          },
+          "zWrite": {
+            "property": "_ZWrite"
+          },
+          "zTest": {
+            "property": "_ZTest"
+          },
+          "colorMask": {
+            "property": "_ColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OffsetFactor"
+            },
+            {
+              "property": "_OffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_BlendOp"
+            },
+            {
+              "property": "_BlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_SrcBlend"
+            },
+            {
+              "property": "_DstBlend"
+            },
+            {
+              "property": "_SrcBlendAlpha"
+            },
+            {
+              "property": "_DstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_AlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_outline": {
+        "name": "FORWARD_OUTLINE",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_OutlineCull"
+          },
+          "zWrite": {
+            "property": "_OutlineZWrite"
+          },
+          "zTest": {
+            "property": "_OutlineZTest"
+          },
+          "colorMask": {
+            "property": "_OutlineColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OutlineOffsetFactor"
+            },
+            {
+              "property": "_OutlineOffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_OutlineBlendOp"
+            },
+            {
+              "property": "_OutlineBlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_OutlineSrcBlend"
+            },
+            {
+              "property": "_OutlineDstBlend"
+            },
+            {
+              "property": "_OutlineSrcBlendAlpha"
+            },
+            {
+              "property": "_OutlineDstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_OutlineAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_OutlineStencilRef"
+            },
+            "readMask": {
+              "property": "_OutlineStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_OutlineStencilWriteMask"
+            },
+            "comp": {
+              "property": "_OutlineStencilComp"
+            },
+            "pass": {
+              "property": "_OutlineStencilPass"
+            },
+            "fail": {
+              "property": "_OutlineStencilFail"
+            },
+            "zFail": {
+              "property": "_OutlineStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_add": {
+        "name": "FORWARD_ADD",
+        "tags": {
+          "LightMode": "ForwardAdd"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_Cull"
+          },
+          "zWrite": false,
+          "zTest": "LEqual",
+          "colorMask": {
+            "property": "_ColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OffsetFactor"
+            },
+            {
+              "property": "_OffsetUnits"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_SrcBlendFA"
+            },
+            {
+              "property": "_DstBlendFA"
+            },
+            "Zero",
+            "One"
+          ],
+          "blendOp": [
+            {
+              "property": "_BlendOpFA"
+            },
+            {
+              "property": "_BlendOpAlphaFA"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_AlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARDADD"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fragment POINT DIRECTIONAL SPOT POINT_COOKIE DIRECTIONAL_COOKIE",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_add_outline": {
+        "name": "FORWARD_ADD_OUTLINE",
+        "tags": {
+          "LightMode": "ForwardAdd"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_OutlineCull"
+          },
+          "zWrite": false,
+          "zTest": "LEqual",
+          "colorMask": {
+            "property": "_OutlineColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OutlineOffsetFactor"
+            },
+            {
+              "property": "_OutlineOffsetUnits"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_OutlineSrcBlendFA"
+            },
+            {
+              "property": "_OutlineDstBlendFA"
+            },
+            "Zero",
+            "One"
+          ],
+          "blendOp": [
+            {
+              "property": "_OutlineBlendOpFA"
+            },
+            {
+              "property": "_OutlineBlendOpAlphaFA"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_OutlineAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_OutlineStencilRef"
+            },
+            "readMask": {
+              "property": "_OutlineStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_OutlineStencilWriteMask"
+            },
+            "comp": {
+              "property": "_OutlineStencilComp"
+            },
+            "pass": {
+              "property": "_OutlineStencilPass"
+            },
+            "fail": {
+              "property": "_OutlineStencilFail"
+            },
+            "zFail": {
+              "property": "_OutlineStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARDADD",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fragment POINT DIRECTIONAL SPOT POINT_COOKIE DIRECTIONAL_COOKIE",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "shadow_caster": {
+        "name": "SHADOW_CASTER",
+        "tags": {
+          "LightMode": "ShadowCaster"
+        },
+        "renderState": {
+          "offset": [
+            1,
+            1
+          ],
+          "cull": {
+            "property": "_Cull"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_SHADOWCASTER"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_shadowcaster",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_shadowcaster.hlsl"
+        ]
+      },
+      "shadow_caster_outline": {
+        "name": "SHADOW_CASTER_OUTLINE",
+        "tags": {
+          "LightMode": "ShadowCaster"
+        },
+        "renderState": {
+          "offset": [
+            1,
+            1
+          ],
+          "cull": {
+            "property": "_Cull"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_SHADOWCASTER",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_shadowcaster",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_shadowcaster.hlsl"
+        ]
+      },
+      "meta": {
+        "name": "META",
+        "tags": {
+          "LightMode": "Meta"
+        },
+        "renderState": {
+          "cull": false
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_META"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "shader_feature EDITOR_VISUALIZATION"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_meta.hlsl"
+        ]
+      }
+    }
+  },
+  "cutout": {
+    "source": "ltspass_cutout.shader",
+    "passes": {
+      "forward": {
+        "name": "FORWARD",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_Cull"
+          },
+          "zWrite": {
+            "property": "_ZWrite"
+          },
+          "zTest": {
+            "property": "_ZTest"
+          },
+          "colorMask": {
+            "property": "_ColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OffsetFactor"
+            },
+            {
+              "property": "_OffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_BlendOp"
+            },
+            {
+              "property": "_BlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_SrcBlend"
+            },
+            {
+              "property": "_DstBlend"
+            },
+            {
+              "property": "_SrcBlendAlpha"
+            },
+            {
+              "property": "_DstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_AlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_outline": {
+        "name": "FORWARD_OUTLINE",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_OutlineCull"
+          },
+          "zWrite": {
+            "property": "_OutlineZWrite"
+          },
+          "zTest": {
+            "property": "_OutlineZTest"
+          },
+          "colorMask": {
+            "property": "_OutlineColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OutlineOffsetFactor"
+            },
+            {
+              "property": "_OutlineOffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_OutlineBlendOp"
+            },
+            {
+              "property": "_OutlineBlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_OutlineSrcBlend"
+            },
+            {
+              "property": "_OutlineDstBlend"
+            },
+            {
+              "property": "_OutlineSrcBlendAlpha"
+            },
+            {
+              "property": "_OutlineDstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_OutlineAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_OutlineStencilRef"
+            },
+            "readMask": {
+              "property": "_OutlineStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_OutlineStencilWriteMask"
+            },
+            "comp": {
+              "property": "_OutlineStencilComp"
+            },
+            "pass": {
+              "property": "_OutlineStencilPass"
+            },
+            "fail": {
+              "property": "_OutlineStencilFail"
+            },
+            "zFail": {
+              "property": "_OutlineStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_add": {
+        "name": "FORWARD_ADD",
+        "tags": {
+          "LightMode": "ForwardAdd"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_Cull"
+          },
+          "zWrite": false,
+          "zTest": "LEqual",
+          "colorMask": {
+            "property": "_ColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OffsetFactor"
+            },
+            {
+              "property": "_OffsetUnits"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_SrcBlendFA"
+            },
+            {
+              "property": "_DstBlendFA"
+            },
+            "Zero",
+            "One"
+          ],
+          "blendOp": [
+            {
+              "property": "_BlendOpFA"
+            },
+            {
+              "property": "_BlendOpAlphaFA"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_AlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARDADD"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fragment POINT DIRECTIONAL SPOT POINT_COOKIE DIRECTIONAL_COOKIE",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_add_outline": {
+        "name": "FORWARD_ADD_OUTLINE",
+        "tags": {
+          "LightMode": "ForwardAdd"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_OutlineCull"
+          },
+          "zWrite": false,
+          "zTest": "LEqual",
+          "colorMask": {
+            "property": "_OutlineColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OutlineOffsetFactor"
+            },
+            {
+              "property": "_OutlineOffsetUnits"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_OutlineSrcBlendFA"
+            },
+            {
+              "property": "_OutlineDstBlendFA"
+            },
+            "Zero",
+            "One"
+          ],
+          "blendOp": [
+            {
+              "property": "_OutlineBlendOpFA"
+            },
+            {
+              "property": "_OutlineBlendOpAlphaFA"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_OutlineAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_OutlineStencilRef"
+            },
+            "readMask": {
+              "property": "_OutlineStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_OutlineStencilWriteMask"
+            },
+            "comp": {
+              "property": "_OutlineStencilComp"
+            },
+            "pass": {
+              "property": "_OutlineStencilPass"
+            },
+            "fail": {
+              "property": "_OutlineStencilFail"
+            },
+            "zFail": {
+              "property": "_OutlineStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARDADD",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fragment POINT DIRECTIONAL SPOT POINT_COOKIE DIRECTIONAL_COOKIE",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "shadow_caster": {
+        "name": "SHADOW_CASTER",
+        "tags": {
+          "LightMode": "ShadowCaster"
+        },
+        "renderState": {
+          "offset": [
+            1,
+            1
+          ],
+          "cull": {
+            "property": "_Cull"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_SHADOWCASTER"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_shadowcaster",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_shadowcaster.hlsl"
+        ]
+      },
+      "shadow_caster_outline": {
+        "name": "SHADOW_CASTER_OUTLINE",
+        "tags": {
+          "LightMode": "ShadowCaster"
+        },
+        "renderState": {
+          "offset": [
+            1,
+            1
+          ],
+          "cull": {
+            "property": "_Cull"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_SHADOWCASTER",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_shadowcaster",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_shadowcaster.hlsl"
+        ]
+      },
+      "meta": {
+        "name": "META",
+        "tags": {
+          "LightMode": "Meta"
+        },
+        "renderState": {
+          "cull": false
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_META"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "shader_feature EDITOR_VISUALIZATION"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_meta.hlsl"
+        ]
+      }
+    }
+  },
+  "transparent": {
+    "source": "ltspass_transparent.shader",
+    "passes": {
+      "forward_back": {
+        "name": "FORWARD_BACK",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_PreCull"
+          },
+          "zWrite": {
+            "property": "_PreZWrite"
+          },
+          "zTest": {
+            "property": "_PreZTest"
+          },
+          "colorMask": {
+            "property": "_PreColorMask"
+          },
+          "offset": [
+            {
+              "property": "_PreOffsetFactor"
+            },
+            {
+              "property": "_PreOffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_PreBlendOp"
+            },
+            {
+              "property": "_PreBlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_PreSrcBlend"
+            },
+            {
+              "property": "_PreDstBlend"
+            },
+            {
+              "property": "_PreSrcBlendAlpha"
+            },
+            {
+              "property": "_PreDstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_PreAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_PreStencilRef"
+            },
+            "readMask": {
+              "property": "_PreStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_PreStencilWriteMask"
+            },
+            "comp": {
+              "property": "_PreStencilComp"
+            },
+            "pass": {
+              "property": "_PreStencilPass"
+            },
+            "fail": {
+              "property": "_PreStencilFail"
+            },
+            "zFail": {
+              "property": "_PreStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD",
+          "LIL_TRANSPARENT_PRE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward": {
+        "name": "FORWARD",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_Cull"
+          },
+          "zWrite": {
+            "property": "_ZWrite"
+          },
+          "zTest": {
+            "property": "_ZTest"
+          },
+          "colorMask": {
+            "property": "_ColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OffsetFactor"
+            },
+            {
+              "property": "_OffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_BlendOp"
+            },
+            {
+              "property": "_BlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_SrcBlend"
+            },
+            {
+              "property": "_DstBlend"
+            },
+            {
+              "property": "_SrcBlendAlpha"
+            },
+            {
+              "property": "_DstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_AlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_outline": {
+        "name": "FORWARD_OUTLINE",
+        "tags": {
+          "LightMode": "ForwardBase"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_OutlineCull"
+          },
+          "zWrite": {
+            "property": "_OutlineZWrite"
+          },
+          "zTest": {
+            "property": "_OutlineZTest"
+          },
+          "colorMask": {
+            "property": "_OutlineColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OutlineOffsetFactor"
+            },
+            {
+              "property": "_OutlineOffsetUnits"
+            }
+          ],
+          "blendOp": [
+            {
+              "property": "_OutlineBlendOp"
+            },
+            {
+              "property": "_OutlineBlendOpAlpha"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_OutlineSrcBlend"
+            },
+            {
+              "property": "_OutlineDstBlend"
+            },
+            {
+              "property": "_OutlineSrcBlendAlpha"
+            },
+            {
+              "property": "_OutlineDstBlendAlpha"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_OutlineAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_OutlineStencilRef"
+            },
+            "readMask": {
+              "property": "_OutlineStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_OutlineStencilWriteMask"
+            },
+            "comp": {
+              "property": "_OutlineStencilComp"
+            },
+            "pass": {
+              "property": "_OutlineStencilPass"
+            },
+            "fail": {
+              "property": "_OutlineStencilFail"
+            },
+            "zFail": {
+              "property": "_OutlineStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARD",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fwdbase",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_add": {
+        "name": "FORWARD_ADD",
+        "tags": {
+          "LightMode": "ForwardAdd"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_Cull"
+          },
+          "zWrite": false,
+          "zTest": "LEqual",
+          "colorMask": {
+            "property": "_ColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OffsetFactor"
+            },
+            {
+              "property": "_OffsetUnits"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_SrcBlendFA"
+            },
+            {
+              "property": "_DstBlendFA"
+            },
+            "Zero",
+            "One"
+          ],
+          "blendOp": [
+            {
+              "property": "_BlendOpFA"
+            },
+            {
+              "property": "_BlendOpAlphaFA"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_AlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARDADD"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fragment POINT DIRECTIONAL SPOT POINT_COOKIE DIRECTIONAL_COOKIE",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "forward_add_outline": {
+        "name": "FORWARD_ADD_OUTLINE",
+        "tags": {
+          "LightMode": "ForwardAdd"
+        },
+        "renderState": {
+          "cull": {
+            "property": "_OutlineCull"
+          },
+          "zWrite": false,
+          "zTest": "LEqual",
+          "colorMask": {
+            "property": "_OutlineColorMask"
+          },
+          "offset": [
+            {
+              "property": "_OutlineOffsetFactor"
+            },
+            {
+              "property": "_OutlineOffsetUnits"
+            }
+          ],
+          "blend": [
+            {
+              "property": "_OutlineSrcBlendFA"
+            },
+            {
+              "property": "_OutlineDstBlendFA"
+            },
+            "Zero",
+            "One"
+          ],
+          "blendOp": [
+            {
+              "property": "_OutlineBlendOpFA"
+            },
+            {
+              "property": "_OutlineBlendOpAlphaFA"
+            }
+          ],
+          "alphaToMask": {
+            "property": "_OutlineAlphaToMask"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_OutlineStencilRef"
+            },
+            "readMask": {
+              "property": "_OutlineStencilReadMask"
+            },
+            "writeMask": {
+              "property": "_OutlineStencilWriteMask"
+            },
+            "comp": {
+              "property": "_OutlineStencilComp"
+            },
+            "pass": {
+              "property": "_OutlineStencilPass"
+            },
+            "fail": {
+              "property": "_OutlineStencilFail"
+            },
+            "zFail": {
+              "property": "_OutlineStencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_FORWARDADD",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_fragment POINT DIRECTIONAL SPOT POINT_COOKIE DIRECTIONAL_COOKIE",
+          "multi_compile_vertex _ FOG_LINEAR FOG_EXP FOG_EXP2",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_forward.hlsl"
+        ]
+      },
+      "shadow_caster": {
+        "name": "SHADOW_CASTER",
+        "tags": {
+          "LightMode": "ShadowCaster"
+        },
+        "renderState": {
+          "offset": [
+            1,
+            1
+          ],
+          "cull": {
+            "property": "_Cull"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_SHADOWCASTER"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_shadowcaster",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_shadowcaster.hlsl"
+        ]
+      },
+      "shadow_caster_outline": {
+        "name": "SHADOW_CASTER_OUTLINE",
+        "tags": {
+          "LightMode": "ShadowCaster"
+        },
+        "renderState": {
+          "offset": [
+            1,
+            1
+          ],
+          "cull": {
+            "property": "_Cull"
+          },
+          "stencil": {
+            "ref": {
+              "property": "_StencilRef"
+            },
+            "readMask": {
+              "property": "_StencilReadMask"
+            },
+            "writeMask": {
+              "property": "_StencilWriteMask"
+            },
+            "comp": {
+              "property": "_StencilComp"
+            },
+            "pass": {
+              "property": "_StencilPass"
+            },
+            "fail": {
+              "property": "_StencilFail"
+            },
+            "zFail": {
+              "property": "_StencilZFail"
+            }
+          }
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_SHADOWCASTER",
+          "LIL_OUTLINE"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "multi_compile_shadowcaster",
+          "multi_compile_instancing"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_shadowcaster.hlsl"
+        ]
+      },
+      "meta": {
+        "name": "META",
+        "tags": {
+          "LightMode": "Meta"
+        },
+        "renderState": {
+          "cull": false
+        },
+        "defines": [
+          "LIL_RENDER",
+          "LIL_FEATURE_ANIMATE_MAIN_UV",
+          "LIL_FEATURE_MAIN_TONE_CORRECTION",
+          "LIL_FEATURE_MAIN_GRADATION_MAP",
+          "LIL_FEATURE_MAIN2ND",
+          "LIL_FEATURE_MAIN3RD",
+          "LIL_FEATURE_DECAL",
+          "LIL_FEATURE_ANIMATE_DECAL",
+          "LIL_FEATURE_LAYER_DISSOLVE",
+          "LIL_FEATURE_ALPHAMASK",
+          "LIL_FEATURE_SHADOW",
+          "LIL_FEATURE_RECEIVE_SHADOW",
+          "LIL_FEATURE_SHADOW_3RD",
+          "LIL_FEATURE_SHADOW_LUT",
+          "LIL_FEATURE_RIMSHADE",
+          "LIL_FEATURE_EMISSION_1ST",
+          "LIL_FEATURE_EMISSION_2ND",
+          "LIL_FEATURE_ANIMATE_EMISSION_UV",
+          "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+          "LIL_FEATURE_EMISSION_GRADATION",
+          "LIL_FEATURE_NORMAL_1ST",
+          "LIL_FEATURE_NORMAL_2ND",
+          "LIL_FEATURE_ANISOTROPY",
+          "LIL_FEATURE_REFLECTION",
+          "LIL_FEATURE_MATCAP",
+          "LIL_FEATURE_MATCAP_2ND",
+          "LIL_FEATURE_RIMLIGHT",
+          "LIL_FEATURE_RIMLIGHT_DIRECTION",
+          "LIL_FEATURE_GLITTER",
+          "LIL_FEATURE_BACKLIGHT",
+          "LIL_FEATURE_PARALLAX",
+          "LIL_FEATURE_POM",
+          "LIL_FEATURE_DISTANCE_FADE",
+          "LIL_FEATURE_AUDIOLINK",
+          "LIL_FEATURE_AUDIOLINK_VERTEX",
+          "LIL_FEATURE_AUDIOLINK_LOCAL",
+          "LIL_FEATURE_DISSOLVE",
+          "LIL_FEATURE_DITHER",
+          "LIL_FEATURE_IDMASK",
+          "LIL_FEATURE_UDIMDISCARD",
+          "LIL_FEATURE_OUTLINE_TONE_CORRECTION",
+          "LIL_FEATURE_OUTLINE_RECEIVE_SHADOW",
+          "LIL_FEATURE_ANIMATE_OUTLINE_UV",
+          "LIL_FEATURE_FUR_COLLISION",
+          "LIL_FEATURE_MainGradationTex",
+          "LIL_FEATURE_MainColorAdjustMask",
+          "LIL_FEATURE_Main2ndTex",
+          "LIL_FEATURE_Main2ndBlendMask",
+          "LIL_FEATURE_Main2ndDissolveMask",
+          "LIL_FEATURE_Main2ndDissolveNoiseMask",
+          "LIL_FEATURE_Main3rdTex",
+          "LIL_FEATURE_Main3rdBlendMask",
+          "LIL_FEATURE_Main3rdDissolveMask",
+          "LIL_FEATURE_Main3rdDissolveNoiseMask",
+          "LIL_FEATURE_AlphaMask",
+          "LIL_FEATURE_BumpMap",
+          "LIL_FEATURE_Bump2ndMap",
+          "LIL_FEATURE_Bump2ndScaleMask",
+          "LIL_FEATURE_AnisotropyTangentMap",
+          "LIL_FEATURE_AnisotropyScaleMask",
+          "LIL_FEATURE_AnisotropyShiftNoiseMask",
+          "LIL_FEATURE_ShadowBorderMask",
+          "LIL_FEATURE_ShadowBlurMask",
+          "LIL_FEATURE_ShadowStrengthMask",
+          "LIL_FEATURE_ShadowColorTex",
+          "LIL_FEATURE_Shadow2ndColorTex",
+          "LIL_FEATURE_Shadow3rdColorTex",
+          "LIL_FEATURE_RimShadeMask",
+          "LIL_FEATURE_BacklightColorTex",
+          "LIL_FEATURE_SmoothnessTex",
+          "LIL_FEATURE_MetallicGlossMap",
+          "LIL_FEATURE_ReflectionColorTex",
+          "LIL_FEATURE_ReflectionCubeTex",
+          "LIL_FEATURE_MatCapTex",
+          "LIL_FEATURE_MatCapBlendMask",
+          "LIL_FEATURE_MatCapBumpMap",
+          "LIL_FEATURE_MatCap2ndTex",
+          "LIL_FEATURE_MatCap2ndBlendMask",
+          "LIL_FEATURE_MatCap2ndBumpMap",
+          "LIL_FEATURE_RimColorTex",
+          "LIL_FEATURE_GlitterColorTex",
+          "LIL_FEATURE_GlitterShapeTex",
+          "LIL_FEATURE_EmissionMap",
+          "LIL_FEATURE_EmissionBlendMask",
+          "LIL_FEATURE_EmissionGradTex",
+          "LIL_FEATURE_Emission2ndMap",
+          "LIL_FEATURE_Emission2ndBlendMask",
+          "LIL_FEATURE_Emission2ndGradTex",
+          "LIL_FEATURE_ParallaxMap",
+          "LIL_FEATURE_AudioLinkMask",
+          "LIL_FEATURE_AudioLinkLocalMap",
+          "LIL_FEATURE_DissolveMask",
+          "LIL_FEATURE_DissolveNoiseMask",
+          "LIL_FEATURE_OutlineTex",
+          "LIL_FEATURE_OutlineWidthMask",
+          "LIL_FEATURE_OutlineVectorTex",
+          "LIL_FEATURE_FurNoiseMask",
+          "LIL_FEATURE_FurMask",
+          "LIL_FEATURE_FurLengthMask",
+          "LIL_FEATURE_FurVectorTex",
+          "LIL_OPTIMIZE_APPLY_SHADOW_FA",
+          "LIL_OPTIMIZE_USE_FORWARDADD",
+          "LIL_OPTIMIZE_USE_VERTEXLIGHT",
+          "LIL_FEATURE_VRCLIGHTVOLUMES_WITHOUTPACKAGE",
+          "LIL_PASS_META"
+        ],
+        "pragmas": [
+          "skip_variants LIGHTMAP_ON DYNAMICLIGHTMAP_ON LIGHTMAP_SHADOW_MIXING SHADOWS_SHADOWMASK DIRLIGHTMAP_COMBINED _MIXED_LIGHTING_SUBTRACTIVE",
+          "target 3.5",
+          "fragmentoption ARB_precision_hint_fastest",
+          "skip_variants DECALS_OFF DECALS_3RT DECALS_4RT DECAL_SURFACE_GRADIENT _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3",
+          "skip_variants _ADDITIONAL_LIGHT_SHADOWS",
+          "skip_variants PROBE_VOLUMES_OFF PROBE_VOLUMES_L1 PROBE_VOLUMES_L2",
+          "skip_variants _SCREEN_SPACE_OCCLUSION",
+          "vertex vert",
+          "fragment frag",
+          "shader_feature EDITOR_VISUALIZATION"
+        ],
+        "includes": [
+          "Includes/lil_pipeline_brp.hlsl",
+          "Includes/lil_common.hlsl",
+          "Includes/lil_pass_meta.hlsl"
+        ]
+      }
+    }
+  }
+}

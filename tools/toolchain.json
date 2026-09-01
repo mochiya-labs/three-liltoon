@@ -1,0 +1,14 @@
+{
+  "dxc": {
+    "versionContains": "1.7(dev;3795-bef540d3)",
+    "targetEnvironment": "vulkan1.0"
+  },
+  "spirvCross": {
+    "required": true,
+    "glslVersion": 300,
+    "es": true
+  },
+  "spirvTools": {
+    "versionContains": "SPIRV-Tools v2023.1"
+  }
+}
