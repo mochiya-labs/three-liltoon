@@ -10,8 +10,10 @@ import { OutlinePass } from "../passes/OutlinePass.js";
 import { ShadowCasterPass } from "../passes/ShadowCasterPass.js";
 import {
   LILTOON_GLTF_EXTENSION,
+  LILTOON_GLTF_SPEC_VERSION,
   type GLTFLilToonMaterialDefinition,
 } from "./types.js";
+import { warnLilToon } from "../utils/diagnostics.js";
 
 export interface GLTFLilToonExtensionOptions {
   rendererAdapter?: LilToonRendererAdapter;
@@ -42,6 +44,12 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
     const definition = materialDefinition?.extensions?.[this.name] as GLTFLilToonMaterialDefinition | undefined;
     if (!definition) return null;
     return (async () => {
+      if (definition.specVersion && definition.specVersion !== LILTOON_GLTF_SPEC_VERSION) {
+        warnLilToon(
+          `Material ${materialIndex} uses ${this.name} spec ${definition.specVersion}; ` +
+          `this build implements ${LILTOON_GLTF_SPEC_VERSION}. Attempting a best-effort load.`,
+        );
+      }
       const textures: Record<string, Texture> = {};
       await Promise.all(
         Object.entries(definition.textures ?? {}).map(async ([property, textureInfo]) => {
@@ -57,6 +65,7 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
         deformation: true,
       });
       material.setRendererAdapter(this.options.rendererAdapter);
+      this.parser.associations.set(material, { materials: materialIndex });
       return material;
     })();
   }

@@ -6,6 +6,7 @@
 
 ```json
 {
+  "specVersion": "1.0",
   "lilToonVersion": "2.3.4-3-g72fc096",
   "renderMode": "opaque",
   "properties": {
@@ -33,6 +34,7 @@ Extension name: `MOCHIYA_materials_liltoon`.
       "name": "Body",
       "extensions": {
         "MOCHIYA_materials_liltoon": {
+          "specVersion": "1.0",
           "lilToonVersion": "2.3.4-3-g72fc096",
           "shaderVariant": "lilToon",
           "renderMode": "opaque",
@@ -54,5 +56,7 @@ Extension name: `MOCHIYA_materials_liltoon`.
 ```
 
 Each texture value may be a glTF texture index or an object with `index` and optional `texCoord`. The alpha loader currently resolves `index`; alternate `texCoord` declarations are preserved by the schema but UV-channel remapping is not implemented. A missing `renderMode` is inferred from `shaderVariant` (`cutout`, `trans`, otherwise opaque).
+
+`specVersion` versions Mochiya's extension payload independently from the installed lilToon version. The current value is `1.0`. A newer value produces a warning and a best-effort load so ordinary glTF fallback material data remains usable.
 
 Register the plugin on a particular `GLTFLoader`. Materials without the extension continue through Three's normal loader. The extension is Mochiya-specific and is not a Khronos or lilToon standard.

@@ -39,6 +39,7 @@ import type {
   LilToonScalarOrVector,
 } from "./LilToonMaterialParameters.js";
 import type { SerializedLilToonMaterial } from "./LilToonMaterialState.js";
+import { LILTOON_GLTF_SPEC_VERSION } from "../loaders/types.js";
 
 function copyValue(value: LilToonScalarOrVector): LilToonScalarOrVector {
   if (Array.isArray(value)) return [...value];
@@ -68,9 +69,9 @@ export class LilToonMaterial extends RawShaderMaterial {
   readonly isLilToonMaterial = true;
   readonly lilToonProperties: Record<string, LilToonScalarOrVector>;
   readonly lilToonTextures: Record<string, Texture | null> = {};
-  readonly globalUniforms: LilToonGlobalUniforms;
-  readonly renderMode: LilToonRenderMode;
-  readonly pass: "forward" | "outline";
+  globalUniforms: LilToonGlobalUniforms;
+  renderMode: LilToonRenderMode;
+  pass: "forward" | "outline";
   featureSet: LilToonFeatureSet;
   rendererAdapter?: LilToonRendererAdapter;
   readonly #samplerBindings: Map<string, string>;
@@ -183,6 +184,7 @@ export class LilToonMaterial extends RawShaderMaterial {
       ]),
     );
     return {
+      specVersion: LILTOON_GLTF_SPEC_VERSION,
       lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
       renderMode: this.renderMode,
       properties,
@@ -211,6 +213,35 @@ export class LilToonMaterial extends RawShaderMaterial {
 
   setRendererAdapter(adapter: LilToonRendererAdapter | undefined): this {
     this.rendererAdapter = adapter;
+    return this;
+  }
+
+  override copy(source: LilToonMaterial): this {
+    super.copy(source);
+    this.renderMode = source.renderMode;
+    this.pass = source.pass;
+
+    this.globalUniforms = createGlobalUniforms(source.vertexShader, source.fragmentShader);
+    this.uniforms._Globals = { value: this.globalUniforms };
+
+    for (const name of Object.keys(this.lilToonProperties)) delete this.lilToonProperties[name];
+    for (const [name, value] of Object.entries(source.lilToonProperties)) {
+      this.lilToonProperties[name] = copyValue(value);
+      setGlobalProperty(this.globalUniforms, name, value);
+    }
+
+    for (const name of Object.keys(this.lilToonTextures)) delete this.lilToonTextures[name];
+    Object.assign(this.lilToonTextures, source.lilToonTextures);
+
+    this.#samplerBindings.clear();
+    for (const [uniformName, property] of source.#samplerBindings) {
+      this.#samplerBindings.set(uniformName, property);
+    }
+    this.#cubeSamplers.clear();
+    for (const uniformName of source.#cubeSamplers) this.#cubeSamplers.add(uniformName);
+
+    this.featureSet = { ...source.featureSet };
+    this.rendererAdapter = source.rendererAdapter;
     return this;
   }
 

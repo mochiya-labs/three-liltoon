@@ -47,7 +47,7 @@ export function detectLilToonFeatures(
     reflection: enabled(properties, "_UseReflection"),
     anisotropy: enabled(properties, "_UseAnisotropy"),
     backlight: enabled(properties, "_UseBacklight"),
-    outline: enabled(properties, "_UseOutline") || Number(properties._OutlineWidth ?? 0) > 0,
+    outline: enabled(properties, "_UseOutline"),
     dissolve: Array.isArray(properties._DissolveParams) && Number(properties._DissolveParams[0]) !== 0,
   };
 }

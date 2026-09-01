@@ -87,6 +87,8 @@ scene.add(gltf.scene);
 
 The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT.md).
 
+Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`com.mochiya.liltoon-exporter`](../mochiya-liltoon-unity/README.md) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
+
 ## Develop and verify
 
 Initialize the pinned upstream source and ensure `dxc`, `spirv-cross`, `spirv-val`, and optionally `glslangValidator` are on `PATH` (or set their `*_PATH` environment variables).
