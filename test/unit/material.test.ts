@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { DataTexture, Vector4 } from "three";
+import {
+  BufferGeometry,
+  DataTexture,
+  Group,
+  Mesh,
+  PerspectiveCamera,
+  SRGBColorSpace,
+  Scene,
+  Vector2,
+  Vector4,
+  type WebGLRenderer,
+} from "three";
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
 import { LILTOON_GLTF_SPEC_VERSION } from "../../src/loaders/types.js";
 import { LILTOON_TEXTURE_SEMANTICS } from "../../src/generated/textureSemantics.js";
@@ -27,6 +38,14 @@ describe("LilToonMaterial", () => {
       .map(([, uniform]) => uniform.value);
     expect(bound.length).toBeGreaterThan(0);
     expect(bound.every((value) => value === texture)).toBe(true);
+  });
+
+  it("converts linear shader output for an sRGB display", () => {
+    const material = new LilToonMaterial();
+
+    expect(material.fragmentShader).toContain("uniform uint uLilToonOutputSrgb");
+    expect(material.fragmentShader).toContain("out_var_SV_Target.rgb = mix(");
+    expect(material.uniforms.uLilToonOutputSrgb?.value).toBe(1);
   });
 
   it("uses the MatCap-mask shader profile and preserves independent normal transforms", () => {
@@ -124,6 +143,64 @@ describe("LilToonMaterial", () => {
     expect((material.globalUniforms._MatCap2ndBumpMap_ST as Vector4).toArray()).toEqual([7, 5, 0.3, 0.4]);
   });
 
+  it("samples the shadow border mask without duplicating shared MatCap normals", () => {
+    const normal = new DataTexture();
+    const shadowBorderMask = new DataTexture();
+    const material = new LilToonMaterial({
+      properties: { _UseShadow: 1, _UseMatCap: 1, _UseReflection: 1 },
+      textures: {
+        _BumpMap: normal,
+        _MatCapBlendMask: new DataTexture(),
+        _MetallicGlossMap: new DataTexture(),
+        _ShadowBorderMask: shadowBorderMask,
+      },
+    });
+
+    expect(material.fragmentShader).toContain("Combined_ShadowBorderMask");
+    expect(material.fragmentShader).not.toContain("Combined_MatCapBumpMap");
+    expect(Object.entries(material.uniforms).some(
+      ([name, uniform]) => name.includes("Combined_ShadowBorderMask") && uniform.value === shadowBorderMask,
+    )).toBe(true);
+  });
+
+  it("binds authored three-band shadow controls in the shadow-border profile", () => {
+    const material = new LilToonMaterial({
+      properties: {
+        _UseShadow: 1,
+        _ShadowColor: [0.59, 0.4, 0.4, 1],
+        _ShadowNormalStrength: 1,
+        _ShadowBorder: 0.726,
+        _ShadowBlur: 0.1,
+        _ShadowReceive: 1,
+        _Shadow2ndColor: [0.37, 0.24, 0.24, 1],
+        _Shadow2ndNormalStrength: 1,
+        _Shadow2ndBorder: 0.599,
+        _Shadow2ndBlur: 0.199,
+        _Shadow2ndReceive: 1,
+        _Shadow3rdColor: [0.14, 0.14, 0.14, 1],
+        _Shadow3rdNormalStrength: 1,
+        _Shadow3rdBorder: 0.457,
+        _Shadow3rdBlur: 0.188,
+        _Shadow3rdReceive: 0.518,
+        _ShadowBorderColor: [0.13, 0.13, 0.13, 1],
+        _ShadowBorderRange: 0.224,
+        _ShadowEnvStrength: 0.391,
+      },
+      textures: { _ShadowBorderMask: new DataTexture() },
+    });
+
+    expect(material.featureSet.shadow).toBe(true);
+    expect(material.featureSet.shadow3rd).toBe(true);
+    expect(material.fragmentShader).toContain("Combined_ShadowBorderMask");
+    expect(material.globalUniforms._ShadowBorder).toBe(0.726);
+    expect(material.globalUniforms._Shadow2ndBorder).toBe(0.599);
+    expect(material.globalUniforms._Shadow3rdBorder).toBe(0.457);
+    expect(material.globalUniforms._ShadowEnvStrength).toBe(0.391);
+    expect((material.globalUniforms._ShadowColor as Vector4).toArray()).toEqual([0.59, 0.4, 0.4, 1]);
+    expect((material.globalUniforms._Shadow2ndColor as Vector4).toArray()).toEqual([0.37, 0.24, 0.24, 1]);
+    expect((material.globalUniforms._Shadow3rdColor as Vector4).toArray()).toEqual([0.14, 0.14, 0.14, 1]);
+  });
+
   it("serializes stable lilToon property names and caller-owned texture references", () => {
     const material = new LilToonMaterial({ properties: { _UseRim: 1 } });
     const texture = new DataTexture();
@@ -162,5 +239,33 @@ describe("LilToonMaterial", () => {
     expect(material.featureSet.outline).toBe(false);
     material.setProperty("_UseOutline", 1);
     expect(material.featureSet.outline).toBe(true);
+  });
+
+  it("uploads per-object globals again when a shared material draws another mesh", () => {
+    const material = new LilToonMaterial();
+    const renderer = {
+      outputColorSpace: SRGBColorSpace,
+      getRenderTarget() {
+        return null;
+      },
+      getDrawingBufferSize(target: Vector2) {
+        return target.set(1280, 720);
+      },
+    } as unknown as WebGLRenderer;
+    const scene = new Scene();
+    const camera = new PerspectiveCamera();
+    const mesh = new Mesh(new BufferGeometry(), material);
+
+    material.uniformsNeedUpdate = false;
+    material.onBeforeRender(
+      renderer,
+      scene,
+      camera,
+      mesh.geometry,
+      mesh,
+      new Group(),
+    );
+
+    expect(material.uniformsNeedUpdate).toBe(true);
   });
 });

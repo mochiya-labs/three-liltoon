@@ -15,7 +15,33 @@ float4 unity_LightShadowBias;
 
 float lilWebUnpackRGBADepth(float4 packedDepth)
 {
-    return dot(packedDepth, float4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+    // This must be the exact inverse of Three.js's packDepthToRGBA(). Three
+    // packs in base 256 and scales the RGB channels so 1.0 is representable.
+    // A base-255 decoder creates a sawtooth error whenever a packed byte rolls
+    // over, which becomes direction-dependent contour/ripple bands on a curved
+    // shadow receiver.
+    const float unpackDownscale = 255.0 / 256.0;
+    const float inv256 = 1.0 / 256.0;
+    return dot(
+        packedDepth,
+        float4(
+            unpackDownscale,
+            unpackDownscale * inv256,
+            unpackDownscale * inv256 * inv256,
+            inv256 * inv256 * inv256
+        )
+    );
+}
+
+// Three.js applies LightShadow.normalBias by moving the receiver's shadow
+// lookup position along its world-space geometric normal before projection.
+// Our raw lilToon shaders bypass Three's shadowmap_vertex chunk, so the same
+// offset has to be part of the web shadow ABI explicitly. Without it, curved
+// surfaces self-shadow at grazing light angles and produce moire/ripple bands.
+float4 lilWebGetShadowCoord(float3 positionWS, float3 normalWS)
+{
+    float3 receiverPositionWS = positionWS + normalize(normalWS) * uShadowNormalBias;
+    return mul(uMainShadowMatrix, float4(receiverPositionWS, 1.0));
 }
 
 float lilWebSampleShadow(float4 shadowCoord)

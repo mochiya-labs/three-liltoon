@@ -10,6 +10,7 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   splitting: true,
-  external: ["three"],
+  // Three.js is a peer dependency, including its examples/addons entrypoints.
+  external: ["three", /^three\//],
   treeshake: true,
 });

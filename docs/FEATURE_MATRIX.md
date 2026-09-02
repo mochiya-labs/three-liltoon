@@ -8,7 +8,7 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | Main UV animation / tone correction | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Compiled in standard variants |
 | Main2nd / Main3rd / decal | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Main2nd/Main3rd blend masks and independent texture transforms are included in layered profiles; advanced dissolve/decal combinations remain budget-dependent |
 | Main toon shadow, 2nd, 3rd | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | lilToon bands retained; lighting ABI differs from Unity |
-| Normal map / normal map 2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Independent `_BumpMap_ST` / `_Bump2ndMap_ST`; authored tangents recommended |
+| Normal map / normal map 2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Independent `_BumpMap_ST` / `_Bump2ndMap_ST`; missing glTF/VRM tangents are reconstructed with MikkTSpace |
 | MatCap / MatCap2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Both blend masks and custom normal maps select WebGL2-safe shader profiles |
 | Rim / directional rim | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Exercised in smoke example |
 | Rim shade / backlight | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | One-light approximation |
@@ -20,7 +20,7 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | Bone-texture skinning | ✅ | — | ✅ | ✅ | ❌ | 🧪 | Three `SkinnedMesh`; four weights |
 | Morph targets | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Position/normal targets; maximum 64 |
 | Outline | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Back-face child follows skinning and morphs |
-| Directional shadow receive | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | One map, 2×2 PCF; no cascades/VSM parity |
+| Directional shadow receive | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | One map, 2×2 PCF with depth and receiver normal bias; no cascades/VSM parity |
 | Directional/point shadow cast | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Uses Three depth/distance materials |
 | One directional + ambient light | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | First visible directional light; simple SH ambient |
 | Environment cubemap | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | `THREE.CubeTexture`; PMREM/equirect internals not accessed |

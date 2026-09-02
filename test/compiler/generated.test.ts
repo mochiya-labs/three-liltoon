@@ -49,6 +49,34 @@ describe("generated shader artifacts", () => {
     expect(vertex).toContain("sampler2DArray");
   });
 
+  it.each([
+    "standard-opaque",
+    "standard-cutout",
+    "standard-transparent",
+    "standard-opaque-shadow-border",
+    "standard-cutout-shadow-border",
+    "standard-transparent-shadow-border",
+    "outline",
+  ])("applies receiver normal bias in the %s shadow lookup", (variant) => {
+    const vertex = readFileSync(
+      resolve(PROJECT_ROOT, `shader/generated/glsl/${variant}.vert.glsl`),
+      "utf8",
+    );
+    const normalBiasReferences = vertex.match(/uShadowNormalBias/g) ?? [];
+    expect(normalBiasReferences.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("uses Three.js's base-256 RGBA shadow-depth decoder", () => {
+    const source = readFileSync(
+      resolve(PROJECT_ROOT, "shader/compat/lil_web_shadow.hlsl"),
+      "utf8",
+    );
+    expect(source).toContain("255.0 / 256.0");
+    expect(source).toContain("1.0 / 256.0");
+    expect(source).not.toContain("1.0 / 65025.0");
+    expect(source).not.toContain("1.0 / 16581375.0");
+  });
+
   it.each(["opaque", "cutout", "transparent"])(
     "samples both MatCap masks in the %s mask profile",
     (renderMode) => {

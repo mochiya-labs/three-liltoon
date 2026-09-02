@@ -347,185 +347,186 @@ mediump mat4 spvWorkaroundRowMajorMP(mediump mat4 wrap) { return wrap; }
 
 void main()
 {
-    vec4 _621;
-    vec4 _622;
-    vec4 _623;
-    vec4 _624;
-    vec3 _625;
-    vec3 _626;
-    vec4 _627;
-    vec3 _628;
-    vec3 _629;
-    vec3 _630;
-    float _631;
+    vec4 _631;
     vec4 _632;
+    vec4 _633;
+    vec4 _634;
+    vec3 _635;
+    vec3 _636;
+    vec4 _637;
+    vec3 _638;
+    vec3 _639;
+    vec3 _640;
+    float _641;
+    vec4 _642;
     do
     {
         if (_Globals._Invisible != 0u)
         {
-            _621 = vec4(0.0);
-            _622 = vec4(0.0);
-            _623 = vec4(0.0);
-            _624 = vec4(0.0);
-            _625 = vec3(0.0);
-            _626 = vec3(0.0);
-            _627 = vec4(0.0);
-            _628 = vec3(0.0);
-            _629 = vec3(0.0);
-            _630 = vec3(0.0);
-            _631 = 0.0;
+            _631 = vec4(0.0);
             _632 = vec4(0.0);
+            _633 = vec4(0.0);
+            _634 = vec4(0.0);
+            _635 = vec3(0.0);
+            _636 = vec3(0.0);
+            _637 = vec4(0.0);
+            _638 = vec3(0.0);
+            _639 = vec3(0.0);
+            _640 = vec3(0.0);
+            _641 = 0.0;
+            _642 = vec4(0.0);
             break;
         }
-        vec3 _221;
-        vec4 _222;
+        vec3 _222;
+        vec4 _223;
         do
         {
             if (_Globals.uMorphTargetCount == 0u)
             {
-                _221 = normal;
-                _222 = position;
+                _222 = normal;
+                _223 = position;
                 break;
             }
-            bvec3 _141 = bvec3(_Globals.uMorphTargetsRelative != 0u);
-            vec3 _145 = position.xyz * _Globals.uMorphTargetBaseInfluence;
-            vec3 _147 = normal * _Globals.uMorphTargetBaseInfluence;
-            vec3 _150;
-            vec3 _153;
-            _150 = vec3(_141.x ? normal.x : _147.x, _141.y ? normal.y : _147.y, _141.z ? normal.z : _147.z);
-            _153 = vec3(_141.x ? position.xyz.x : _145.x, _141.y ? position.xyz.y : _145.y, _141.z ? position.xyz.z : _145.z);
+            bvec3 _142 = bvec3(_Globals.uMorphTargetsRelative != 0u);
+            vec3 _146 = position.xyz * _Globals.uMorphTargetBaseInfluence;
+            vec3 _148 = normal * _Globals.uMorphTargetBaseInfluence;
             vec3 _151;
             vec3 _154;
-            for (uint _155 = 0u; _155 < 64u; _150 = _151, _153 = _154, _155++)
+            _151 = vec3(_142.x ? normal.x : _148.x, _142.y ? normal.y : _148.y, _142.z ? normal.z : _148.z);
+            _154 = vec3(_142.x ? position.xyz.x : _146.x, _142.y ? position.xyz.y : _146.y, _142.z ? position.xyz.z : _146.z);
+            vec3 _152;
+            vec3 _155;
+            for (uint _156 = 0u; _156 < 64u; _151 = _152, _154 = _155, _156++)
             {
-                if (_155 >= _Globals.uMorphTargetCount)
+                if (_156 >= _Globals.uMorphTargetCount)
                 {
                     break;
                 }
-                if (_Globals.uMorphTargetInfluences[_155] == 0.0)
+                if (_Globals.uMorphTargetInfluences[_156] == 0.0)
                 {
-                    _151 = _150;
-                    _154 = _153;
+                    _152 = _151;
+                    _155 = _154;
                     continue;
                 }
-                bool _170 = _Globals.uMorphHasPositions != 0u;
-                vec3 _192;
-                if (_170)
+                bool _171 = _Globals.uMorphHasPositions != 0u;
+                vec3 _193;
+                if (_171)
                 {
-                    uint _176 = max(uint(_Globals.uMorphTargetsTextureSize.x), 1u);
-                    uint _179 = uint(gl_VertexID) * _Globals.uMorphVertexDataStride;
-                    _192 = _153 + (texelFetch(SPIRV_Cross_CombinedmorphTargetsTextureSPIRV_Cross_DummySampler, ivec4(int(_179 % _176), int(_179 / _176), int(_155), 0).xyz, 0).xyz * _Globals.uMorphTargetInfluences[_155]);
+                    uint _177 = max(uint(_Globals.uMorphTargetsTextureSize.x), 1u);
+                    uint _180 = uint(gl_VertexID) * _Globals.uMorphVertexDataStride;
+                    _193 = _154 + (texelFetch(SPIRV_Cross_CombinedmorphTargetsTextureSPIRV_Cross_DummySampler, ivec4(int(_180 % _177), int(_180 / _177), int(_156), 0).xyz, 0).xyz * _Globals.uMorphTargetInfluences[_156]);
                 }
                 else
                 {
-                    _192 = _153;
+                    _193 = _154;
                 }
-                vec3 _219;
+                vec3 _220;
                 if (_Globals.uMorphHasNormals != 0u)
                 {
-                    uint _202 = max(uint(_Globals.uMorphTargetsTextureSize.x), 1u);
-                    uint _206 = (uint(gl_VertexID) * _Globals.uMorphVertexDataStride) + uint(_170);
-                    _219 = _150 + (texelFetch(SPIRV_Cross_CombinedmorphTargetsTextureSPIRV_Cross_DummySampler, ivec4(int(_206 % _202), int(_206 / _202), int(_155), 0).xyz, 0).xyz * _Globals.uMorphTargetInfluences[_155]);
+                    uint _203 = max(uint(_Globals.uMorphTargetsTextureSize.x), 1u);
+                    uint _207 = (uint(gl_VertexID) * _Globals.uMorphVertexDataStride) + uint(_171);
+                    _220 = _151 + (texelFetch(SPIRV_Cross_CombinedmorphTargetsTextureSPIRV_Cross_DummySampler, ivec4(int(_207 % _203), int(_207 / _203), int(_156), 0).xyz, 0).xyz * _Globals.uMorphTargetInfluences[_156]);
                 }
                 else
                 {
-                    _219 = _150;
+                    _220 = _151;
                 }
-                _151 = _219;
-                _154 = _192;
+                _152 = _220;
+                _155 = _193;
             }
-            _221 = _150;
-            _222 = vec4(_153.x, _153.y, _153.z, position.w);
+            _222 = _151;
+            _223 = vec4(_154.x, _154.y, _154.z, position.w);
             break;
         } while(false);
-        vec4 _469;
-        vec3 _470;
-        vec4 _471;
+        vec4 _470;
+        vec3 _471;
+        vec4 _472;
         do
         {
             if (_Globals.uSkinningEnabled == 0u)
             {
-                _469 = tangent;
-                _470 = _221;
+                _470 = tangent;
                 _471 = _222;
+                _472 = _223;
                 break;
             }
-            uvec4 _230 = uvec4(skinIndex);
-            vec4 _233 = _222 * spvWorkaroundRowMajor(_Globals.uBindMatrix);
-            mat3 _240 = mat3(spvWorkaroundRowMajor(_Globals.uBindMatrix)[0].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrix)[1].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrix)[2].xyz);
-            vec3 _241 = _221 * _240;
-            vec3 _243 = tangent.xyz * _240;
-            uint _245 = _230.x * 4u;
-            uint _249 = max(uint(_Globals.uBoneTextureSize.x), 1u);
-            uint _258 = _245 + 1u;
-            uint _266 = _245 + 2u;
-            uint _274 = _245 + 3u;
-            mat4 _283 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_245 % _249), int(_245 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_258 % _249), int(_258 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_266 % _249), int(_266 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_274 % _249), int(_274 / _249), 0).xy, 0)));
-            uint _285 = _230.y * 4u;
-            uint _293 = _285 + 1u;
-            uint _301 = _285 + 2u;
-            uint _309 = _285 + 3u;
-            mat4 _318 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_285 % _249), int(_285 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_293 % _249), int(_293 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_301 % _249), int(_301 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_309 % _249), int(_309 / _249), 0).xy, 0)));
-            uint _320 = _230.z * 4u;
-            uint _328 = _320 + 1u;
-            uint _336 = _320 + 2u;
-            uint _344 = _320 + 3u;
-            mat4 _353 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_320 % _249), int(_320 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_328 % _249), int(_328 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_336 % _249), int(_336 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_344 % _249), int(_344 / _249), 0).xy, 0)));
-            uint _355 = _230.w * 4u;
-            uint _363 = _355 + 1u;
-            uint _371 = _355 + 2u;
-            uint _379 = _355 + 3u;
-            mat4 _388 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_355 % _249), int(_355 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_363 % _249), int(_363 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_371 % _249), int(_371 / _249), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_379 % _249), int(_379 / _249), 0).xy, 0)));
-            mat3 _410 = mat3(_283[0].xyz, _283[1].xyz, _283[2].xyz);
-            mat3 _419 = mat3(_318[0].xyz, _318[1].xyz, _318[2].xyz);
-            mat3 _429 = mat3(_353[0].xyz, _353[1].xyz, _353[2].xyz);
-            mat3 _439 = mat3(_388[0].xyz, _388[1].xyz, _388[2].xyz);
-            mat3 _463 = mat3(spvWorkaroundRowMajor(_Globals.uBindMatrixInverse)[0].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrixInverse)[1].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrixInverse)[2].xyz);
-            vec3 _467 = normalize((((((_243 * _410) * skinWeight.x) + ((_243 * _419) * skinWeight.y)) + ((_243 * _429) * skinWeight.z)) + ((_243 * _439) * skinWeight.w)) * _463);
-            _469 = vec4(_467.x, _467.y, _467.z, tangent.w);
-            _470 = normalize((((((_241 * _410) * skinWeight.x) + ((_241 * _419) * skinWeight.y)) + ((_241 * _429) * skinWeight.z)) + ((_241 * _439) * skinWeight.w)) * _463);
-            _471 = (((((_233 * _283) * skinWeight.x) + ((_233 * _318) * skinWeight.y)) + ((_233 * _353) * skinWeight.z)) + ((_233 * _388) * skinWeight.w)) * spvWorkaroundRowMajor(_Globals.uBindMatrixInverse);
+            uvec4 _231 = uvec4(skinIndex);
+            vec4 _234 = _223 * spvWorkaroundRowMajor(_Globals.uBindMatrix);
+            mat3 _241 = mat3(spvWorkaroundRowMajor(_Globals.uBindMatrix)[0].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrix)[1].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrix)[2].xyz);
+            vec3 _242 = _222 * _241;
+            vec3 _244 = tangent.xyz * _241;
+            uint _246 = _231.x * 4u;
+            uint _250 = max(uint(_Globals.uBoneTextureSize.x), 1u);
+            uint _259 = _246 + 1u;
+            uint _267 = _246 + 2u;
+            uint _275 = _246 + 3u;
+            mat4 _284 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_246 % _250), int(_246 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_259 % _250), int(_259 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_267 % _250), int(_267 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_275 % _250), int(_275 / _250), 0).xy, 0)));
+            uint _286 = _231.y * 4u;
+            uint _294 = _286 + 1u;
+            uint _302 = _286 + 2u;
+            uint _310 = _286 + 3u;
+            mat4 _319 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_286 % _250), int(_286 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_294 % _250), int(_294 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_302 % _250), int(_302 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_310 % _250), int(_310 / _250), 0).xy, 0)));
+            uint _321 = _231.z * 4u;
+            uint _329 = _321 + 1u;
+            uint _337 = _321 + 2u;
+            uint _345 = _321 + 3u;
+            mat4 _354 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_321 % _250), int(_321 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_329 % _250), int(_329 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_337 % _250), int(_337 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_345 % _250), int(_345 / _250), 0).xy, 0)));
+            uint _356 = _231.w * 4u;
+            uint _364 = _356 + 1u;
+            uint _372 = _356 + 2u;
+            uint _380 = _356 + 3u;
+            mat4 _389 = transpose(mat4(texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_356 % _250), int(_356 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_364 % _250), int(_364 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_372 % _250), int(_372 / _250), 0).xy, 0), texelFetch(SPIRV_Cross_CombinedboneTextureSPIRV_Cross_DummySampler, ivec3(int(_380 % _250), int(_380 / _250), 0).xy, 0)));
+            mat3 _411 = mat3(_284[0].xyz, _284[1].xyz, _284[2].xyz);
+            mat3 _420 = mat3(_319[0].xyz, _319[1].xyz, _319[2].xyz);
+            mat3 _430 = mat3(_354[0].xyz, _354[1].xyz, _354[2].xyz);
+            mat3 _440 = mat3(_389[0].xyz, _389[1].xyz, _389[2].xyz);
+            mat3 _464 = mat3(spvWorkaroundRowMajor(_Globals.uBindMatrixInverse)[0].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrixInverse)[1].xyz, spvWorkaroundRowMajor(_Globals.uBindMatrixInverse)[2].xyz);
+            vec3 _468 = normalize((((((_244 * _411) * skinWeight.x) + ((_244 * _420) * skinWeight.y)) + ((_244 * _430) * skinWeight.z)) + ((_244 * _440) * skinWeight.w)) * _464);
+            _470 = vec4(_468.x, _468.y, _468.z, tangent.w);
+            _471 = normalize((((((_242 * _411) * skinWeight.x) + ((_242 * _420) * skinWeight.y)) + ((_242 * _430) * skinWeight.z)) + ((_242 * _440) * skinWeight.w)) * _464);
+            _472 = (((((_234 * _284) * skinWeight.x) + ((_234 * _319) * skinWeight.y)) + ((_234 * _354) * skinWeight.z)) + ((_234 * _389) * skinWeight.w)) * spvWorkaroundRowMajor(_Globals.uBindMatrixInverse);
             break;
         } while(false);
-        vec4 _478 = vec4(_471.xyz, 1.0) * spvWorkaroundRowMajor(_Globals.uModelMatrix);
-        vec4 _485 = vec4(_478.xyz, 1.0);
-        mat3 _505 = mat3(spvWorkaroundRowMajor(_Globals.uModelMatrix)[0].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrix)[1].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrix)[2].xyz);
-        vec4 _510 = vec4(_471.x, _471.y, _471.z, vec4(0.0).w);
-        vec3 _547 = ((_Globals.unity_SHAr.xyz * 0.3333329856395721435546875) + (_Globals.unity_SHAg.xyz * 0.3333329856395721435546875)) + (_Globals.unity_SHAb.xyz * 0.3333329856395721435546875);
-        vec3 _557 = normalize(_Globals._LightDirectionOverride.xyz * _505) * length(_Globals._LightDirectionOverride.xyz);
-        bvec3 _560 = bvec3(_Globals._LightDirectionOverride.w != 0.0);
-        vec3 _564 = normalize((vec3(_547.x, abs(_547.y), _547.z) + (_Globals.uMainLightDirection.xyz * dot(_Globals.uMainLightColor.xyz, vec3(0.0396819151937961578369140625, 0.4580217897891998291015625, 0.0060965395532548427581787109375)))) + vec3(_560.x ? _557.x : _Globals._LightDirectionOverride.xyz.x, _560.y ? _557.y : _Globals._LightDirectionOverride.xyz.y, _560.z ? _557.z : _Globals._LightDirectionOverride.xyz.z));
-        vec4 _567 = _564.xyzz * _564.yzzx;
-        float _579 = _564.x;
-        float _580 = _564.y;
-        vec3 _585 = vec3(_Globals.unity_SHAr.w + dot(_Globals.unity_SHBr, _567), _Globals.unity_SHAg.w + dot(_Globals.unity_SHBg, _567), _Globals.unity_SHAb.w + dot(_Globals.unity_SHBb, _567)) + (_Globals.unity_SHC.xyz * (_579 * _579 + (-(_580 * _580))));
-        vec3 _593 = normalize((_Globals.unity_SHAr.xyz + _Globals.unity_SHAg.xyz) + _Globals.unity_SHAb.xyz);
-        vec3 _606 = clamp((_585 + vec3(dot(_Globals.unity_SHAr.xyz, _564), dot(_Globals.unity_SHAg.xyz, _564), dot(_Globals.unity_SHAb.xyz, _564))) + _Globals.uMainLightColor.xyz, vec3(_Globals._LightMinLimit), vec3(_Globals._LightMaxLimit));
-        _510.w = 1.0;
-        _621 = _485 * spvWorkaroundRowMajor(_Globals.uViewProjectionMatrix);
-        _622 = vec4(uv.x, uv.y, uv1.x, uv1.y);
-        _623 = vec4(uv2.x, uv2.y, uv3.x, uv3.y);
-        _624 = _510;
-        _625 = _478.xyz;
-        _626 = normalize(mat3(spvWorkaroundRowMajor(_Globals.uModelMatrixInverse)[0].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrixInverse)[1].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrixInverse)[2].xyz) * _470);
-        _627 = vec4(normalize(_469.xyz * _505), _469.w);
-        _628 = mix(mix(_606, vec3(dot(_606, vec3(0.3333333432674407958984375))), vec3(_Globals._MonochromeLighting)), vec3(1.0), vec3(_Globals._AsUnlit));
-        _629 = _564;
-        _630 = _585 + vec3(dot(_Globals.unity_SHAr.xyz, _593), dot(_Globals.unity_SHAg.xyz, _593), dot(_Globals.unity_SHAb.xyz, _593));
-        _631 = 1.0;
-        _632 = _485 * spvWorkaroundRowMajor(_Globals.uMainShadowMatrix);
+        vec4 _479 = vec4(_472.xyz, 1.0) * spvWorkaroundRowMajor(_Globals.uModelMatrix);
+        vec3 _480 = _479.xyz;
+        vec3 _498 = normalize(mat3(spvWorkaroundRowMajor(_Globals.uModelMatrixInverse)[0].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrixInverse)[1].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrixInverse)[2].xyz) * _471);
+        mat3 _506 = mat3(spvWorkaroundRowMajor(_Globals.uModelMatrix)[0].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrix)[1].xyz, spvWorkaroundRowMajor(_Globals.uModelMatrix)[2].xyz);
+        vec4 _511 = vec4(_472.x, _472.y, _472.z, vec4(0.0).w);
+        vec3 _548 = ((_Globals.unity_SHAr.xyz * 0.3333329856395721435546875) + (_Globals.unity_SHAg.xyz * 0.3333329856395721435546875)) + (_Globals.unity_SHAb.xyz * 0.3333329856395721435546875);
+        vec3 _558 = normalize(_Globals._LightDirectionOverride.xyz * _506) * length(_Globals._LightDirectionOverride.xyz);
+        bvec3 _561 = bvec3(_Globals._LightDirectionOverride.w != 0.0);
+        vec3 _565 = normalize((vec3(_548.x, abs(_548.y), _548.z) + (_Globals.uMainLightDirection.xyz * dot(_Globals.uMainLightColor.xyz, vec3(0.0396819151937961578369140625, 0.4580217897891998291015625, 0.0060965395532548427581787109375)))) + vec3(_561.x ? _558.x : _Globals._LightDirectionOverride.xyz.x, _561.y ? _558.y : _Globals._LightDirectionOverride.xyz.y, _561.z ? _558.z : _Globals._LightDirectionOverride.xyz.z));
+        vec4 _568 = _565.xyzz * _565.yzzx;
+        float _580 = _565.x;
+        float _581 = _565.y;
+        vec3 _586 = vec3(_Globals.unity_SHAr.w + dot(_Globals.unity_SHBr, _568), _Globals.unity_SHAg.w + dot(_Globals.unity_SHBg, _568), _Globals.unity_SHAb.w + dot(_Globals.unity_SHBb, _568)) + (_Globals.unity_SHC.xyz * (_580 * _580 + (-(_581 * _581))));
+        vec3 _594 = normalize((_Globals.unity_SHAr.xyz + _Globals.unity_SHAg.xyz) + _Globals.unity_SHAb.xyz);
+        vec3 _607 = clamp((_586 + vec3(dot(_Globals.unity_SHAr.xyz, _565), dot(_Globals.unity_SHAg.xyz, _565), dot(_Globals.unity_SHAb.xyz, _565))) + _Globals.uMainLightColor.xyz, vec3(_Globals._LightMinLimit), vec3(_Globals._LightMaxLimit));
+        _511.w = 1.0;
+        _631 = vec4(_479.xyz, 1.0) * spvWorkaroundRowMajor(_Globals.uViewProjectionMatrix);
+        _632 = vec4(uv.x, uv.y, uv1.x, uv1.y);
+        _633 = vec4(uv2.x, uv2.y, uv3.x, uv3.y);
+        _634 = _511;
+        _635 = _480;
+        _636 = _498;
+        _637 = vec4(normalize(_470.xyz * _506), _470.w);
+        _638 = mix(mix(_607, vec3(dot(_607, vec3(0.3333333432674407958984375))), vec3(_Globals._MonochromeLighting)), vec3(1.0), vec3(_Globals._AsUnlit));
+        _639 = _565;
+        _640 = _586 + vec3(dot(_Globals.unity_SHAr.xyz, _594), dot(_Globals.unity_SHAg.xyz, _594), dot(_Globals.unity_SHAb.xyz, _594));
+        _641 = 1.0;
+        _642 = vec4(_480 + (normalize(_498) * _Globals.uShadowNormalBias), 1.0) * spvWorkaroundRowMajor(_Globals.uMainShadowMatrix);
         break;
     } while(false);
-    gl_Position = _621;
-    out_var_TEXCOORD0 = _622;
-    out_var_TEXCOORD1 = _623;
-    out_var_TEXCOORD2 = _624;
-    out_var_TEXCOORD3 = _625;
-    out_var_TEXCOORD4 = _626;
-    out_var_TEXCOORD5 = _627;
-    out_var_TEXCOORD6 = _628;
-    out_var_TEXCOORD7 = _629;
-    out_var_TEXCOORD8 = _630;
-    out_var_TEXCOORD9 = _631;
-    out_var_TEXCOORD10 = _632;
+    gl_Position = _631;
+    out_var_TEXCOORD0 = _632;
+    out_var_TEXCOORD1 = _633;
+    out_var_TEXCOORD2 = _634;
+    out_var_TEXCOORD3 = _635;
+    out_var_TEXCOORD4 = _636;
+    out_var_TEXCOORD5 = _637;
+    out_var_TEXCOORD6 = _638;
+    out_var_TEXCOORD7 = _639;
+    out_var_TEXCOORD8 = _640;
+    out_var_TEXCOORD9 = _641;
+    out_var_TEXCOORD10 = _642;
 }

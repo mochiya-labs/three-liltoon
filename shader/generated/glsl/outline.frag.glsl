@@ -116,70 +116,70 @@ mediump mat4 spvWorkaroundRowMajorMP(mediump mat4 wrap) { return wrap; }
 
 void main()
 {
-    highp float _153;
+    highp float _154;
     do
     {
-        highp vec3 _109 = out_var_TEXCOORD7.xyz / vec3(isnan(9.9999997473787516355514526367188e-06) ? out_var_TEXCOORD7.w : (isnan(out_var_TEXCOORD7.w) ? 9.9999997473787516355514526367188e-06 : max(out_var_TEXCOORD7.w, 9.9999997473787516355514526367188e-06)));
-        highp vec2 _110 = _109.xy;
-        highp float _116 = _109.z;
-        if ((any(lessThan(_110, vec2(0.0))) || any(greaterThan(_110, vec2(1.0)))) || (_116 > 1.0))
+        highp vec3 _110 = out_var_TEXCOORD7.xyz / vec3(isnan(9.9999997473787516355514526367188e-06) ? out_var_TEXCOORD7.w : (isnan(out_var_TEXCOORD7.w) ? 9.9999997473787516355514526367188e-06 : max(out_var_TEXCOORD7.w, 9.9999997473787516355514526367188e-06)));
+        highp vec2 _111 = _110.xy;
+        highp float _117 = _110.z;
+        if ((any(lessThan(_111, vec2(0.0))) || any(greaterThan(_111, vec2(1.0)))) || (_117 > 1.0))
         {
-            _153 = 1.0;
+            _154 = 1.0;
             break;
         }
-        highp float _126 = _116 + _Globals.uShadowBias;
-        _153 = (((step(_126, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5) + _110), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08))) + step(_126, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5, -0.5) + _110), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) + step(_126, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5, 0.5) + _110), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) + step(_126, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5) + _110), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) * 0.25;
+        highp float _127 = _117 + _Globals.uShadowBias;
+        _154 = (((step(_127, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5) + _111), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08))) + step(_127, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5, -0.5) + _111), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08)))) + step(_127, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5, 0.5) + _111), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08)))) + step(_127, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5) + _111), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08)))) * 0.25;
         break;
     } while(false);
-    highp vec3 _154 = normalize(vec3(0.0, 1.0, 0.0));
-    highp float _166 = _Globals._OutlineTex_ScrollRotate.w * _Globals.uTime.y + _Globals._OutlineTex_ScrollRotate.z;
-    highp float _167 = sin(_166);
-    highp float _168 = cos(_166);
-    highp vec2 _169 = (out_var_TEXCOORD0.xy * _Globals._OutlineTex_ST.xy + _Globals._OutlineTex_ST.zw) - vec2(0.5);
-    highp float _170 = _169.x;
-    highp float _171 = _169.y;
-    highp vec4 _187 = texture(SPIRV_Cross_Combined_OutlineTexsampler_OutlineTex, (vec2(_170 * _168 + (-(_171 * _167)), _170 * _167 + (_171 * _168)) + vec2(0.5)) + fract(_Globals._OutlineTex_ScrollRotate.xy * _Globals.uTime.y));
-    highp vec3 _194 = pow(abs(_187.xyz), vec3(_Globals._OutlineTexHSVG.w));
-    highp float _195 = _194.z;
-    highp float _196 = _194.y;
-    bvec4 _198 = bvec4(_195 > _196);
-    highp vec4 _199 = vec4(_195, _196, -1.0, 0.666666686534881591796875);
-    highp vec4 _200 = vec4(_196, _195, 0.0, -0.3333333432674407958984375);
-    highp vec4 _201 = vec4(_198.x ? _199.x : _200.x, _198.y ? _199.y : _200.y, _198.z ? _199.z : _200.z, _198.w ? _199.w : _200.w);
-    highp float _202 = _201.x;
-    highp float _203 = _194.x;
-    bvec4 _205 = bvec4(_202 > _203);
-    highp vec4 _208 = vec4(_202, _201.yw, _203);
-    highp vec4 _210 = vec4(_203, _201.yz, _202);
-    highp vec4 _211 = vec4(_205.x ? _208.x : _210.x, _205.y ? _208.y : _210.y, _205.z ? _208.z : _210.z, _205.w ? _208.w : _210.w);
-    highp float _212 = _211.x;
-    highp float _213 = _211.w;
-    highp float _214 = _211.y;
-    highp float _216 = _212 - (isnan(_214) ? _213 : (isnan(_213) ? _214 : min(_213, _214)));
-    highp float _229 = clamp((_216 / (_212 + 1.0000000133514319600180897396058e-10)) * _Globals._OutlineTexHSVG.y, 0.0, 1.0);
-    highp float _232 = clamp(_212 * _Globals._OutlineTexHSVG.z, 0.0, 1.0);
-    highp mat3 _254 = mat3(spvWorkaroundRowMajor(_Globals.uViewMatrix)[0].xyz, spvWorkaroundRowMajor(_Globals.uViewMatrix)[1].xyz, spvWorkaroundRowMajor(_Globals.uViewMatrix)[2].xyz);
-    bvec3 _266 = bvec3(_Globals._OutlineLitApplyTex != 0u);
-    highp vec3 _267 = (vec3((-_232) * _229 + _232) + (clamp(abs((fract(vec3(abs(_211.z + ((_213 - _214) / (6.0 * _216 + 1.0000000133514319600180897396058e-10))) + _Globals._OutlineTexHSVG.x) + vec3(1.0, 0.666666686534881591796875, 0.3333333432674407958984375)) * 6.0) - vec3(3.0)) - vec3(1.0), vec3(0.0), vec3(1.0)) * (_232 * _229))).xyz;
-    highp vec3 _271 = _267 * _Globals._OutlineLitColor.xyz;
-    highp float _281 = clamp((dot(normalize((normalize(out_var_TEXCOORD4) * _254).xy), normalize((_154 * _254).xy)) * 0.5 + 0.5) * _Globals._OutlineLitScale + _Globals._OutlineLitOffset, 0.0, 1.0) * _Globals._OutlineLitColor.w;
-    highp float _288;
+    highp vec3 _155 = normalize(vec3(0.0, 1.0, 0.0));
+    highp float _167 = _Globals._OutlineTex_ScrollRotate.w * _Globals.uTime.y + _Globals._OutlineTex_ScrollRotate.z;
+    highp float _168 = sin(_167);
+    highp float _169 = cos(_167);
+    highp vec2 _170 = (out_var_TEXCOORD0.xy * _Globals._OutlineTex_ST.xy + _Globals._OutlineTex_ST.zw) - vec2(0.5);
+    highp float _171 = _170.x;
+    highp float _172 = _170.y;
+    highp vec4 _188 = texture(SPIRV_Cross_Combined_OutlineTexsampler_OutlineTex, (vec2(_171 * _169 + (-(_172 * _168)), _171 * _168 + (_172 * _169)) + vec2(0.5)) + fract(_Globals._OutlineTex_ScrollRotate.xy * _Globals.uTime.y));
+    highp vec3 _195 = pow(abs(_188.xyz), vec3(_Globals._OutlineTexHSVG.w));
+    highp float _196 = _195.z;
+    highp float _197 = _195.y;
+    bvec4 _199 = bvec4(_196 > _197);
+    highp vec4 _200 = vec4(_196, _197, -1.0, 0.666666686534881591796875);
+    highp vec4 _201 = vec4(_197, _196, 0.0, -0.3333333432674407958984375);
+    highp vec4 _202 = vec4(_199.x ? _200.x : _201.x, _199.y ? _200.y : _201.y, _199.z ? _200.z : _201.z, _199.w ? _200.w : _201.w);
+    highp float _203 = _202.x;
+    highp float _204 = _195.x;
+    bvec4 _206 = bvec4(_203 > _204);
+    highp vec4 _209 = vec4(_203, _202.yw, _204);
+    highp vec4 _211 = vec4(_204, _202.yz, _203);
+    highp vec4 _212 = vec4(_206.x ? _209.x : _211.x, _206.y ? _209.y : _211.y, _206.z ? _209.z : _211.z, _206.w ? _209.w : _211.w);
+    highp float _213 = _212.x;
+    highp float _214 = _212.w;
+    highp float _215 = _212.y;
+    highp float _217 = _213 - (isnan(_215) ? _214 : (isnan(_214) ? _215 : min(_214, _215)));
+    highp float _230 = clamp((_217 / (_213 + 1.0000000133514319600180897396058e-10)) * _Globals._OutlineTexHSVG.y, 0.0, 1.0);
+    highp float _233 = clamp(_213 * _Globals._OutlineTexHSVG.z, 0.0, 1.0);
+    highp mat3 _255 = mat3(spvWorkaroundRowMajor(_Globals.uViewMatrix)[0].xyz, spvWorkaroundRowMajor(_Globals.uViewMatrix)[1].xyz, spvWorkaroundRowMajor(_Globals.uViewMatrix)[2].xyz);
+    bvec3 _267 = bvec3(_Globals._OutlineLitApplyTex != 0u);
+    highp vec3 _268 = (vec3((-_233) * _230 + _233) + (clamp(abs((fract(vec3(abs(_212.z + ((_214 - _215) / (6.0 * _217 + 1.0000000133514319600180897396058e-10))) + _Globals._OutlineTexHSVG.x) + vec3(1.0, 0.666666686534881591796875, 0.3333333432674407958984375)) * 6.0) - vec3(3.0)) - vec3(1.0), vec3(0.0), vec3(1.0)) * (_233 * _230))).xyz;
+    highp vec3 _272 = _268 * _Globals._OutlineLitColor.xyz;
+    highp float _282 = clamp((dot(normalize((normalize(out_var_TEXCOORD4) * _255).xy), normalize((_155 * _255).xy)) * 0.5 + 0.5) * _Globals._OutlineLitScale + _Globals._OutlineLitOffset, 0.0, 1.0) * _Globals._OutlineLitColor.w;
+    highp float _289;
     if (_Globals._OutlineLitShadowReceive != 0u)
     {
-        _288 = _281 * _153;
+        _289 = _282 * _154;
     }
     else
     {
-        _288 = _281;
+        _289 = _282;
     }
-    highp vec3 _294 = mix(_267 * _Globals._OutlineColor.xyz, vec3(_266.x ? _271.x : _Globals._OutlineLitColor.xyz.x, _266.y ? _271.y : _Globals._OutlineLitColor.xyz.y, _266.z ? _271.z : _Globals._OutlineLitColor.xyz.z), vec3(_288));
-    highp vec4 _295 = vec4(_294.x, _294.y, _294.z, _187.w);
-    _295.w = 1.0;
-    highp vec3 _300 = vec3(_Globals._LightMaxLimit);
-    bvec3 _327 = isnan(out_var_TEXCOORD5);
-    bvec3 _328 = isnan(_300);
-    highp vec3 _329 = min(out_var_TEXCOORD5, _300);
-    highp vec3 _330 = vec3(_327.x ? _300.x : _329.x, _327.y ? _300.y : _329.y, _327.z ? _300.z : _329.z);
-    highp vec3 _306 = mix(_295.xyz, _295.xyz * vec3(_328.x ? out_var_TEXCOORD5.x : _330.x, _328.y ? out_var_TEXCOORD5.y : _330.y, _328.z ? out_var_TEXCOORD5.z : _330.z), vec3(_Globals._OutlineEnableLighting));
-    out_var_SV_Target = mix(_Globals.unity_FogColor, vec4(_306.x, _306.y, _306.z, _295.w), vec4(out_var_TEXCOORD6));
+    highp vec3 _295 = mix(_268 * _Globals._OutlineColor.xyz, vec3(_267.x ? _272.x : _Globals._OutlineLitColor.xyz.x, _267.y ? _272.y : _Globals._OutlineLitColor.xyz.y, _267.z ? _272.z : _Globals._OutlineLitColor.xyz.z), vec3(_289));
+    highp vec4 _296 = vec4(_295.x, _295.y, _295.z, _188.w);
+    _296.w = 1.0;
+    highp vec3 _301 = vec3(_Globals._LightMaxLimit);
+    bvec3 _328 = isnan(out_var_TEXCOORD5);
+    bvec3 _329 = isnan(_301);
+    highp vec3 _330 = min(out_var_TEXCOORD5, _301);
+    highp vec3 _331 = vec3(_328.x ? _301.x : _330.x, _328.y ? _301.y : _330.y, _328.z ? _301.z : _330.z);
+    highp vec3 _307 = mix(_296.xyz, _296.xyz * vec3(_329.x ? out_var_TEXCOORD5.x : _331.x, _329.y ? out_var_TEXCOORD5.y : _331.y, _329.z ? out_var_TEXCOORD5.z : _331.z), vec3(_Globals._OutlineEnableLighting));
+    out_var_SV_Target = mix(_Globals.unity_FogColor, vec4(_307.x, _307.y, _307.z, _296.w), vec4(out_var_TEXCOORD6));
 }

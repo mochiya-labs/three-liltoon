@@ -14,6 +14,7 @@ import {
   type GLTFLilToonMaterialDefinition,
 } from "./types.js";
 import { warnLilToon } from "../utils/diagnostics.js";
+import { ensureLilToonTangents } from "./LilToonTangentGenerator.js";
 
 export interface GLTFLilToonExtensionOptions {
   rendererAdapter?: LilToonRendererAdapter;
@@ -75,6 +76,7 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
     result.scene.traverse((object) => {
       if ((object as Mesh).isMesh) meshes.push(object as Mesh);
     });
+    await ensureLilToonTangents(meshes);
     for (const mesh of meshes) {
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const material of materials) {

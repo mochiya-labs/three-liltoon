@@ -2,9 +2,9 @@
 precision mediump float;
 precision highp int;
 
-vec3 _307;
-vec3 _313;
-float _314;
+vec3 _308;
+vec3 _314;
+float _315;
 
 struct type_Globals
 {
@@ -338,998 +338,998 @@ mediump mat4 spvWorkaroundRowMajorMP(mediump mat4 wrap) { return wrap; }
 
 void main()
 {
-    highp vec3 _334 = vec3(_Globals.uViewMatrix[2].x, _Globals.uViewMatrix[2].y, _Globals.uViewMatrix[2].z);
-    highp vec3 _341 = vec3(_Globals.uViewMatrix[1].x, _Globals.uViewMatrix[1].y, _Globals.uViewMatrix[1].z);
-    int _357 = int(roundEven(out_var_TEXCOORD2.w));
-    highp float _366 = float(gl_FrontFacing ? 1 : (-1));
-    highp float _417;
+    highp vec3 _335 = vec3(_Globals.uViewMatrix[2].x, _Globals.uViewMatrix[2].y, _Globals.uViewMatrix[2].z);
+    highp vec3 _342 = vec3(_Globals.uViewMatrix[1].x, _Globals.uViewMatrix[1].y, _Globals.uViewMatrix[1].z);
+    int _358 = int(roundEven(out_var_TEXCOORD2.w));
+    highp float _367 = float(gl_FrontFacing ? 1 : (-1));
+    highp float _418;
     do
     {
-        highp vec3 _373 = out_var_TEXCOORD10.xyz / vec3(isnan(9.9999997473787516355514526367188e-06) ? out_var_TEXCOORD10.w : (isnan(out_var_TEXCOORD10.w) ? 9.9999997473787516355514526367188e-06 : max(out_var_TEXCOORD10.w, 9.9999997473787516355514526367188e-06)));
-        highp vec2 _374 = _373.xy;
-        highp float _380 = _373.z;
-        if ((any(lessThan(_374, vec2(0.0))) || any(greaterThan(_374, vec2(1.0)))) || (_380 > 1.0))
+        highp vec3 _374 = out_var_TEXCOORD10.xyz / vec3(isnan(9.9999997473787516355514526367188e-06) ? out_var_TEXCOORD10.w : (isnan(out_var_TEXCOORD10.w) ? 9.9999997473787516355514526367188e-06 : max(out_var_TEXCOORD10.w, 9.9999997473787516355514526367188e-06)));
+        highp vec2 _375 = _374.xy;
+        highp float _381 = _374.z;
+        if ((any(lessThan(_375, vec2(0.0))) || any(greaterThan(_375, vec2(1.0)))) || (_381 > 1.0))
         {
-            _417 = 1.0;
+            _418 = 1.0;
             break;
         }
-        highp float _390 = _380 + _Globals.uShadowBias;
-        _417 = (((step(_390, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5) + _374), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08))) + step(_390, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5, -0.5) + _374), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) + step(_390, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5, 0.5) + _374), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) + step(_390, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5) + _374), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) * 0.25;
+        highp float _391 = _381 + _Globals.uShadowBias;
+        _418 = (((step(_391, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5) + _375), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08))) + step(_391, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5, -0.5) + _375), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08)))) + step(_391, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5, 0.5) + _375), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08)))) + step(_391, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5) + _375), vec4(0.99609375, 0.0038909912109375, 1.5199184417724609375e-05, 5.9604644775390625e-08)))) * 0.25;
         break;
     } while(false);
-    highp vec3 _418 = normalize(out_var_TEXCOORD7);
-    highp vec3 _422 = clamp((vec3(1.0) - out_var_TEXCOORD6) * sqrt(out_var_TEXCOORD6), vec3(0.0), vec3(1.0));
-    highp vec3 _426 = _Globals.uCameraPosition.xyz - out_var_TEXCOORD3;
-    highp float _427 = length(_426);
-    highp vec3 _434 = normalize(_426);
-    highp mat3 _443 = mat3(out_var_TEXCOORD5.xyz, cross(out_var_TEXCOORD4, out_var_TEXCOORD5.xyz) * (out_var_TEXCOORD5.w * _Globals.uWorldTransformParams.w), out_var_TEXCOORD4);
-    bvec2 _448 = bvec2(_366 < (_Globals._ShiftBackfaceUV - 1.0));
-    highp vec2 _449 = out_var_TEXCOORD0.xy + vec2(1.0, 0.0);
-    highp float _462 = _Globals._MainTex_ScrollRotate.w * _Globals.uTime.y + _Globals._MainTex_ScrollRotate.z;
-    highp float _463 = sin(_462);
-    highp float _464 = cos(_462);
-    highp vec2 _465 = (vec2(_448.x ? _449.x : out_var_TEXCOORD0.xy.x, _448.y ? _449.y : out_var_TEXCOORD0.xy.y) * _Globals._MainTex_ST.xy + _Globals._MainTex_ST.zw) - vec2(0.5);
-    highp float _466 = _465.x;
-    highp float _467 = _465.y;
-    highp vec2 _478 = (vec2(_466 * _464 + (-(_467 * _463)), _466 * _463 + (_467 * _464)) + vec2(0.5)) + fract(_Globals._MainTex_ScrollRotate.xy * _Globals.uTime.y);
-    highp vec4 _482 = texture(SPIRV_Cross_Combined_MainTexsampler_MainTex, _478);
-    highp vec3 _489 = pow(abs(_482.xyz), vec3(_Globals._MainTexHSVG.w));
-    highp float _490 = _489.z;
-    highp float _491 = _489.y;
-    bvec4 _493 = bvec4(_490 > _491);
-    highp vec4 _494 = vec4(_490, _491, -1.0, 0.666666686534881591796875);
-    highp vec4 _495 = vec4(_491, _490, 0.0, -0.3333333432674407958984375);
-    highp vec4 _496 = vec4(_493.x ? _494.x : _495.x, _493.y ? _494.y : _495.y, _493.z ? _494.z : _495.z, _493.w ? _494.w : _495.w);
-    highp float _497 = _496.x;
-    highp float _498 = _489.x;
-    bvec4 _500 = bvec4(_497 > _498);
-    highp vec4 _503 = vec4(_497, _496.yw, _498);
-    highp vec4 _505 = vec4(_498, _496.yz, _497);
-    highp vec4 _506 = vec4(_500.x ? _503.x : _505.x, _500.y ? _503.y : _505.y, _500.z ? _503.z : _505.z, _500.w ? _503.w : _505.w);
-    highp float _511 = _506.x - (isnan(_506.y) ? _506.w : (isnan(_506.w) ? _506.y : min(_506.w, _506.y)));
-    highp float _524 = clamp((_511 / (_506.x + 1.0000000133514319600180897396058e-10)) * _Globals._MainTexHSVG.y, 0.0, 1.0);
-    highp float _527 = clamp(_506.x * _Globals._MainTexHSVG.z, 0.0, 1.0);
-    highp vec3 _541 = vec3((-_527) * _524 + _527) + (clamp(abs((fract(vec3(abs(_506.z + ((_506.w - _506.y) / (6.0 * _511 + 1.0000000133514319600180897396058e-10))) + _Globals._MainTexHSVG.x) + vec3(1.0, 0.666666686534881591796875, 0.3333333432674407958984375)) * 6.0) - vec3(3.0)) - vec3(1.0), vec3(0.0), vec3(1.0)) * (_527 * _524));
-    highp vec4 _545 = vec4(_541.x, _541.y, _541.z, _482.w) * _Globals._Color;
-    highp vec3 _577;
+    highp vec3 _419 = normalize(out_var_TEXCOORD7);
+    highp vec3 _423 = clamp((vec3(1.0) - out_var_TEXCOORD6) * sqrt(out_var_TEXCOORD6), vec3(0.0), vec3(1.0));
+    highp vec3 _427 = _Globals.uCameraPosition.xyz - out_var_TEXCOORD3;
+    highp float _428 = length(_427);
+    highp vec3 _435 = normalize(_427);
+    highp mat3 _444 = mat3(out_var_TEXCOORD5.xyz, cross(out_var_TEXCOORD4, out_var_TEXCOORD5.xyz) * (out_var_TEXCOORD5.w * _Globals.uWorldTransformParams.w), out_var_TEXCOORD4);
+    bvec2 _449 = bvec2(_367 < (_Globals._ShiftBackfaceUV - 1.0));
+    highp vec2 _450 = out_var_TEXCOORD0.xy + vec2(1.0, 0.0);
+    highp float _463 = _Globals._MainTex_ScrollRotate.w * _Globals.uTime.y + _Globals._MainTex_ScrollRotate.z;
+    highp float _464 = sin(_463);
+    highp float _465 = cos(_463);
+    highp vec2 _466 = (vec2(_449.x ? _450.x : out_var_TEXCOORD0.xy.x, _449.y ? _450.y : out_var_TEXCOORD0.xy.y) * _Globals._MainTex_ST.xy + _Globals._MainTex_ST.zw) - vec2(0.5);
+    highp float _467 = _466.x;
+    highp float _468 = _466.y;
+    highp vec2 _479 = (vec2(_467 * _465 + (-(_468 * _464)), _467 * _464 + (_468 * _465)) + vec2(0.5)) + fract(_Globals._MainTex_ScrollRotate.xy * _Globals.uTime.y);
+    highp vec4 _483 = texture(SPIRV_Cross_Combined_MainTexsampler_MainTex, _479);
+    highp vec3 _490 = pow(abs(_483.xyz), vec3(_Globals._MainTexHSVG.w));
+    highp float _491 = _490.z;
+    highp float _492 = _490.y;
+    bvec4 _494 = bvec4(_491 > _492);
+    highp vec4 _495 = vec4(_491, _492, -1.0, 0.666666686534881591796875);
+    highp vec4 _496 = vec4(_492, _491, 0.0, -0.3333333432674407958984375);
+    highp vec4 _497 = vec4(_494.x ? _495.x : _496.x, _494.y ? _495.y : _496.y, _494.z ? _495.z : _496.z, _494.w ? _495.w : _496.w);
+    highp float _498 = _497.x;
+    highp float _499 = _490.x;
+    bvec4 _501 = bvec4(_498 > _499);
+    highp vec4 _504 = vec4(_498, _497.yw, _499);
+    highp vec4 _506 = vec4(_499, _497.yz, _498);
+    highp vec4 _507 = vec4(_501.x ? _504.x : _506.x, _501.y ? _504.y : _506.y, _501.z ? _504.z : _506.z, _501.w ? _504.w : _506.w);
+    highp float _512 = _507.x - (isnan(_507.y) ? _507.w : (isnan(_507.w) ? _507.y : min(_507.w, _507.y)));
+    highp float _525 = clamp((_512 / (_507.x + 1.0000000133514319600180897396058e-10)) * _Globals._MainTexHSVG.y, 0.0, 1.0);
+    highp float _528 = clamp(_507.x * _Globals._MainTexHSVG.z, 0.0, 1.0);
+    highp vec3 _542 = vec3((-_528) * _525 + _528) + (clamp(abs((fract(vec3(abs(_507.z + ((_507.w - _507.y) / (6.0 * _512 + 1.0000000133514319600180897396058e-10))) + _Globals._MainTexHSVG.x) + vec3(1.0, 0.666666686534881591796875, 0.3333333432674407958984375)) * 6.0) - vec3(3.0)) - vec3(1.0), vec3(0.0), vec3(1.0)) * (_528 * _525));
+    highp vec4 _546 = vec4(_542.x, _542.y, _542.z, _483.w) * _Globals._Color;
+    highp vec3 _578;
     if (_Globals._UseBumpMap != 0u)
     {
-        highp vec4 _558 = texture(SPIRV_Cross_Combined_BumpMapsampler_MainTex, _478 * _Globals._BumpMap_ST.xy + _Globals._BumpMap_ST.zw);
-        _558.w = _558.w * _558.x;
-        highp vec2 _569 = ((_558.wy * 2.0) - vec2(1.0)).xy * _Globals._BumpScale;
-        highp vec3 _570 = vec3(_569.x, _569.y, _313.z);
-        highp vec2 _571 = _569.xy;
-        _570.z = sqrt(1.0 - clamp(dot(_571, _571), 0.0, 1.0));
-        _577 = _570;
+        highp vec4 _559 = texture(SPIRV_Cross_Combined_BumpMapsampler_MainTex, _479 * _Globals._BumpMap_ST.xy + _Globals._BumpMap_ST.zw);
+        _559.w = _559.w * _559.x;
+        highp vec2 _570 = ((_559.wy * 2.0) - vec2(1.0)).xy * _Globals._BumpScale;
+        highp vec3 _571 = vec3(_570.x, _570.y, _314.z);
+        highp vec2 _572 = _570.xy;
+        _571.z = sqrt(1.0 - clamp(dot(_572, _572), 0.0, 1.0));
+        _578 = _571;
     }
     else
     {
-        _577 = vec3(0.0, 0.0, 1.0);
+        _578 = vec3(0.0, 0.0, 1.0);
     }
-    highp vec3 _579 = normalize(_443 * _577);
-    bvec3 _584 = bvec3(_366 < (_Globals._FlipNormal - 1.0));
-    highp vec3 _585 = -_579;
-    highp vec3 _586 = vec3(_584.x ? _585.x : _579.x, _584.y ? _585.y : _579.y, _584.z ? _585.z : _579.z);
-    highp float _588 = clamp(dot(_586, _434), 0.0, 1.0);
-    highp vec3 _589 = normalize(out_var_TEXCOORD4);
-    highp vec2 _593 = ((_586 * mat3(vec3(_Globals.uViewMatrix[0].x, _Globals.uViewMatrix[0].y, _Globals.uViewMatrix[0].z), _341, _334)).xy * 0.5) + vec2(0.5);
-    bool _594 = out_var_TEXCOORD5.w > 0.0;
-    bool _599 = _Globals._UseMain2ndTex != 0u;
-    highp vec4 _882;
+    highp vec3 _580 = normalize(_444 * _578);
+    bvec3 _585 = bvec3(_367 < (_Globals._FlipNormal - 1.0));
+    highp vec3 _586 = -_580;
+    highp vec3 _587 = vec3(_585.x ? _586.x : _580.x, _585.y ? _586.y : _580.y, _585.z ? _586.z : _580.z);
+    highp float _589 = clamp(dot(_587, _435), 0.0, 1.0);
+    highp vec3 _590 = normalize(out_var_TEXCOORD4);
+    highp vec2 _594 = ((_587 * mat3(vec3(_Globals.uViewMatrix[0].x, _Globals.uViewMatrix[0].y, _Globals.uViewMatrix[0].z), _342, _335)).xy * 0.5) + vec2(0.5);
+    bool _595 = out_var_TEXCOORD5.w > 0.0;
+    bool _600 = _Globals._UseMain2ndTex != 0u;
     highp vec4 _883;
-    if (_599)
+    highp vec4 _884;
+    if (_600)
     {
-        bvec2 _605 = bvec2(_Globals._Main2ndTex_UVMode == 1u);
-        highp vec2 _606 = vec2(_605.x ? out_var_TEXCOORD0.zw.x : out_var_TEXCOORD0.xy.x, _605.y ? out_var_TEXCOORD0.zw.y : out_var_TEXCOORD0.xy.y);
-        bvec2 _608 = bvec2(_Globals._Main2ndTex_UVMode == 2u);
-        highp vec2 _609 = vec2(_608.x ? out_var_TEXCOORD1.xy.x : _606.x, _608.y ? out_var_TEXCOORD1.xy.y : _606.y);
-        bvec2 _611 = bvec2(_Globals._Main2ndTex_UVMode == 3u);
-        highp vec2 _612 = vec2(_611.x ? out_var_TEXCOORD1.zw.x : _609.x, _611.y ? out_var_TEXCOORD1.zw.y : _609.y);
-        bvec2 _614 = bvec2(_Globals._Main2ndTex_UVMode == 4u);
-        highp vec2 _615 = vec2(_614.x ? _593.x : _612.x, _614.y ? _593.y : _612.y);
-        highp vec4 _654 = _Globals._Main2ndTex_ST + (vec4(0.0, 0.0, _Globals._Main2ndTex_ScrollRotate.xy) * _Globals.uTime.y);
-        highp float _655 = _Globals._Main2ndTex_ScrollRotate.w * _Globals.uTime.y + _Globals._Main2ndTexAngle;
-        highp vec2 _663;
+        bvec2 _606 = bvec2(_Globals._Main2ndTex_UVMode == 1u);
+        highp vec2 _607 = vec2(_606.x ? out_var_TEXCOORD0.zw.x : out_var_TEXCOORD0.xy.x, _606.y ? out_var_TEXCOORD0.zw.y : out_var_TEXCOORD0.xy.y);
+        bvec2 _609 = bvec2(_Globals._Main2ndTex_UVMode == 2u);
+        highp vec2 _610 = vec2(_609.x ? out_var_TEXCOORD1.xy.x : _607.x, _609.y ? out_var_TEXCOORD1.xy.y : _607.y);
+        bvec2 _612 = bvec2(_Globals._Main2ndTex_UVMode == 3u);
+        highp vec2 _613 = vec2(_612.x ? out_var_TEXCOORD1.zw.x : _610.x, _612.y ? out_var_TEXCOORD1.zw.y : _610.y);
+        bvec2 _615 = bvec2(_Globals._Main2ndTex_UVMode == 4u);
+        highp vec2 _616 = vec2(_615.x ? _594.x : _613.x, _615.y ? _594.y : _613.y);
+        highp vec4 _655 = _Globals._Main2ndTex_ST + (vec4(0.0, 0.0, _Globals._Main2ndTex_ScrollRotate.xy) * _Globals.uTime.y);
+        highp float _656 = _Globals._Main2ndTex_ScrollRotate.w * _Globals.uTime.y + _Globals._Main2ndTexAngle;
+        highp vec2 _664;
         if (_Globals._Main2ndTexShouldCopy != 0u)
         {
-            highp vec2 _662 = _615;
-            _662.x = abs(_615.x - 0.5) + 0.5;
-            _663 = _662;
+            highp vec2 _663 = _616;
+            _663.x = abs(_616.x - 0.5) + 0.5;
+            _664 = _663;
         }
         else
         {
-            _663 = _615;
+            _664 = _616;
         }
-        highp vec2 _664 = _654.xy;
-        highp vec2 _665 = _654.zw;
-        highp vec2 _666 = _663 * _664 + _665;
-        highp vec2 _675;
-        if ((_Globals._Main2ndTexShouldFlipCopy != 0u) && (_615.x < 0.5))
+        highp vec2 _665 = _655.xy;
+        highp vec2 _666 = _655.zw;
+        highp vec2 _667 = _664 * _665 + _666;
+        highp vec2 _676;
+        if ((_Globals._Main2ndTexShouldFlipCopy != 0u) && (_616.x < 0.5))
         {
-            highp vec2 _674 = _666;
-            _674.x = 1.0 - _666.x;
-            _675 = _674;
+            highp vec2 _675 = _667;
+            _675.x = 1.0 - _667.x;
+            _676 = _675;
         }
         else
         {
-            _675 = _666;
+            _676 = _667;
         }
-        highp vec2 _682;
-        if ((_Globals._Main2ndTexShouldFlipMirror != 0u) && _594)
+        highp vec2 _683;
+        if ((_Globals._Main2ndTexShouldFlipMirror != 0u) && _595)
         {
-            highp vec2 _681 = _675;
-            _681.x = 1.0 - _675.x;
-            _682 = _681;
+            highp vec2 _682 = _676;
+            _682.x = 1.0 - _676.x;
+            _683 = _682;
         }
         else
         {
-            _682 = _675;
+            _683 = _676;
         }
-        highp vec2 _687;
-        if ((_Globals._Main2ndTexIsLeftOnly != 0u) && _594)
+        highp vec2 _688;
+        if ((_Globals._Main2ndTexIsLeftOnly != 0u) && _595)
         {
-            highp vec2 _686 = _682;
-            _686.x = -1.0;
-            _687 = _686;
+            highp vec2 _687 = _683;
+            _687.x = -1.0;
+            _688 = _687;
         }
         else
         {
-            _687 = _682;
+            _688 = _683;
         }
-        highp vec2 _693;
-        if ((_Globals._Main2ndTexIsRightOnly != 0u) && (!_594))
+        highp vec2 _694;
+        if ((_Globals._Main2ndTexIsRightOnly != 0u) && (!_595))
         {
-            highp vec2 _692 = _687;
-            _692.x = -1.0;
-            _693 = _692;
+            highp vec2 _693 = _688;
+            _693.x = -1.0;
+            _694 = _693;
         }
         else
         {
-            _693 = _687;
+            _694 = _688;
         }
-        highp float _696 = sin(_655);
-        highp float _697 = cos(_655);
-        highp vec2 _698 = ((_693 - _665) / _664) - vec2(0.5);
-        highp float _699 = _698.x;
-        highp float _700 = _698.y;
-        highp vec2 _708 = (vec2(_699 * _697 + (-(_700 * _696)), _699 * _696 + (_700 * _697)) + vec2(0.5)) * _664 + _665;
-        uint _712 = uint(_Globals._Main2ndTexDecalAnimation.z);
-        uint _716 = (_Globals._Main2ndTexDecalAnimation.w == 0.0) ? _712 : (uint(_Globals.uTime.y * _Globals._Main2ndTexDecalAnimation.w) % _712);
-        highp float _717 = _708.x;
-        highp float _718 = _708.y;
-        uint _725 = uint(_Globals._Main2ndTexDecalAnimation.x);
-        highp vec2 _735 = ((mix(vec2(_717, 1.0 - _718), vec2(0.5), vec2(_Globals._Main2ndTexDecalSubParam.z)) + vec2(float(_716 % _725), float(_716 / _725))) * _Globals._Main2ndTexDecalSubParam.xy) / _Globals._Main2ndTexDecalAnimation.xy;
-        _735.y = 1.0 - _735.y;
-        highp vec4 _740 = texture(SPIRV_Cross_Combined_Main2ndTexsampler_Main2ndTex, _735);
-        highp vec4 _756;
+        highp float _697 = sin(_656);
+        highp float _698 = cos(_656);
+        highp vec2 _699 = ((_694 - _666) / _665) - vec2(0.5);
+        highp float _700 = _699.x;
+        highp float _701 = _699.y;
+        highp vec2 _709 = (vec2(_700 * _698 + (-(_701 * _697)), _700 * _697 + (_701 * _698)) + vec2(0.5)) * _665 + _666;
+        uint _713 = uint(_Globals._Main2ndTexDecalAnimation.z);
+        uint _717 = (_Globals._Main2ndTexDecalAnimation.w == 0.0) ? _713 : (uint(_Globals.uTime.y * _Globals._Main2ndTexDecalAnimation.w) % _713);
+        highp float _718 = _709.x;
+        highp float _719 = _709.y;
+        uint _726 = uint(_Globals._Main2ndTexDecalAnimation.x);
+        highp vec2 _736 = ((mix(vec2(_718, 1.0 - _719), vec2(0.5), vec2(_Globals._Main2ndTexDecalSubParam.z)) + vec2(float(_717 % _726), float(_717 / _726))) * _Globals._Main2ndTexDecalSubParam.xy) / _Globals._Main2ndTexDecalAnimation.xy;
+        _736.y = 1.0 - _736.y;
+        highp vec4 _741 = texture(SPIRV_Cross_Combined_Main2ndTexsampler_Main2ndTex, _736);
+        highp vec4 _757;
         if (_Globals._Main2ndTexIsMSDF != 0u)
         {
-            highp float _743 = _740.x;
-            highp float _744 = _740.y;
-            highp float _745 = _740.z;
-            highp float _746 = isnan(_744) ? _743 : (isnan(_743) ? _744 : min(_743, _744));
-            highp float _747 = isnan(_744) ? _743 : (isnan(_743) ? _744 : max(_743, _744));
-            highp float _748 = isnan(_745) ? _747 : (isnan(_747) ? _745 : min(_747, _745));
-            highp float _749 = isnan(_748) ? _746 : (isnan(_746) ? _748 : max(_746, _748));
-            _756 = vec4(1.0, 1.0, 1.0, clamp((_749 - 0.5) / clamp(fwidth(_749), 0.00999999977648258209228515625, 1.0), 0.0, 1.0));
+            highp float _744 = _741.x;
+            highp float _745 = _741.y;
+            highp float _746 = _741.z;
+            highp float _747 = isnan(_745) ? _744 : (isnan(_744) ? _745 : min(_744, _745));
+            highp float _748 = isnan(_745) ? _744 : (isnan(_744) ? _745 : max(_744, _745));
+            highp float _749 = isnan(_746) ? _748 : (isnan(_748) ? _746 : min(_748, _746));
+            highp float _750 = isnan(_749) ? _747 : (isnan(_747) ? _749 : max(_747, _749));
+            _757 = vec4(1.0, 1.0, 1.0, clamp((_750 - 0.5) / clamp(fwidth(_750), 0.00999999977648258209228515625, 1.0), 0.0, 1.0));
         }
         else
         {
-            _756 = _740;
+            _757 = _741;
         }
-        highp vec4 _779;
+        highp vec4 _780;
         if (_Globals._Main2ndTexIsDecal != 0u)
         {
-            highp float _760 = clamp(_588 - 0.0500000007450580596923828125, 0.0, 1.0);
-            highp float _763 = 0.5 - abs(_717 - 0.5);
-            highp float _770 = 0.5 - abs(_718 - 0.5);
-            highp vec4 _778 = _756;
-            _778.w = _756.w * (clamp(_763 / clamp(fwidth(_763), 9.9999997473787516355514526367188e-05, _760), 0.0, 1.0) * clamp(_770 / clamp(fwidth(_770), 9.9999997473787516355514526367188e-05, _760), 0.0, 1.0));
-            _779 = _778;
+            highp float _761 = clamp(_589 - 0.0500000007450580596923828125, 0.0, 1.0);
+            highp float _764 = 0.5 - abs(_718 - 0.5);
+            highp float _771 = 0.5 - abs(_719 - 0.5);
+            highp vec4 _779 = _757;
+            _779.w = _757.w * (clamp(_764 / clamp(fwidth(_764), 9.9999997473787516355514526367188e-05, _761), 0.0, 1.0) * clamp(_771 / clamp(fwidth(_771), 9.9999997473787516355514526367188e-05, _761), 0.0, 1.0));
+            _780 = _779;
         }
         else
         {
-            _779 = _756;
+            _780 = _757;
         }
-        highp vec4 _780 = _Globals._Color2nd * _779;
-        highp float _786 = _780.w * texture(SPIRV_Cross_Combined_Main2ndBlendMasksampler_MainTex, _478).x;
-        _780.w = mix(_786, _786 * clamp((_427 - _Globals._Main2ndDistanceFade.x) / (_Globals._Main2ndDistanceFade.y - _Globals._Main2ndDistanceFade.x), 0.0, 1.0), _Globals._Main2ndDistanceFade.z);
-        highp vec4 _812;
-        if (((_Globals._Main2ndTex_Cull == 1u) && (_366 > 0.0)) || ((_Globals._Main2ndTex_Cull == 2u) && (_366 < 0.0)))
+        highp vec4 _781 = _Globals._Color2nd * _780;
+        highp float _787 = _781.w * texture(SPIRV_Cross_Combined_Main2ndBlendMasksampler_MainTex, _479).x;
+        _781.w = mix(_787, _787 * clamp((_428 - _Globals._Main2ndDistanceFade.x) / (_Globals._Main2ndDistanceFade.y - _Globals._Main2ndDistanceFade.x), 0.0, 1.0), _Globals._Main2ndDistanceFade.z);
+        highp vec4 _813;
+        if (((_Globals._Main2ndTex_Cull == 1u) && (_367 > 0.0)) || ((_Globals._Main2ndTex_Cull == 2u) && (_367 < 0.0)))
         {
-            highp vec4 _811 = _780;
-            _811.w = 0.0;
-            _812 = _811;
+            highp vec4 _812 = _781;
+            _812.w = 0.0;
+            _813 = _812;
         }
         else
         {
-            _812 = _780;
+            _813 = _781;
         }
-        highp vec4 _851;
         highp vec4 _852;
+        highp vec4 _853;
         if (_Globals._Main2ndTexAlphaMode != 0u)
         {
-            highp vec4 _823;
+            highp vec4 _824;
             if (_Globals._Main2ndTexAlphaMode == 1u)
             {
-                highp vec4 _822 = _545;
-                _822.w = _812.w;
-                _823 = _822;
+                highp vec4 _823 = _546;
+                _823.w = _813.w;
+                _824 = _823;
             }
             else
             {
-                _823 = _545;
+                _824 = _546;
             }
-            highp vec4 _831;
+            highp vec4 _832;
             if (_Globals._Main2ndTexAlphaMode == 2u)
             {
-                highp vec4 _830 = _823;
-                _830.w = _823.w * _812.w;
-                _831 = _830;
+                highp vec4 _831 = _824;
+                _831.w = _824.w * _813.w;
+                _832 = _831;
             }
             else
             {
-                _831 = _823;
+                _832 = _824;
             }
-            highp vec4 _840;
+            highp vec4 _841;
             if (_Globals._Main2ndTexAlphaMode == 3u)
             {
-                highp vec4 _839 = _831;
-                _839.w = clamp(_831.w + _812.w, 0.0, 1.0);
-                _840 = _839;
+                highp vec4 _840 = _832;
+                _840.w = clamp(_832.w + _813.w, 0.0, 1.0);
+                _841 = _840;
             }
             else
             {
-                _840 = _831;
+                _841 = _832;
             }
-            highp vec4 _849;
+            highp vec4 _850;
             if (_Globals._Main2ndTexAlphaMode == 4u)
             {
-                highp vec4 _848 = _840;
-                _848.w = clamp(_840.w - _812.w, 0.0, 1.0);
-                _849 = _848;
+                highp vec4 _849 = _841;
+                _849.w = clamp(_841.w - _813.w, 0.0, 1.0);
+                _850 = _849;
             }
             else
             {
-                _849 = _840;
+                _850 = _841;
             }
-            highp vec4 _850 = _812;
-            _850.w = 1.0;
-            _851 = _850;
-            _852 = _849;
+            highp vec4 _851 = _813;
+            _851.w = 1.0;
+            _852 = _851;
+            _853 = _850;
         }
         else
         {
-            _851 = _812;
-            _852 = _545;
+            _852 = _813;
+            _853 = _546;
         }
-        highp vec3 _862 = _852.xyz + _851.xyz;
-        highp vec3 _863 = _852.xyz * _851.xyz;
-        bvec3 _865 = bvec3(_Globals._Main2ndTexBlendMode == 0u);
-        highp vec3 _866 = vec3(_865.x ? _851.xyz.x : _307.x, _865.y ? _851.xyz.y : _307.y, _865.z ? _851.xyz.z : _307.z);
-        bvec3 _868 = bvec3(_Globals._Main2ndTexBlendMode == 1u);
-        highp vec3 _876;
+        highp vec3 _863 = _853.xyz + _852.xyz;
+        highp vec3 _864 = _853.xyz * _852.xyz;
+        bvec3 _866 = bvec3(_Globals._Main2ndTexBlendMode == 0u);
+        highp vec3 _867 = vec3(_866.x ? _852.xyz.x : _308.x, _866.y ? _852.xyz.y : _308.y, _866.z ? _852.xyz.z : _308.z);
+        bvec3 _869 = bvec3(_Globals._Main2ndTexBlendMode == 1u);
+        highp vec3 _877;
         if (_Globals._Main2ndTexBlendMode == 2u)
         {
-            highp vec3 _874 = (-_852.xyz) * _851.xyz + _862;
-            bvec3 _2402 = isnan(_874);
-            bvec3 _2403 = isnan(_852.xyz);
-            highp vec3 _2404 = max(_874, _852.xyz);
-            highp vec3 _2405 = vec3(_2402.x ? _852.xyz.x : _2404.x, _2402.y ? _852.xyz.y : _2404.y, _2402.z ? _852.xyz.z : _2404.z);
-            _876 = vec3(_2403.x ? _874.x : _2405.x, _2403.y ? _874.y : _2405.y, _2403.z ? _874.z : _2405.z);
+            highp vec3 _875 = (-_853.xyz) * _852.xyz + _863;
+            bvec3 _2403 = isnan(_875);
+            bvec3 _2404 = isnan(_853.xyz);
+            highp vec3 _2405 = max(_875, _853.xyz);
+            highp vec3 _2406 = vec3(_2403.x ? _853.xyz.x : _2405.x, _2403.y ? _853.xyz.y : _2405.y, _2403.z ? _853.xyz.z : _2405.z);
+            _877 = vec3(_2404.x ? _875.x : _2406.x, _2404.y ? _875.y : _2406.y, _2404.z ? _875.z : _2406.z);
         }
         else
         {
-            _876 = vec3(_868.x ? _862.x : _866.x, _868.y ? _862.y : _866.y, _868.z ? _862.z : _866.z);
+            _877 = vec3(_869.x ? _863.x : _867.x, _869.y ? _863.y : _867.y, _869.z ? _863.z : _867.z);
         }
-        bvec3 _878 = bvec3(_Globals._Main2ndTexBlendMode == 3u);
-        highp vec3 _880 = mix(_852.xyz, vec3(_878.x ? _863.x : _876.x, _878.y ? _863.y : _876.y, _878.z ? _863.z : _876.z), vec3(_851.w * _Globals._Main2ndEnableLighting));
-        _882 = _851;
-        _883 = vec4(_880.x, _880.y, _880.z, _852.w);
+        bvec3 _879 = bvec3(_Globals._Main2ndTexBlendMode == 3u);
+        highp vec3 _881 = mix(_853.xyz, vec3(_879.x ? _864.x : _877.x, _879.y ? _864.y : _877.y, _879.z ? _864.z : _877.z), vec3(_852.w * _Globals._Main2ndEnableLighting));
+        _883 = _852;
+        _884 = vec4(_881.x, _881.y, _881.z, _853.w);
     }
     else
     {
-        _882 = _Globals._Color2nd;
-        _883 = _545;
+        _883 = _Globals._Color2nd;
+        _884 = _546;
     }
-    highp vec4 _923;
+    highp vec4 _924;
     if (_Globals._AlphaMaskMode != 0u)
     {
-        highp float _894 = clamp(_Globals._AlphaMaskScale + _Globals._AlphaMaskValue, 0.0, 1.0);
-        highp vec4 _899;
+        highp float _895 = clamp(_Globals._AlphaMaskScale + _Globals._AlphaMaskValue, 0.0, 1.0);
+        highp vec4 _900;
         if (_Globals._AlphaMaskMode == 1u)
         {
-            highp vec4 _898 = _883;
-            _898.w = _894;
-            _899 = _898;
+            highp vec4 _899 = _884;
+            _899.w = _895;
+            _900 = _899;
         }
         else
         {
-            _899 = _883;
+            _900 = _884;
         }
-        highp vec4 _906;
+        highp vec4 _907;
         if (_Globals._AlphaMaskMode == 2u)
         {
-            highp vec4 _905 = _899;
-            _905.w = _899.w * _894;
-            _906 = _905;
+            highp vec4 _906 = _900;
+            _906.w = _900.w * _895;
+            _907 = _906;
         }
         else
         {
-            _906 = _899;
+            _907 = _900;
         }
-        highp vec4 _914;
+        highp vec4 _915;
         if (_Globals._AlphaMaskMode == 3u)
         {
-            highp vec4 _913 = _906;
-            _913.w = clamp(_906.w + _894, 0.0, 1.0);
-            _914 = _913;
+            highp vec4 _914 = _907;
+            _914.w = clamp(_907.w + _895, 0.0, 1.0);
+            _915 = _914;
         }
         else
         {
-            _914 = _906;
+            _915 = _907;
         }
-        highp vec4 _922;
+        highp vec4 _923;
         if (_Globals._AlphaMaskMode == 4u)
         {
-            highp vec4 _921 = _914;
-            _921.w = clamp(_914.w - _894, 0.0, 1.0);
-            _922 = _921;
+            highp vec4 _922 = _915;
+            _922.w = clamp(_915.w - _895, 0.0, 1.0);
+            _923 = _922;
         }
         else
         {
-            _922 = _914;
+            _923 = _915;
         }
-        _923 = _922;
+        _924 = _923;
     }
     else
     {
-        _923 = _883;
+        _924 = _884;
     }
-    highp vec4 _1018;
-    highp float _1019;
-    if ((_357 & 1) != 0)
+    highp vec4 _1019;
+    highp float _1020;
+    if ((_358 & 1) != 0)
     {
-        highp vec4 _927 = _923;
-        _927.w = 1.0;
-        highp vec2 _933 = roundEven(_Globals._DissolveParams.xy);
-        highp float _934 = _933.x;
-        highp vec4 _1007;
-        highp float _1008;
-        if (_934 != 0.0)
+        highp vec4 _928 = _924;
+        _928.w = 1.0;
+        highp vec2 _934 = roundEven(_Globals._DissolveParams.xy);
+        highp float _935 = _934.x;
+        highp vec4 _1008;
+        highp float _1009;
+        if (_935 != 0.0)
         {
-            highp float _950;
             highp float _951;
-            if (_934 == 1.0)
+            highp float _952;
+            if (_935 == 1.0)
             {
-                _950 = 1.0 - clamp(abs(1.0 - _Globals._DissolveParams.z) / _Globals._DissolveParams.w, 0.0, 1.0);
-                _951 = float(1.0 > _Globals._DissolveParams.z);
+                _951 = 1.0 - clamp(abs(1.0 - _Globals._DissolveParams.z) / _Globals._DissolveParams.w, 0.0, 1.0);
+                _952 = float(1.0 > _Globals._DissolveParams.z);
             }
             else
             {
-                _950 = 0.0;
-                _951 = 1.0;
+                _951 = 0.0;
+                _952 = 1.0;
             }
-            highp float _982;
             highp float _983;
-            if (_934 == 2.0)
+            highp float _984;
+            if (_935 == 2.0)
             {
-                highp vec2 _960 = out_var_TEXCOORD0.xy - vec2(0.5);
-                highp float _971 = (_933.y == 1.0) ? (vec2(_960.x * cos(_Globals._DissolvePos.w) + (-(_960.y * sin(_Globals._DissolvePos.w))), _314) + vec2(0.5)).x : distance(out_var_TEXCOORD0.xy, _Globals._DissolvePos.xy);
-                _982 = 1.0 - clamp(abs(_971 - _Globals._DissolveParams.z) / _Globals._DissolveParams.w, 0.0, 1.0);
-                _983 = _951 * float(_971 > _Globals._DissolveParams.z);
+                highp vec2 _961 = out_var_TEXCOORD0.xy - vec2(0.5);
+                highp float _972 = (_934.y == 1.0) ? (vec2(_961.x * cos(_Globals._DissolvePos.w) + (-(_961.y * sin(_Globals._DissolvePos.w))), _315) + vec2(0.5)).x : distance(out_var_TEXCOORD0.xy, _Globals._DissolvePos.xy);
+                _983 = 1.0 - clamp(abs(_972 - _Globals._DissolveParams.z) / _Globals._DissolveParams.w, 0.0, 1.0);
+                _984 = _952 * float(_972 > _Globals._DissolveParams.z);
             }
             else
             {
-                _982 = _950;
                 _983 = _951;
+                _984 = _952;
             }
-            highp float _1004;
             highp float _1005;
-            if (_934 == 3.0)
+            highp float _1006;
+            if (_935 == 3.0)
             {
-                highp float _993 = (_933.y == 1.0) ? dot(out_var_TEXCOORD2.xyz, normalize(_Globals._DissolvePos.xyz)) : distance(out_var_TEXCOORD2.xyz, _Globals._DissolvePos.xyz);
-                _1004 = 1.0 - clamp(abs(_993 - _Globals._DissolveParams.z) / _Globals._DissolveParams.w, 0.0, 1.0);
-                _1005 = _983 * float(_993 > _Globals._DissolveParams.z);
+                highp float _994 = (_934.y == 1.0) ? dot(out_var_TEXCOORD2.xyz, normalize(_Globals._DissolvePos.xyz)) : distance(out_var_TEXCOORD2.xyz, _Globals._DissolvePos.xyz);
+                _1005 = 1.0 - clamp(abs(_994 - _Globals._DissolveParams.z) / _Globals._DissolveParams.w, 0.0, 1.0);
+                _1006 = _984 * float(_994 > _Globals._DissolveParams.z);
             }
             else
             {
-                _1004 = _982;
                 _1005 = _983;
+                _1006 = _984;
             }
-            highp vec4 _1006 = _927;
-            _1006.w = _1005;
-            _1007 = _1006;
-            _1008 = _1004;
+            highp vec4 _1007 = _928;
+            _1007.w = _1006;
+            _1008 = _1007;
+            _1009 = _1005;
         }
         else
         {
-            _1007 = _927;
-            _1008 = 0.0;
+            _1008 = _928;
+            _1009 = 0.0;
         }
-        highp vec4 _1014;
-        if ((_357 & 2) != 0)
+        highp vec4 _1015;
+        if ((_358 & 2) != 0)
         {
-            highp vec4 _1013 = _1007;
-            _1013.w = 1.0 - _1007.w;
-            _1014 = _1013;
+            highp vec4 _1014 = _1008;
+            _1014.w = 1.0 - _1008.w;
+            _1015 = _1014;
         }
         else
         {
-            _1014 = _1007;
+            _1015 = _1008;
         }
-        highp vec4 _1017 = _1014;
-        _1017.w = _1014.w * _923.w;
-        _1018 = _1017;
-        _1019 = _1008;
+        highp vec4 _1018 = _1015;
+        _1018.w = _1015.w * _924.w;
+        _1019 = _1018;
+        _1020 = _1009;
     }
     else
     {
-        _1018 = _923;
-        _1019 = 0.0;
+        _1019 = _924;
+        _1020 = 0.0;
     }
-    if ((_1018.w - _Globals._Cutoff) < 0.0)
+    if ((_1019.w - _Globals._Cutoff) < 0.0)
     {
         discard;
     }
-    highp vec4 _1200;
-    highp float _1201;
+    highp vec4 _1201;
+    highp float _1202;
     if (_Globals._UseShadow != 0u)
     {
-        highp float _1052 = clamp(dot(_418, mix(_589, _586, vec3(_Globals._ShadowNormalStrength))) * 0.5 + 0.5, 0.0, 1.0);
-        highp float _1055 = clamp(dot(_418, mix(_589, _586, vec3(_Globals._Shadow2ndNormalStrength))) * 0.5 + 0.5, 0.0, 1.0);
-        highp float _1058 = clamp(dot(_418, mix(_589, _586, vec3(_Globals._Shadow3rdNormalStrength))) * 0.5 + 0.5, 0.0, 1.0);
-        highp float _1062 = (_Globals._ShadowMaskType == 2u) ? 0.0 : _Globals._AAStrength;
-        highp float _1065 = clamp(_417 + distance(_418, _Globals.uMainLightDirection.xyz), 0.0, 1.0);
-        highp float _1068 = mix(1.0, _1065, _Globals._ShadowReceive);
-        highp float _1069 = _1052 * _1068;
-        highp float _1072 = mix(1.0, _1065, _Globals._Shadow2ndReceive);
-        highp float _1076 = mix(1.0, _1065, _Globals._Shadow3rdReceive);
-        highp float _1087 = (-_Globals._ShadowBlur) * 0.5 + _Globals._ShadowBorder;
-        highp float _1088 = clamp(_1087, 0.0, 1.0);
-        highp float _1090 = clamp(_Globals._ShadowBlur * 0.5 + _Globals._ShadowBorder, 0.0, 1.0);
-        highp float _1103 = clamp((-_Globals._Shadow2ndBlur) * 0.5 + _Globals._Shadow2ndBorder, 0.0, 1.0);
-        highp float _1117 = clamp(_1087 - _Globals._ShadowBorderRange, 0.0, 1.0);
-        highp float _1130 = clamp((-_Globals._Shadow3rdBlur) * 0.5 + _Globals._Shadow3rdBorder, 0.0, 1.0);
-        highp float _1145 = (_366 < 0.0) ? (1.0 - _Globals._BackfaceForceShadow) : 1.0;
-        highp float _1146 = clamp((_1052 * _1068 + (-_1088)) / clamp(fwidth(_1069) * _1062 + (_1090 - _1088), 0.0, 1.0), 0.0, 1.0) * _1145;
-        highp vec3 _1178 = mix(mix(_1018.xyz * _Globals._ShadowColor.xyz, (_1018.xyz * _Globals._Shadow2ndColor.xyz).xyz, vec3((-(clamp((_1055 * _1072 + (-_1103)) / clamp(fwidth(_1055 * _1072) * _1062 + (clamp(_Globals._Shadow2ndBlur * 0.5 + _Globals._Shadow2ndBorder, 0.0, 1.0) - _1103), 0.0, 1.0), 0.0, 1.0) * _1145)) * _Globals._Shadow2ndColor.w + _Globals._Shadow2ndColor.w)), (_1018.xyz * _Globals._Shadow3rdColor.xyz).xyz, vec3((-(clamp((_1058 * _1076 + (-_1130)) / clamp(fwidth(_1058 * _1076) * _1062 + (clamp(_Globals._Shadow3rdBlur * 0.5 + _Globals._Shadow3rdBorder, 0.0, 1.0) - _1130), 0.0, 1.0), 0.0, 1.0) * _1145)) * _Globals._Shadow3rdColor.w + _Globals._Shadow3rdColor.w));
-        highp vec3 _1184 = _1018.xyz * out_var_TEXCOORD6;
-        highp vec3 _1190 = mix(mix(_1178, _1178 * _1018.xyz, vec3(_Globals._ShadowMainStrength)) * out_var_TEXCOORD6, _1018.xyz, clamp(out_var_TEXCOORD8 * _Globals._ShadowEnvStrength, vec3(0.0), vec3(1.0)));
-        bvec3 _2407 = isnan(_1190);
-        bvec3 _2408 = isnan(_1184);
-        highp vec3 _2409 = min(_1190, _1184);
-        highp vec3 _2410 = vec3(_2407.x ? _1184.x : _2409.x, _2407.y ? _1184.y : _2409.y, _2407.z ? _1184.z : _2409.z);
-        highp vec3 _1198 = mix(mix(vec3(_2408.x ? _1190.x : _2410.x, _2408.y ? _1190.y : _2410.y, _2408.z ? _1190.z : _2410.z), _1184, _Globals._ShadowBorderColor.xyz * (clamp((_1052 * _1068 + (-_1117)) / clamp(fwidth(_1069) * _1062 + (_1090 - _1117), 0.0, 1.0), 0.0, 1.0) * _1145)), _1184, vec3(mix(1.0, _1146, _Globals._ShadowStrength)));
-        _1200 = vec4(_1198.x, _1198.y, _1198.z, _1018.w);
-        _1201 = _1146;
+        highp float _1053 = clamp(dot(_419, mix(_590, _587, vec3(_Globals._ShadowNormalStrength))) * 0.5 + 0.5, 0.0, 1.0);
+        highp float _1056 = clamp(dot(_419, mix(_590, _587, vec3(_Globals._Shadow2ndNormalStrength))) * 0.5 + 0.5, 0.0, 1.0);
+        highp float _1059 = clamp(dot(_419, mix(_590, _587, vec3(_Globals._Shadow3rdNormalStrength))) * 0.5 + 0.5, 0.0, 1.0);
+        highp float _1063 = (_Globals._ShadowMaskType == 2u) ? 0.0 : _Globals._AAStrength;
+        highp float _1066 = clamp(_418 + distance(_419, _Globals.uMainLightDirection.xyz), 0.0, 1.0);
+        highp float _1069 = mix(1.0, _1066, _Globals._ShadowReceive);
+        highp float _1070 = _1053 * _1069;
+        highp float _1073 = mix(1.0, _1066, _Globals._Shadow2ndReceive);
+        highp float _1077 = mix(1.0, _1066, _Globals._Shadow3rdReceive);
+        highp float _1088 = (-_Globals._ShadowBlur) * 0.5 + _Globals._ShadowBorder;
+        highp float _1089 = clamp(_1088, 0.0, 1.0);
+        highp float _1091 = clamp(_Globals._ShadowBlur * 0.5 + _Globals._ShadowBorder, 0.0, 1.0);
+        highp float _1104 = clamp((-_Globals._Shadow2ndBlur) * 0.5 + _Globals._Shadow2ndBorder, 0.0, 1.0);
+        highp float _1118 = clamp(_1088 - _Globals._ShadowBorderRange, 0.0, 1.0);
+        highp float _1131 = clamp((-_Globals._Shadow3rdBlur) * 0.5 + _Globals._Shadow3rdBorder, 0.0, 1.0);
+        highp float _1146 = (_367 < 0.0) ? (1.0 - _Globals._BackfaceForceShadow) : 1.0;
+        highp float _1147 = clamp((_1053 * _1069 + (-_1089)) / clamp(fwidth(_1070) * _1063 + (_1091 - _1089), 0.0, 1.0), 0.0, 1.0) * _1146;
+        highp vec3 _1179 = mix(mix(_1019.xyz * _Globals._ShadowColor.xyz, (_1019.xyz * _Globals._Shadow2ndColor.xyz).xyz, vec3((-(clamp((_1056 * _1073 + (-_1104)) / clamp(fwidth(_1056 * _1073) * _1063 + (clamp(_Globals._Shadow2ndBlur * 0.5 + _Globals._Shadow2ndBorder, 0.0, 1.0) - _1104), 0.0, 1.0), 0.0, 1.0) * _1146)) * _Globals._Shadow2ndColor.w + _Globals._Shadow2ndColor.w)), (_1019.xyz * _Globals._Shadow3rdColor.xyz).xyz, vec3((-(clamp((_1059 * _1077 + (-_1131)) / clamp(fwidth(_1059 * _1077) * _1063 + (clamp(_Globals._Shadow3rdBlur * 0.5 + _Globals._Shadow3rdBorder, 0.0, 1.0) - _1131), 0.0, 1.0), 0.0, 1.0) * _1146)) * _Globals._Shadow3rdColor.w + _Globals._Shadow3rdColor.w));
+        highp vec3 _1185 = _1019.xyz * out_var_TEXCOORD6;
+        highp vec3 _1191 = mix(mix(_1179, _1179 * _1019.xyz, vec3(_Globals._ShadowMainStrength)) * out_var_TEXCOORD6, _1019.xyz, clamp(out_var_TEXCOORD8 * _Globals._ShadowEnvStrength, vec3(0.0), vec3(1.0)));
+        bvec3 _2408 = isnan(_1191);
+        bvec3 _2409 = isnan(_1185);
+        highp vec3 _2410 = min(_1191, _1185);
+        highp vec3 _2411 = vec3(_2408.x ? _1185.x : _2410.x, _2408.y ? _1185.y : _2410.y, _2408.z ? _1185.z : _2410.z);
+        highp vec3 _1199 = mix(mix(vec3(_2409.x ? _1191.x : _2411.x, _2409.y ? _1191.y : _2411.y, _2409.z ? _1191.z : _2411.z), _1185, _Globals._ShadowBorderColor.xyz * (clamp((_1053 * _1069 + (-_1118)) / clamp(fwidth(_1070) * _1063 + (_1091 - _1118), 0.0, 1.0), 0.0, 1.0) * _1146)), _1185, vec3(mix(1.0, _1147, _Globals._ShadowStrength)));
+        _1201 = vec4(_1199.x, _1199.y, _1199.z, _1019.w);
+        _1202 = _1147;
     }
     else
     {
-        highp vec3 _1034 = _1018.xyz * out_var_TEXCOORD6;
-        _1200 = vec4(_1034.x, _1034.y, _1034.z, _1018.w);
-        _1201 = 1.0;
+        highp vec3 _1035 = _1019.xyz * out_var_TEXCOORD6;
+        _1201 = vec4(_1035.x, _1035.y, _1035.z, _1019.w);
+        _1202 = 1.0;
     }
-    highp vec3 _1204 = vec3(_Globals._LightMaxLimit);
-    bvec3 _2412 = isnan(out_var_TEXCOORD6);
-    bvec3 _2413 = isnan(_1204);
-    highp vec3 _2414 = min(out_var_TEXCOORD6, _1204);
-    highp vec3 _2415 = vec3(_2412.x ? _1204.x : _2414.x, _2412.y ? _1204.y : _2414.y, _2412.z ? _1204.z : _2414.z);
-    highp vec3 _1205 = vec3(_2413.x ? out_var_TEXCOORD6.x : _2415.x, _2413.y ? out_var_TEXCOORD6.y : _2415.y, _2413.z ? out_var_TEXCOORD6.z : _2415.z);
-    highp float _1206 = clamp(_1201, 0.0, 1.0);
-    highp vec3 _1208 = _1018.xyz * _Globals._LightMaxLimit;
-    bvec3 _2417 = isnan(_1200.xyz);
-    bvec3 _2418 = isnan(_1208);
-    highp vec3 _2419 = min(_1200.xyz, _1208);
-    highp vec3 _2420 = vec3(_2417.x ? _1208.x : _2419.x, _2417.y ? _1208.y : _2419.y, _2417.z ? _1208.z : _2419.z);
-    highp vec3 _1209 = vec3(_2418.x ? _1200.xyz.x : _2420.x, _2418.y ? _1200.xyz.y : _2420.y, _2418.z ? _1200.xyz.z : _2420.z);
-    highp vec4 _1243;
-    if (_599)
+    highp vec3 _1205 = vec3(_Globals._LightMaxLimit);
+    bvec3 _2413 = isnan(out_var_TEXCOORD6);
+    bvec3 _2414 = isnan(_1205);
+    highp vec3 _2415 = min(out_var_TEXCOORD6, _1205);
+    highp vec3 _2416 = vec3(_2413.x ? _1205.x : _2415.x, _2413.y ? _1205.y : _2415.y, _2413.z ? _1205.z : _2415.z);
+    highp vec3 _1206 = vec3(_2414.x ? out_var_TEXCOORD6.x : _2416.x, _2414.y ? out_var_TEXCOORD6.y : _2416.y, _2414.z ? out_var_TEXCOORD6.z : _2416.z);
+    highp float _1207 = clamp(_1202, 0.0, 1.0);
+    highp vec3 _1209 = _1019.xyz * _Globals._LightMaxLimit;
+    bvec3 _2418 = isnan(_1201.xyz);
+    bvec3 _2419 = isnan(_1209);
+    highp vec3 _2420 = min(_1201.xyz, _1209);
+    highp vec3 _2421 = vec3(_2418.x ? _1209.x : _2420.x, _2418.y ? _1209.y : _2420.y, _2418.z ? _1209.z : _2420.z);
+    highp vec3 _1210 = vec3(_2419.x ? _1201.xyz.x : _2421.x, _2419.y ? _1201.xyz.y : _2421.y, _2419.z ? _1201.xyz.z : _2421.z);
+    highp vec4 _1244;
+    if (_600)
     {
-        highp vec3 _1213 = _1209.xyz;
-        highp vec3 _1223 = _1213 + _882.xyz;
-        highp vec3 _1224 = _1213 * _882.xyz;
-        bvec3 _1226 = bvec3(_Globals._Main2ndTexBlendMode == 0u);
-        highp vec3 _1227 = vec3(_1226.x ? _882.xyz.x : _307.x, _1226.y ? _882.xyz.y : _307.y, _1226.z ? _882.xyz.z : _307.z);
-        bvec3 _1229 = bvec3(_Globals._Main2ndTexBlendMode == 1u);
-        highp vec3 _1237;
+        highp vec3 _1214 = _1210.xyz;
+        highp vec3 _1224 = _1214 + _883.xyz;
+        highp vec3 _1225 = _1214 * _883.xyz;
+        bvec3 _1227 = bvec3(_Globals._Main2ndTexBlendMode == 0u);
+        highp vec3 _1228 = vec3(_1227.x ? _883.xyz.x : _308.x, _1227.y ? _883.xyz.y : _308.y, _1227.z ? _883.xyz.z : _308.z);
+        bvec3 _1230 = bvec3(_Globals._Main2ndTexBlendMode == 1u);
+        highp vec3 _1238;
         if (_Globals._Main2ndTexBlendMode == 2u)
         {
-            highp vec3 _1235 = (-_1213) * _882.xyz + _1223;
-            bvec3 _2422 = isnan(_1235);
-            bvec3 _2423 = isnan(_1213);
-            highp vec3 _2424 = max(_1235, _1213);
-            highp vec3 _2425 = vec3(_2422.x ? _1213.x : _2424.x, _2422.y ? _1213.y : _2424.y, _2422.z ? _1213.z : _2424.z);
-            _1237 = vec3(_2423.x ? _1235.x : _2425.x, _2423.y ? _1235.y : _2425.y, _2423.z ? _1235.z : _2425.z);
+            highp vec3 _1236 = (-_1214) * _883.xyz + _1224;
+            bvec3 _2423 = isnan(_1236);
+            bvec3 _2424 = isnan(_1214);
+            highp vec3 _2425 = max(_1236, _1214);
+            highp vec3 _2426 = vec3(_2423.x ? _1214.x : _2425.x, _2423.y ? _1214.y : _2425.y, _2423.z ? _1214.z : _2425.z);
+            _1238 = vec3(_2424.x ? _1236.x : _2426.x, _2424.y ? _1236.y : _2426.y, _2424.z ? _1236.z : _2426.z);
         }
         else
         {
-            _1237 = vec3(_1229.x ? _1223.x : _1227.x, _1229.y ? _1223.y : _1227.y, _1229.z ? _1223.z : _1227.z);
+            _1238 = vec3(_1230.x ? _1224.x : _1228.x, _1230.y ? _1224.y : _1228.y, _1230.z ? _1224.z : _1228.z);
         }
-        bvec3 _1239 = bvec3(_Globals._Main2ndTexBlendMode == 3u);
-        highp vec3 _1241 = mix(_1213, vec3(_1239.x ? _1224.x : _1237.x, _1239.y ? _1224.y : _1237.y, _1239.z ? _1224.z : _1237.z), vec3((-_882.w) * _Globals._Main2ndEnableLighting + _882.w));
-        _1243 = vec4(_1241.x, _1241.y, _1241.z, _1200.w);
+        bvec3 _1240 = bvec3(_Globals._Main2ndTexBlendMode == 3u);
+        highp vec3 _1242 = mix(_1214, vec3(_1240.x ? _1225.x : _1238.x, _1240.y ? _1225.y : _1238.y, _1240.z ? _1225.z : _1238.z), vec3((-_883.w) * _Globals._Main2ndEnableLighting + _883.w));
+        _1244 = vec4(_1242.x, _1242.y, _1242.z, _1201.w);
     }
     else
     {
-        _1243 = vec4(_1209.x, _1209.y, _1209.z, _1200.w);
+        _1244 = vec4(_1210.x, _1210.y, _1210.z, _1201.w);
     }
-    highp vec4 _1289;
+    highp vec4 _1290;
     if (_Globals._UseRimShade != 0u)
     {
-        highp float _1259 = pow(clamp(1.0 - abs(dot(mix(_589, _586, vec3(_Globals._RimShadeNormalStrength)), _434)), 0.0, 1.0), _Globals._RimShadeFresnelPower);
-        highp float _1268 = clamp((-_Globals._RimShadeBlur) * 0.5 + _Globals._RimShadeBorder, 0.0, 1.0);
-        highp vec3 _1287 = mix(_1243.xyz, _1243.xyz * _Globals._RimShadeColor.xyz, vec3(clamp((_1259 - _1268) / clamp(fwidth(_1259) * _Globals._AAStrength + (clamp(_Globals._RimShadeBlur * 0.5 + _Globals._RimShadeBorder, 0.0, 1.0) - _1268), 0.0, 1.0), 0.0, 1.0) * _Globals._RimShadeColor.w));
-        _1289 = vec4(_1287.x, _1287.y, _1287.z, _1243.w);
+        highp float _1260 = pow(clamp(1.0 - abs(dot(mix(_590, _587, vec3(_Globals._RimShadeNormalStrength)), _435)), 0.0, 1.0), _Globals._RimShadeFresnelPower);
+        highp float _1269 = clamp((-_Globals._RimShadeBlur) * 0.5 + _Globals._RimShadeBorder, 0.0, 1.0);
+        highp vec3 _1288 = mix(_1244.xyz, _1244.xyz * _Globals._RimShadeColor.xyz, vec3(clamp((_1260 - _1269) / clamp(fwidth(_1260) * _Globals._AAStrength + (clamp(_Globals._RimShadeBlur * 0.5 + _Globals._RimShadeBorder, 0.0, 1.0) - _1269), 0.0, 1.0), 0.0, 1.0) * _Globals._RimShadeColor.w));
+        _1290 = vec4(_1288.x, _1288.y, _1288.z, _1244.w);
     }
     else
     {
-        _1289 = _1243;
+        _1290 = _1244;
     }
-    highp vec4 _1362;
+    highp vec4 _1363;
     if (_Globals._UseBacklight != 0u)
     {
-        highp float _1313 = dot(normalize(((-_434) * _Globals._BacklightViewStrength) + _418), mix(_589, _586, vec3(_Globals._BacklightNormalStrength))) * 0.5 + 0.5;
-        highp float _1323;
+        highp float _1314 = dot(normalize(((-_435) * _Globals._BacklightViewStrength) + _419), mix(_590, _587, vec3(_Globals._BacklightNormalStrength))) * 0.5 + 0.5;
+        highp float _1324;
         if (_Globals._BacklightReceiveShadow != 0u)
         {
-            _1323 = _1313 * clamp(_417 + distance(_418, _Globals.uMainLightDirection.xyz), 0.0, 1.0);
+            _1324 = _1314 * clamp(_418 + distance(_419, _Globals.uMainLightDirection.xyz), 0.0, 1.0);
         }
         else
         {
-            _1323 = _1313;
+            _1324 = _1314;
         }
-        highp float _1332 = clamp((-_Globals._BacklightBlur) * 0.5 + _Globals._BacklightBorder, 0.0, 1.0);
-        highp vec3 _1360 = (mix(_Globals._BacklightColor.xyz, _Globals._BacklightColor.xyz * _1018.xyz, vec3(_Globals._BacklightMainStrength)).xyz * (((_366 < (_Globals._BacklightBackfaceMask - 1.0)) ? 0.0 : clamp(pow(clamp(dot(_434, _418) * (-0.5) + 0.5, 0.0, 1.0), _Globals._BacklightDirectivity) * clamp((_1323 - _1332) / clamp(fwidth(_1323) * _Globals._AAStrength + (clamp(_Globals._BacklightBlur * 0.5 + _Globals._BacklightBorder, 0.0, 1.0) - _1332), 0.0, 1.0), 0.0, 1.0), 0.0, 1.0)) * _Globals._BacklightColor.w)) * _1205 + _1289.xyz;
-        _1362 = vec4(_1360.x, _1360.y, _1360.z, _1289.w);
+        highp float _1333 = clamp((-_Globals._BacklightBlur) * 0.5 + _Globals._BacklightBorder, 0.0, 1.0);
+        highp vec3 _1361 = (mix(_Globals._BacklightColor.xyz, _Globals._BacklightColor.xyz * _1019.xyz, vec3(_Globals._BacklightMainStrength)).xyz * (((_367 < (_Globals._BacklightBackfaceMask - 1.0)) ? 0.0 : clamp(pow(clamp(dot(_435, _419) * (-0.5) + 0.5, 0.0, 1.0), _Globals._BacklightDirectivity) * clamp((_1324 - _1333) / clamp(fwidth(_1324) * _Globals._AAStrength + (clamp(_Globals._BacklightBlur * 0.5 + _Globals._BacklightBorder, 0.0, 1.0) - _1333), 0.0, 1.0), 0.0, 1.0), 0.0, 1.0)) * _Globals._BacklightColor.w)) * _1206 + _1290.xyz;
+        _1363 = vec4(_1361.x, _1361.y, _1361.z, _1290.w);
     }
     else
     {
-        _1362 = _1289;
+        _1363 = _1290;
     }
-    highp vec3 _1365 = _1362.xyz * _1362.w;
-    highp vec4 _1647;
+    highp vec3 _1366 = _1363.xyz * _1363.w;
+    highp vec4 _1648;
     if (_Globals._UseReflection != 0u)
     {
-        highp vec4 _1381 = texture(SPIRV_Cross_Combined_SmoothnessTexsampler_MainTex, _478 * _Globals._SmoothnessTex_ST.xy + _Globals._SmoothnessTex_ST.zw);
-        highp float _1383 = _Globals._Smoothness * _1381.x;
-        highp vec3 _1386 = dFdx(_586);
-        highp vec3 _1387 = abs(_1386);
-        highp vec3 _1388 = dFdy(_586);
-        highp vec3 _1389 = abs(_1388);
-        highp float _1390 = dot(_1387, _1387);
-        highp float _1391 = dot(_1389, _1389);
-        highp float _1392 = isnan(_1391) ? _1390 : (isnan(_1390) ? _1391 : max(_1390, _1391));
-        highp float _1395 = (_1392 / (_1392 * 5.0 + 0.00200000009499490261077880859375)) * _Globals._GSAAStrength;
-        highp float _1398 = clamp(1.0 - (isnan(_1395) ? 0.0 : (isnan(0.0) ? _1395 : max(0.0, _1395))), 0.0, 1.0);
-        highp float _1399 = isnan(_1398) ? _1383 : (isnan(_1383) ? _1398 : min(_1383, _1398));
-        highp float _1400 = 1.0 - _1399;
-        highp float _1401 = _1400 * _1400;
-        highp vec4 _1411 = texture(SPIRV_Cross_Combined_MetallicGlossMapsampler_MainTex, _478 * _Globals._MetallicGlossMap_ST.xy + _Globals._MetallicGlossMap_ST.zw);
-        highp float _1413 = _Globals._Metallic * _1411.x;
-        highp vec3 _1414 = _1365.xyz;
-        highp vec3 _1416 = _1414 - (_1414 * _1413);
-        highp vec3 _1422 = mix(vec3(_Globals._Reflectance), _1018.xyz, vec3(_1413));
-        highp vec4 _1432 = texture(SPIRV_Cross_Combined_ReflectionColorTexsampler_MainTex, _478 * _Globals._ReflectionColorTex_ST.xy + _Globals._ReflectionColorTex_ST.zw);
-        highp vec4 _1433 = _Globals._ReflectionColor * _1432;
-        highp vec4 _1442;
+        highp vec4 _1382 = texture(SPIRV_Cross_Combined_SmoothnessTexsampler_MainTex, _479 * _Globals._SmoothnessTex_ST.xy + _Globals._SmoothnessTex_ST.zw);
+        highp float _1384 = _Globals._Smoothness * _1382.x;
+        highp vec3 _1387 = dFdx(_587);
+        highp vec3 _1388 = abs(_1387);
+        highp vec3 _1389 = dFdy(_587);
+        highp vec3 _1390 = abs(_1389);
+        highp float _1391 = dot(_1388, _1388);
+        highp float _1392 = dot(_1390, _1390);
+        highp float _1393 = isnan(_1392) ? _1391 : (isnan(_1391) ? _1392 : max(_1391, _1392));
+        highp float _1396 = (_1393 / (_1393 * 5.0 + 0.00200000009499490261077880859375)) * _Globals._GSAAStrength;
+        highp float _1399 = clamp(1.0 - (isnan(_1396) ? 0.0 : (isnan(0.0) ? _1396 : max(0.0, _1396))), 0.0, 1.0);
+        highp float _1400 = isnan(_1399) ? _1384 : (isnan(_1384) ? _1399 : min(_1384, _1399));
+        highp float _1401 = 1.0 - _1400;
+        highp float _1402 = _1401 * _1401;
+        highp vec4 _1412 = texture(SPIRV_Cross_Combined_MetallicGlossMapsampler_MainTex, _479 * _Globals._MetallicGlossMap_ST.xy + _Globals._MetallicGlossMap_ST.zw);
+        highp float _1414 = _Globals._Metallic * _1412.x;
+        highp vec3 _1415 = _1366.xyz;
+        highp vec3 _1417 = _1415 - (_1415 * _1414);
+        highp vec3 _1423 = mix(vec3(_Globals._Reflectance), _1019.xyz, vec3(_1414));
+        highp vec4 _1433 = texture(SPIRV_Cross_Combined_ReflectionColorTexsampler_MainTex, _479 * _Globals._ReflectionColorTex_ST.xy + _Globals._ReflectionColorTex_ST.zw);
+        highp vec4 _1434 = _Globals._ReflectionColor * _1433;
+        highp vec4 _1443;
         if (_Globals._ReflectionApplyTransparency != 0u)
         {
-            highp vec4 _1441 = _1433;
-            _1441.w = _1433.w * _1362.w;
-            _1442 = _1441;
+            highp vec4 _1442 = _1434;
+            _1442.w = _1434.w * _1363.w;
+            _1443 = _1442;
         }
         else
         {
-            _1442 = _1433;
+            _1443 = _1434;
         }
-        highp vec4 _1543;
+        highp vec4 _1544;
         if (_Globals._ApplySpecular != 0u)
         {
-            highp vec3 _1515;
+            highp vec3 _1516;
             do
             {
-                highp vec3 _1453 = mix(_589, _586, vec3(_Globals._SpecularNormalStrength));
-                highp vec3 _1455 = normalize(_434 + _418);
-                highp float _1457 = clamp(dot(_1453, _1455), 0.0, 1.0);
+                highp vec3 _1454 = mix(_590, _587, vec3(_Globals._SpecularNormalStrength));
+                highp vec3 _1456 = normalize(_435 + _419);
+                highp float _1458 = clamp(dot(_1454, _1456), 0.0, 1.0);
                 if (_Globals._SpecularToon != 0u)
                 {
-                    highp float _1466 = pow(_1457, 1.0 / _1401);
-                    highp float _1473 = clamp((-_Globals._SpecularBlur) * 0.5 + _Globals._SpecularBorder, 0.0, 1.0);
-                    _1515 = vec3(clamp((_1466 - _1473) / clamp(fwidth(_1466) * _Globals._AAStrength + (clamp(_Globals._SpecularBlur * 0.5 + _Globals._SpecularBorder, 0.0, 1.0) - _1473), 0.0, 1.0), 0.0, 1.0));
+                    highp float _1467 = pow(_1458, 1.0 / _1402);
+                    highp float _1474 = clamp((-_Globals._SpecularBlur) * 0.5 + _Globals._SpecularBorder, 0.0, 1.0);
+                    _1516 = vec3(clamp((_1467 - _1474) / clamp(fwidth(_1467) * _Globals._AAStrength + (clamp(_Globals._SpecularBlur * 0.5 + _Globals._SpecularBorder, 0.0, 1.0) - _1474), 0.0, 1.0), 0.0, 1.0));
                     break;
                 }
-                highp float _1485 = clamp(dot(_1453, _434), 0.0, 1.0);
-                highp float _1487 = clamp(dot(_1453, _418), 0.0, 1.0);
-                highp float _1490 = isnan(0.00200000009499490261077880859375) ? _1401 : (isnan(_1401) ? 0.00200000009499490261077880859375 : max(_1401, 0.00200000009499490261077880859375));
-                highp float _1491 = 1.0 - _1490;
-                highp float _1495 = _1490 * _1490;
-                highp float _1498 = (_1457 * _1495 + (-_1457)) * _1457 + 1.0;
-                highp float _1506 = 1.0 - clamp(dot(_418, _1455), 0.0, 1.0);
-                _1515 = (_1422 + ((((((vec3(1.0) - _1422) * _1506) * _1506) * _1506) * _1506) * _1506)) * (((0.5 / ((_1487 * (_1485 * _1491 + _1490) + (_1485 * (_1487 * _1491 + _1490))) + 9.9999997473787516355514526367188e-06)) * (_1495 / (_1498 * _1498 + 1.0000000116860974230803549289703e-07))) * _1487);
+                highp float _1486 = clamp(dot(_1454, _435), 0.0, 1.0);
+                highp float _1488 = clamp(dot(_1454, _419), 0.0, 1.0);
+                highp float _1491 = isnan(0.00200000009499490261077880859375) ? _1402 : (isnan(_1402) ? 0.00200000009499490261077880859375 : max(_1402, 0.00200000009499490261077880859375));
+                highp float _1492 = 1.0 - _1491;
+                highp float _1496 = _1491 * _1491;
+                highp float _1499 = (_1458 * _1496 + (-_1458)) * _1458 + 1.0;
+                highp float _1507 = 1.0 - clamp(dot(_419, _1456), 0.0, 1.0);
+                _1516 = (_1423 + ((((((vec3(1.0) - _1423) * _1507) * _1507) * _1507) * _1507) * _1507)) * (((0.5 / ((_1488 * (_1486 * _1492 + _1491) + (_1486 * (_1488 * _1492 + _1491))) + 9.9999997473787516355514526367188e-06)) * (_1496 / (_1499 * _1499 + 1.0000000116860974230803549289703e-07))) * _1488);
                 break;
             } while(false);
-            highp vec3 _1516 = _1416.xyz;
-            highp vec3 _1518 = _1442.xyz * _1205;
-            highp vec3 _1523 = _1442.xyz * _1205 + _1516;
-            highp vec3 _1524 = _1516 * _1518;
-            bvec3 _1526 = bvec3(_Globals._ReflectionBlendMode == 0u);
-            highp vec3 _1527 = vec3(_1526.x ? _1518.x : _307.x, _1526.y ? _1518.y : _307.y, _1526.z ? _1518.z : _307.z);
-            bvec3 _1529 = bvec3(_Globals._ReflectionBlendMode == 1u);
-            highp vec3 _1537;
+            highp vec3 _1517 = _1417.xyz;
+            highp vec3 _1519 = _1443.xyz * _1206;
+            highp vec3 _1524 = _1443.xyz * _1206 + _1517;
+            highp vec3 _1525 = _1517 * _1519;
+            bvec3 _1527 = bvec3(_Globals._ReflectionBlendMode == 0u);
+            highp vec3 _1528 = vec3(_1527.x ? _1519.x : _308.x, _1527.y ? _1519.y : _308.y, _1527.z ? _1519.z : _308.z);
+            bvec3 _1530 = bvec3(_Globals._ReflectionBlendMode == 1u);
+            highp vec3 _1538;
             if (_Globals._ReflectionBlendMode == 2u)
             {
-                highp vec3 _1535 = (-_1516) * _1518 + _1523;
-                bvec3 _2447 = isnan(_1535);
-                bvec3 _2448 = isnan(_1516);
-                highp vec3 _2449 = max(_1535, _1516);
-                highp vec3 _2450 = vec3(_2447.x ? _1516.x : _2449.x, _2447.y ? _1516.y : _2449.y, _2447.z ? _1516.z : _2449.z);
-                _1537 = vec3(_2448.x ? _1535.x : _2450.x, _2448.y ? _1535.y : _2450.y, _2448.z ? _1535.z : _2450.z);
+                highp vec3 _1536 = (-_1517) * _1519 + _1524;
+                bvec3 _2448 = isnan(_1536);
+                bvec3 _2449 = isnan(_1517);
+                highp vec3 _2450 = max(_1536, _1517);
+                highp vec3 _2451 = vec3(_2448.x ? _1517.x : _2450.x, _2448.y ? _1517.y : _2450.y, _2448.z ? _1517.z : _2450.z);
+                _1538 = vec3(_2449.x ? _1536.x : _2451.x, _2449.y ? _1536.y : _2451.y, _2449.z ? _1536.z : _2451.z);
             }
             else
             {
-                _1537 = vec3(_1529.x ? _1523.x : _1527.x, _1529.y ? _1523.y : _1527.y, _1529.z ? _1523.z : _1527.z);
+                _1538 = vec3(_1530.x ? _1524.x : _1528.x, _1530.y ? _1524.y : _1528.y, _1530.z ? _1524.z : _1528.z);
             }
-            bvec3 _1539 = bvec3(_Globals._ReflectionBlendMode == 3u);
-            highp vec3 _1541 = mix(_1516, vec3(_1539.x ? _1524.x : _1537.x, _1539.y ? _1524.y : _1537.y, _1539.z ? _1524.z : _1537.z), _1515 * _1442.w);
-            _1543 = vec4(_1541.x, _1541.y, _1541.z, _1362.w);
+            bvec3 _1540 = bvec3(_Globals._ReflectionBlendMode == 3u);
+            highp vec3 _1542 = mix(_1517, vec3(_1540.x ? _1525.x : _1538.x, _1540.y ? _1525.y : _1538.y, _1540.z ? _1525.z : _1538.z), _1516 * _1443.w);
+            _1544 = vec4(_1542.x, _1542.y, _1542.z, _1363.w);
         }
         else
         {
-            _1543 = vec4(_1416.x, _1416.y, _1416.z, _1362.w);
+            _1544 = vec4(_1417.x, _1417.y, _1417.z, _1363.w);
         }
-        highp vec4 _1646;
+        highp vec4 _1647;
         if (_Globals._ApplyReflection != 0u)
         {
-            bvec3 _1565 = bvec3(((uvec2(textureSize(SPIRV_Cross_Combinedunity_SpecCube0samplerunity_SpecCube0, int(0u))).x < 15u) || (_Globals.unity_SpecCube0_HDR.x == 0.0)) || (_Globals._ReflectionCubeOverride != 0u));
-            highp vec3 _1572 = reflect(-_434, mix(_589, _586, vec3(_Globals._ReflectionNormalStrength)));
-            highp vec4 _1575 = textureLod(SPIRV_Cross_Combined_ReflectionCubeTexlil_sampler_trilinear_repeat, _1572, _1400 * ((-4.19999980926513671875) * _1400 + 10.19999980926513671875));
-            highp vec3 _1595 = ((_1575.xyz * (_Globals._ReflectionCubeTex_HDR.x * pow(abs(_Globals._ReflectionCubeTex_HDR.w * (_1575.w - 1.0) + 1.0), _Globals._ReflectionCubeTex_HDR.y))) * _Globals._ReflectionCubeColor.xyz) * mix(vec3(1.0), _1205, vec3(_Globals._ReflectionCubeEnableLighting));
-            highp vec3 _1601 = textureLod(SPIRV_Cross_Combinedunity_SpecCube0samplerunity_SpecCube0, _1572, _1400 * 8.0).xyz * 1.0;
-            highp float _1612 = 1.0 - _588;
-            highp vec3 _1626 = _1543.xyz + _1442.xyz;
-            highp vec3 _1627 = _1543.xyz * _1442.xyz;
-            bvec3 _1629 = bvec3(_Globals._ReflectionBlendMode == 0u);
-            highp vec3 _1630 = vec3(_1629.x ? _1442.xyz.x : _307.x, _1629.y ? _1442.xyz.y : _307.y, _1629.z ? _1442.xyz.z : _307.z);
-            bvec3 _1632 = bvec3(_Globals._ReflectionBlendMode == 1u);
-            highp vec3 _1640;
+            bvec3 _1566 = bvec3(((uvec2(textureSize(SPIRV_Cross_Combinedunity_SpecCube0samplerunity_SpecCube0, int(0u))).x < 15u) || (_Globals.unity_SpecCube0_HDR.x == 0.0)) || (_Globals._ReflectionCubeOverride != 0u));
+            highp vec3 _1573 = reflect(-_435, mix(_590, _587, vec3(_Globals._ReflectionNormalStrength)));
+            highp vec4 _1576 = textureLod(SPIRV_Cross_Combined_ReflectionCubeTexlil_sampler_trilinear_repeat, _1573, _1401 * ((-4.19999980926513671875) * _1401 + 10.19999980926513671875));
+            highp vec3 _1596 = ((_1576.xyz * (_Globals._ReflectionCubeTex_HDR.x * pow(abs(_Globals._ReflectionCubeTex_HDR.w * (_1576.w - 1.0) + 1.0), _Globals._ReflectionCubeTex_HDR.y))) * _Globals._ReflectionCubeColor.xyz) * mix(vec3(1.0), _1206, vec3(_Globals._ReflectionCubeEnableLighting));
+            highp vec3 _1602 = textureLod(SPIRV_Cross_Combinedunity_SpecCube0samplerunity_SpecCube0, _1573, _1401 * 8.0).xyz * 1.0;
+            highp float _1613 = 1.0 - _589;
+            highp vec3 _1627 = _1544.xyz + _1443.xyz;
+            highp vec3 _1628 = _1544.xyz * _1443.xyz;
+            bvec3 _1630 = bvec3(_Globals._ReflectionBlendMode == 0u);
+            highp vec3 _1631 = vec3(_1630.x ? _1443.xyz.x : _308.x, _1630.y ? _1443.xyz.y : _308.y, _1630.z ? _1443.xyz.z : _308.z);
+            bvec3 _1633 = bvec3(_Globals._ReflectionBlendMode == 1u);
+            highp vec3 _1641;
             if (_Globals._ReflectionBlendMode == 2u)
             {
-                highp vec3 _1638 = (-_1543.xyz) * _1442.xyz + _1626;
-                bvec3 _2452 = isnan(_1638);
-                bvec3 _2453 = isnan(_1543.xyz);
-                highp vec3 _2454 = max(_1638, _1543.xyz);
-                highp vec3 _2455 = vec3(_2452.x ? _1543.xyz.x : _2454.x, _2452.y ? _1543.xyz.y : _2454.y, _2452.z ? _1543.xyz.z : _2454.z);
-                _1640 = vec3(_2453.x ? _1638.x : _2455.x, _2453.y ? _1638.y : _2455.y, _2453.z ? _1638.z : _2455.z);
+                highp vec3 _1639 = (-_1544.xyz) * _1443.xyz + _1627;
+                bvec3 _2453 = isnan(_1639);
+                bvec3 _2454 = isnan(_1544.xyz);
+                highp vec3 _2455 = max(_1639, _1544.xyz);
+                highp vec3 _2456 = vec3(_2453.x ? _1544.xyz.x : _2455.x, _2453.y ? _1544.xyz.y : _2455.y, _2453.z ? _1544.xyz.z : _2455.z);
+                _1641 = vec3(_2454.x ? _1639.x : _2456.x, _2454.y ? _1639.y : _2456.y, _2454.z ? _1639.z : _2456.z);
             }
             else
             {
-                _1640 = vec3(_1632.x ? _1626.x : _1630.x, _1632.y ? _1626.y : _1630.y, _1632.z ? _1626.z : _1630.z);
+                _1641 = vec3(_1633.x ? _1627.x : _1631.x, _1633.y ? _1627.y : _1631.y, _1633.z ? _1627.z : _1631.z);
             }
-            bvec3 _1642 = bvec3(_Globals._ReflectionBlendMode == 3u);
-            highp vec3 _1644 = mix(_1543.xyz, vec3(_1642.x ? _1627.x : _1640.x, _1642.y ? _1627.y : _1640.y, _1642.z ? _1627.z : _1640.z), ((vec3(_1565.x ? _1595.x : _1601.x, _1565.y ? _1595.y : _1601.y, _1565.z ? _1595.z : _1601.z) * (1.0 / (_1401 * _1401 + 1.0))) * mix(_1422, vec3(clamp(_1399 + (1.0 - ((-_1413) * 0.959999978542327880859375 + 0.959999978542327880859375)), 0.0, 1.0)), vec3((((_1612 * _1612) * _1612) * _1612) * _1612))) * _1442.w);
-            _1646 = vec4(_1644.x, _1644.y, _1644.z, _1543.w);
+            bvec3 _1643 = bvec3(_Globals._ReflectionBlendMode == 3u);
+            highp vec3 _1645 = mix(_1544.xyz, vec3(_1643.x ? _1628.x : _1641.x, _1643.y ? _1628.y : _1641.y, _1643.z ? _1628.z : _1641.z), ((vec3(_1566.x ? _1596.x : _1602.x, _1566.y ? _1596.y : _1602.y, _1566.z ? _1596.z : _1602.z) * (1.0 / (_1402 * _1402 + 1.0))) * mix(_1423, vec3(clamp(_1400 + (1.0 - ((-_1414) * 0.959999978542327880859375 + 0.959999978542327880859375)), 0.0, 1.0)), vec3((((_1613 * _1613) * _1613) * _1613) * _1613))) * _1443.w);
+            _1647 = vec4(_1645.x, _1645.y, _1645.z, _1544.w);
         }
         else
         {
-            _1646 = _1543;
+            _1647 = _1544;
         }
-        _1647 = _1646;
+        _1648 = _1647;
     }
     else
     {
-        _1647 = vec4(_1365.x, _1365.y, _1365.z, _1362.w);
+        _1648 = vec4(_1366.x, _1366.y, _1366.z, _1363.w);
     }
-    highp vec4 _1810;
+    highp vec4 _1811;
     if (_Globals._UseMatCap != 0u)
     {
-        highp vec3 _1692;
+        highp vec3 _1693;
         if (_Globals._MatCapCustomNormal != 0u)
         {
-            highp vec4 _1669 = texture(SPIRV_Cross_Combined_BumpMapsampler_MainTex, _478 * _Globals._MatCapBumpMap_ST.xy + _Globals._MatCapBumpMap_ST.zw);
-            _1669.w = _1669.w * _1669.x;
-            highp vec2 _1680 = ((_1669.wy * 2.0) - vec2(1.0)).xy * _Globals._MatCapBumpScale;
-            highp vec3 _1681 = vec3(_1680.x, _1680.y, _313.z);
-            highp vec2 _1682 = _1680.xy;
-            _1681.z = sqrt(1.0 - clamp(dot(_1682, _1682), 0.0, 1.0));
-            highp vec3 _1689 = normalize(_443 * _1681);
-            highp vec3 _1690 = -_1689;
-            _1692 = vec3(_584.x ? _1690.x : _1689.x, _584.y ? _1690.y : _1689.y, _584.z ? _1690.z : _1689.z);
+            highp vec4 _1670 = texture(SPIRV_Cross_Combined_BumpMapsampler_MainTex, _479 * _Globals._MatCapBumpMap_ST.xy + _Globals._MatCapBumpMap_ST.zw);
+            _1670.w = _1670.w * _1670.x;
+            highp vec2 _1681 = ((_1670.wy * 2.0) - vec2(1.0)).xy * _Globals._MatCapBumpScale;
+            highp vec3 _1682 = vec3(_1681.x, _1681.y, _314.z);
+            highp vec2 _1683 = _1681.xy;
+            _1682.z = sqrt(1.0 - clamp(dot(_1683, _1683), 0.0, 1.0));
+            highp vec3 _1690 = normalize(_444 * _1682);
+            highp vec3 _1691 = -_1690;
+            _1693 = vec3(_585.x ? _1691.x : _1690.x, _585.y ? _1691.y : _1690.y, _585.z ? _1691.z : _1690.z);
         }
         else
         {
-            _1692 = mix(_589, _586, vec3(_Globals._MatCapNormalStrength));
+            _1693 = mix(_590, _587, vec3(_Globals._MatCapNormalStrength));
         }
-        bvec3 _1709 = bvec3((_Globals.uOrthoParams.w == 0.0) && (_Globals._MatCapPerspective != 0u));
-        highp vec3 _1710 = vec3(_1709.x ? _434.x : _334.x, _1709.y ? _434.y : _334.y, _1709.z ? _434.z : _334.z);
-        bvec3 _1711 = bvec3(_Globals._MatCapZRotCancel != 0u);
-        highp vec3 _1712 = vec3(_1711.x ? vec3(0.0, 1.0, 0.0).x : _341.x, _1711.y ? vec3(0.0, 1.0, 0.0).y : _341.y, _1711.z ? vec3(0.0, 1.0, 0.0).z : _341.z);
-        highp vec3 _1716 = normalize(_1712 - (_1710 * dot(_1710, _1712)));
-        highp vec4 _1738 = _Globals._MatCapColor * textureLod(SPIRV_Cross_Combined_MatCapTexlil_sampler_trilinear_repeat, ((mix((normalize(_1692) * mat3(cross(_1710, _1716), _1716, _1710)).xy, (clamp(out_var_TEXCOORD0.zw, vec2(0.0), vec2(1.0)) * 2.0) - vec2(1.0), _Globals._MatCapBlendUV1.xy) * _Globals._MatCapTex_ST.xy + _Globals._MatCapTex_ST.zw) * 0.5) + vec2(0.5), _Globals._MatCapLod);
-        highp vec3 _1744 = mix(_1738.xyz, _1738.xyz * _1205, vec3(_Globals._MatCapEnableLighting));
-        highp vec4 _1745 = vec4(_1744.x, _1744.y, _1744.z, _1738.w);
-        highp float _1750 = mix(_1738.w, _1738.w * _1206, _Globals._MatCapShadowMask);
-        _1745.w = _1750;
-        highp vec4 _1760;
+        bvec3 _1710 = bvec3((_Globals.uOrthoParams.w == 0.0) && (_Globals._MatCapPerspective != 0u));
+        highp vec3 _1711 = vec3(_1710.x ? _435.x : _335.x, _1710.y ? _435.y : _335.y, _1710.z ? _435.z : _335.z);
+        bvec3 _1712 = bvec3(_Globals._MatCapZRotCancel != 0u);
+        highp vec3 _1713 = vec3(_1712.x ? vec3(0.0, 1.0, 0.0).x : _342.x, _1712.y ? vec3(0.0, 1.0, 0.0).y : _342.y, _1712.z ? vec3(0.0, 1.0, 0.0).z : _342.z);
+        highp vec3 _1717 = normalize(_1713 - (_1711 * dot(_1711, _1713)));
+        highp vec4 _1739 = _Globals._MatCapColor * textureLod(SPIRV_Cross_Combined_MatCapTexlil_sampler_trilinear_repeat, ((mix((normalize(_1693) * mat3(cross(_1711, _1717), _1717, _1711)).xy, (clamp(out_var_TEXCOORD0.zw, vec2(0.0), vec2(1.0)) * 2.0) - vec2(1.0), _Globals._MatCapBlendUV1.xy) * _Globals._MatCapTex_ST.xy + _Globals._MatCapTex_ST.zw) * 0.5) + vec2(0.5), _Globals._MatCapLod);
+        highp vec3 _1745 = mix(_1739.xyz, _1739.xyz * _1206, vec3(_Globals._MatCapEnableLighting));
+        highp vec4 _1746 = vec4(_1745.x, _1745.y, _1745.z, _1739.w);
+        highp float _1751 = mix(_1739.w, _1739.w * _1207, _Globals._MatCapShadowMask);
+        _1746.w = _1751;
+        highp vec4 _1761;
         if (_Globals._MatCapApplyTransparency != 0u)
         {
-            highp vec4 _1759 = _1745;
-            _1759.w = _1750 * _1647.w;
-            _1760 = _1759;
+            highp vec4 _1760 = _1746;
+            _1760.w = _1751 * _1648.w;
+            _1761 = _1760;
         }
         else
         {
-            _1760 = _1745;
+            _1761 = _1746;
         }
-        highp vec4 _1774 = texture(SPIRV_Cross_Combined_MatCapBlendMasksampler_MainTex, _478 * _Globals._MatCapBlendMask_ST.xy + _Globals._MatCapBlendMask_ST.zw);
-        highp vec3 _1783 = mix(_1760.xyz, _1760.xyz * _1018.xyz, vec3(_Globals._MatCapMainStrength)).xyz;
-        highp vec3 _1790 = _1647.xyz + _1783;
-        highp vec3 _1791 = _1647.xyz * _1783;
-        bvec3 _1793 = bvec3(_Globals._MatCapBlendMode == 0u);
-        highp vec3 _1794 = vec3(_1793.x ? _1783.x : _307.x, _1793.y ? _1783.y : _307.y, _1793.z ? _1783.z : _307.z);
-        bvec3 _1796 = bvec3(_Globals._MatCapBlendMode == 1u);
-        highp vec3 _1804;
+        highp vec4 _1775 = texture(SPIRV_Cross_Combined_MatCapBlendMasksampler_MainTex, _479 * _Globals._MatCapBlendMask_ST.xy + _Globals._MatCapBlendMask_ST.zw);
+        highp vec3 _1784 = mix(_1761.xyz, _1761.xyz * _1019.xyz, vec3(_Globals._MatCapMainStrength)).xyz;
+        highp vec3 _1791 = _1648.xyz + _1784;
+        highp vec3 _1792 = _1648.xyz * _1784;
+        bvec3 _1794 = bvec3(_Globals._MatCapBlendMode == 0u);
+        highp vec3 _1795 = vec3(_1794.x ? _1784.x : _308.x, _1794.y ? _1784.y : _308.y, _1794.z ? _1784.z : _308.z);
+        bvec3 _1797 = bvec3(_Globals._MatCapBlendMode == 1u);
+        highp vec3 _1805;
         if (_Globals._MatCapBlendMode == 2u)
         {
-            highp vec3 _1802 = (-_1647.xyz) * _1783 + _1790;
-            bvec3 _2457 = isnan(_1802);
-            bvec3 _2458 = isnan(_1647.xyz);
-            highp vec3 _2459 = max(_1802, _1647.xyz);
-            highp vec3 _2460 = vec3(_2457.x ? _1647.xyz.x : _2459.x, _2457.y ? _1647.xyz.y : _2459.y, _2457.z ? _1647.xyz.z : _2459.z);
-            _1804 = vec3(_2458.x ? _1802.x : _2460.x, _2458.y ? _1802.y : _2460.y, _2458.z ? _1802.z : _2460.z);
+            highp vec3 _1803 = (-_1648.xyz) * _1784 + _1791;
+            bvec3 _2458 = isnan(_1803);
+            bvec3 _2459 = isnan(_1648.xyz);
+            highp vec3 _2460 = max(_1803, _1648.xyz);
+            highp vec3 _2461 = vec3(_2458.x ? _1648.xyz.x : _2460.x, _2458.y ? _1648.xyz.y : _2460.y, _2458.z ? _1648.xyz.z : _2460.z);
+            _1805 = vec3(_2459.x ? _1803.x : _2461.x, _2459.y ? _1803.y : _2461.y, _2459.z ? _1803.z : _2461.z);
         }
         else
         {
-            _1804 = vec3(_1796.x ? _1790.x : _1794.x, _1796.y ? _1790.y : _1794.y, _1796.z ? _1790.z : _1794.z);
+            _1805 = vec3(_1797.x ? _1791.x : _1795.x, _1797.y ? _1791.y : _1795.y, _1797.z ? _1791.z : _1795.z);
         }
-        bvec3 _1806 = bvec3(_Globals._MatCapBlendMode == 3u);
-        highp vec3 _1808 = mix(_1647.xyz, vec3(_1806.x ? _1791.x : _1804.x, _1806.y ? _1791.y : _1804.y, _1806.z ? _1791.z : _1804.z), _1774.xyz * (_Globals._MatCapBlend * ((_366 < (_Globals._MatCapBackfaceMask - 1.0)) ? 0.0 : _1760.w)));
-        _1810 = vec4(_1808.x, _1808.y, _1808.z, _1647.w);
+        bvec3 _1807 = bvec3(_Globals._MatCapBlendMode == 3u);
+        highp vec3 _1809 = mix(_1648.xyz, vec3(_1807.x ? _1792.x : _1805.x, _1807.y ? _1792.y : _1805.y, _1807.z ? _1792.z : _1805.z), _1775.xyz * (_Globals._MatCapBlend * ((_367 < (_Globals._MatCapBackfaceMask - 1.0)) ? 0.0 : _1761.w)));
+        _1811 = vec4(_1809.x, _1809.y, _1809.z, _1648.w);
     }
     else
     {
-        _1810 = _1647;
+        _1811 = _1648;
     }
-    highp vec4 _1972;
+    highp vec4 _1973;
     if (_Globals._UseMatCap2nd != 0u)
     {
-        highp vec3 _1855;
+        highp vec3 _1856;
         if (_Globals._MatCap2ndCustomNormal != 0u)
         {
-            highp vec4 _1832 = texture(SPIRV_Cross_Combined_BumpMapsampler_MainTex, _478 * _Globals._MatCap2ndBumpMap_ST.xy + _Globals._MatCap2ndBumpMap_ST.zw);
-            _1832.w = _1832.w * _1832.x;
-            highp vec2 _1843 = ((_1832.wy * 2.0) - vec2(1.0)).xy * _Globals._MatCap2ndBumpScale;
-            highp vec3 _1844 = vec3(_1843.x, _1843.y, _313.z);
-            highp vec2 _1845 = _1843.xy;
-            _1844.z = sqrt(1.0 - clamp(dot(_1845, _1845), 0.0, 1.0));
-            highp vec3 _1852 = normalize(_443 * _1844);
-            highp vec3 _1853 = -_1852;
-            _1855 = vec3(_584.x ? _1853.x : _1852.x, _584.y ? _1853.y : _1852.y, _584.z ? _1853.z : _1852.z);
+            highp vec4 _1833 = texture(SPIRV_Cross_Combined_BumpMapsampler_MainTex, _479 * _Globals._MatCap2ndBumpMap_ST.xy + _Globals._MatCap2ndBumpMap_ST.zw);
+            _1833.w = _1833.w * _1833.x;
+            highp vec2 _1844 = ((_1833.wy * 2.0) - vec2(1.0)).xy * _Globals._MatCap2ndBumpScale;
+            highp vec3 _1845 = vec3(_1844.x, _1844.y, _314.z);
+            highp vec2 _1846 = _1844.xy;
+            _1845.z = sqrt(1.0 - clamp(dot(_1846, _1846), 0.0, 1.0));
+            highp vec3 _1853 = normalize(_444 * _1845);
+            highp vec3 _1854 = -_1853;
+            _1856 = vec3(_585.x ? _1854.x : _1853.x, _585.y ? _1854.y : _1853.y, _585.z ? _1854.z : _1853.z);
         }
         else
         {
-            _1855 = mix(_589, _586, vec3(_Globals._MatCap2ndNormalStrength));
+            _1856 = mix(_590, _587, vec3(_Globals._MatCap2ndNormalStrength));
         }
-        bvec3 _1871 = bvec3((_Globals.uOrthoParams.w == 0.0) && (_Globals._MatCap2ndPerspective != 0u));
-        highp vec3 _1872 = vec3(_1871.x ? _434.x : _334.x, _1871.y ? _434.y : _334.y, _1871.z ? _434.z : _334.z);
-        bvec3 _1873 = bvec3(_Globals._MatCap2ndZRotCancel != 0u);
-        highp vec3 _1874 = vec3(_1873.x ? vec3(0.0, 1.0, 0.0).x : _341.x, _1873.y ? vec3(0.0, 1.0, 0.0).y : _341.y, _1873.z ? vec3(0.0, 1.0, 0.0).z : _341.z);
-        highp vec3 _1878 = normalize(_1874 - (_1872 * dot(_1872, _1874)));
-        highp vec4 _1900 = _Globals._MatCap2ndColor * textureLod(SPIRV_Cross_Combined_MatCap2ndTexlil_sampler_trilinear_repeat, ((mix((_1855 * mat3(cross(_1872, _1878), _1878, _1872)).xy, (clamp(out_var_TEXCOORD0.zw, vec2(0.0), vec2(1.0)) * 2.0) - vec2(1.0), _Globals._MatCap2ndBlendUV1.xy) * _Globals._MatCap2ndTex_ST.xy + _Globals._MatCap2ndTex_ST.zw) * 0.5) + vec2(0.5), _Globals._MatCap2ndLod);
-        highp vec3 _1901 = _1900.xyz;
-        highp vec3 _1906 = mix(_1901, _1901 * _1205, vec3(_Globals._MatCap2ndEnableLighting));
-        highp vec4 _1907 = vec4(_1906.x, _1906.y, _1906.z, _1900.w);
-        highp float _1908 = _1900.w;
-        highp float _1912 = mix(_1908, _1908 * _1206, _Globals._MatCap2ndShadowMask);
-        _1907.w = _1912;
-        highp vec4 _1922;
+        bvec3 _1872 = bvec3((_Globals.uOrthoParams.w == 0.0) && (_Globals._MatCap2ndPerspective != 0u));
+        highp vec3 _1873 = vec3(_1872.x ? _435.x : _335.x, _1872.y ? _435.y : _335.y, _1872.z ? _435.z : _335.z);
+        bvec3 _1874 = bvec3(_Globals._MatCap2ndZRotCancel != 0u);
+        highp vec3 _1875 = vec3(_1874.x ? vec3(0.0, 1.0, 0.0).x : _342.x, _1874.y ? vec3(0.0, 1.0, 0.0).y : _342.y, _1874.z ? vec3(0.0, 1.0, 0.0).z : _342.z);
+        highp vec3 _1879 = normalize(_1875 - (_1873 * dot(_1873, _1875)));
+        highp vec4 _1901 = _Globals._MatCap2ndColor * textureLod(SPIRV_Cross_Combined_MatCap2ndTexlil_sampler_trilinear_repeat, ((mix((_1856 * mat3(cross(_1873, _1879), _1879, _1873)).xy, (clamp(out_var_TEXCOORD0.zw, vec2(0.0), vec2(1.0)) * 2.0) - vec2(1.0), _Globals._MatCap2ndBlendUV1.xy) * _Globals._MatCap2ndTex_ST.xy + _Globals._MatCap2ndTex_ST.zw) * 0.5) + vec2(0.5), _Globals._MatCap2ndLod);
+        highp vec3 _1902 = _1901.xyz;
+        highp vec3 _1907 = mix(_1902, _1902 * _1206, vec3(_Globals._MatCap2ndEnableLighting));
+        highp vec4 _1908 = vec4(_1907.x, _1907.y, _1907.z, _1901.w);
+        highp float _1909 = _1901.w;
+        highp float _1913 = mix(_1909, _1909 * _1207, _Globals._MatCap2ndShadowMask);
+        _1908.w = _1913;
+        highp vec4 _1923;
         if (_Globals._MatCap2ndApplyTransparency != 0u)
         {
-            highp vec4 _1921 = _1907;
-            _1921.w = _1912 * _1810.w;
-            _1922 = _1921;
+            highp vec4 _1922 = _1908;
+            _1922.w = _1913 * _1811.w;
+            _1923 = _1922;
         }
         else
         {
-            _1922 = _1907;
+            _1923 = _1908;
         }
-        highp vec4 _1936 = texture(SPIRV_Cross_Combined_MatCap2ndBlendMasksampler_MainTex, _478 * _Globals._MatCap2ndBlendMask_ST.xy + _Globals._MatCap2ndBlendMask_ST.zw);
-        highp vec3 _1945 = mix(_1922.xyz, _1922.xyz * _1018.xyz, vec3(_Globals._MatCap2ndMainStrength)).xyz;
-        highp vec3 _1952 = _1810.xyz + _1945;
-        highp vec3 _1953 = _1810.xyz * _1945;
-        bvec3 _1955 = bvec3(_Globals._MatCap2ndBlendMode == 0u);
-        highp vec3 _1956 = vec3(_1955.x ? _1945.x : _307.x, _1955.y ? _1945.y : _307.y, _1955.z ? _1945.z : _307.z);
-        bvec3 _1958 = bvec3(_Globals._MatCap2ndBlendMode == 1u);
-        highp vec3 _1966;
+        highp vec4 _1937 = texture(SPIRV_Cross_Combined_MatCap2ndBlendMasksampler_MainTex, _479 * _Globals._MatCap2ndBlendMask_ST.xy + _Globals._MatCap2ndBlendMask_ST.zw);
+        highp vec3 _1946 = mix(_1923.xyz, _1923.xyz * _1019.xyz, vec3(_Globals._MatCap2ndMainStrength)).xyz;
+        highp vec3 _1953 = _1811.xyz + _1946;
+        highp vec3 _1954 = _1811.xyz * _1946;
+        bvec3 _1956 = bvec3(_Globals._MatCap2ndBlendMode == 0u);
+        highp vec3 _1957 = vec3(_1956.x ? _1946.x : _308.x, _1956.y ? _1946.y : _308.y, _1956.z ? _1946.z : _308.z);
+        bvec3 _1959 = bvec3(_Globals._MatCap2ndBlendMode == 1u);
+        highp vec3 _1967;
         if (_Globals._MatCap2ndBlendMode == 2u)
         {
-            highp vec3 _1964 = (-_1810.xyz) * _1945 + _1952;
-            bvec3 _2462 = isnan(_1964);
-            bvec3 _2463 = isnan(_1810.xyz);
-            highp vec3 _2464 = max(_1964, _1810.xyz);
-            highp vec3 _2465 = vec3(_2462.x ? _1810.xyz.x : _2464.x, _2462.y ? _1810.xyz.y : _2464.y, _2462.z ? _1810.xyz.z : _2464.z);
-            _1966 = vec3(_2463.x ? _1964.x : _2465.x, _2463.y ? _1964.y : _2465.y, _2463.z ? _1964.z : _2465.z);
+            highp vec3 _1965 = (-_1811.xyz) * _1946 + _1953;
+            bvec3 _2463 = isnan(_1965);
+            bvec3 _2464 = isnan(_1811.xyz);
+            highp vec3 _2465 = max(_1965, _1811.xyz);
+            highp vec3 _2466 = vec3(_2463.x ? _1811.xyz.x : _2465.x, _2463.y ? _1811.xyz.y : _2465.y, _2463.z ? _1811.xyz.z : _2465.z);
+            _1967 = vec3(_2464.x ? _1965.x : _2466.x, _2464.y ? _1965.y : _2466.y, _2464.z ? _1965.z : _2466.z);
         }
         else
         {
-            _1966 = vec3(_1958.x ? _1952.x : _1956.x, _1958.y ? _1952.y : _1956.y, _1958.z ? _1952.z : _1956.z);
+            _1967 = vec3(_1959.x ? _1953.x : _1957.x, _1959.y ? _1953.y : _1957.y, _1959.z ? _1953.z : _1957.z);
         }
-        bvec3 _1968 = bvec3(_Globals._MatCap2ndBlendMode == 3u);
-        highp vec3 _1970 = mix(_1810.xyz, vec3(_1968.x ? _1953.x : _1966.x, _1968.y ? _1953.y : _1966.y, _1968.z ? _1953.z : _1966.z), _1936.xyz * (_Globals._MatCap2ndBlend * ((_366 < (_Globals._MatCap2ndBackfaceMask - 1.0)) ? 0.0 : _1922.w)));
-        _1972 = vec4(_1970.x, _1970.y, _1970.z, _1810.w);
+        bvec3 _1969 = bvec3(_Globals._MatCap2ndBlendMode == 3u);
+        highp vec3 _1971 = mix(_1811.xyz, vec3(_1969.x ? _1954.x : _1967.x, _1969.y ? _1954.y : _1967.y, _1969.z ? _1954.z : _1967.z), _1937.xyz * (_Globals._MatCap2ndBlend * ((_367 < (_Globals._MatCap2ndBackfaceMask - 1.0)) ? 0.0 : _1923.w)));
+        _1973 = vec4(_1971.x, _1971.y, _1971.z, _1811.w);
     }
     else
     {
-        _1972 = _1810;
+        _1973 = _1811;
     }
-    highp vec4 _2128;
+    highp vec4 _2129;
     if (_Globals._UseRim != 0u)
     {
-        highp vec3 _1991 = mix(_589, _586, vec3(_Globals._RimNormalStrength));
-        highp float _1995 = dot(_418, _1991) * 0.5 + 0.5;
-        highp float _2018 = (_366 < (_Globals._RimBackfaceMask - 1.0)) ? 0.0 : pow(clamp(1.0 - abs(dot(_1991, _434)), 0.0, 1.0), _Globals._RimFresnelPower);
-        highp float _2022 = mix(_2018, _2018 * clamp((_1995 + _Globals._RimDirRange) / (1.0 + _Globals._RimDirRange), 0.0, 1.0), _Globals._RimDirStrength);
-        highp float _2023 = _2018 * clamp(((1.0 - _1995) + _Globals._RimIndirRange) / (1.0 + _Globals._RimIndirRange), 0.0, 1.0);
-        highp float _2033 = clamp((-_Globals._RimBlur) * 0.5 + _Globals._RimBorder, 0.0, 1.0);
-        highp float _2042 = clamp((_2022 - _2033) / clamp(fwidth(_2022) * _Globals._AAStrength + (clamp(_Globals._RimBlur * 0.5 + _Globals._RimBorder, 0.0, 1.0) - _2033), 0.0, 1.0), 0.0, 1.0);
-        highp float _2049 = clamp((-_Globals._RimIndirBlur) * 0.5 + _Globals._RimIndirBorder, 0.0, 1.0);
-        highp float _2059 = clamp((_2023 * _Globals._RimDirStrength + (-_2049)) / clamp(fwidth(_2023 * _Globals._RimDirStrength) * _Globals._AAStrength + (clamp(_Globals._RimIndirBlur * 0.5 + _Globals._RimIndirBorder, 0.0, 1.0) - _2049), 0.0, 1.0), 0.0, 1.0);
-        highp float _2063 = mix(_2042, _2042 * _1206, _Globals._RimShadowMask);
-        highp float _2065 = mix(_2059, _2059 * _1206, _Globals._RimShadowMask);
-        highp float _2074;
+        highp vec3 _1992 = mix(_590, _587, vec3(_Globals._RimNormalStrength));
+        highp float _1996 = dot(_419, _1992) * 0.5 + 0.5;
+        highp float _2019 = (_367 < (_Globals._RimBackfaceMask - 1.0)) ? 0.0 : pow(clamp(1.0 - abs(dot(_1992, _435)), 0.0, 1.0), _Globals._RimFresnelPower);
+        highp float _2023 = mix(_2019, _2019 * clamp((_1996 + _Globals._RimDirRange) / (1.0 + _Globals._RimDirRange), 0.0, 1.0), _Globals._RimDirStrength);
+        highp float _2024 = _2019 * clamp(((1.0 - _1996) + _Globals._RimIndirRange) / (1.0 + _Globals._RimIndirRange), 0.0, 1.0);
+        highp float _2034 = clamp((-_Globals._RimBlur) * 0.5 + _Globals._RimBorder, 0.0, 1.0);
+        highp float _2043 = clamp((_2023 - _2034) / clamp(fwidth(_2023) * _Globals._AAStrength + (clamp(_Globals._RimBlur * 0.5 + _Globals._RimBorder, 0.0, 1.0) - _2034), 0.0, 1.0), 0.0, 1.0);
+        highp float _2050 = clamp((-_Globals._RimIndirBlur) * 0.5 + _Globals._RimIndirBorder, 0.0, 1.0);
+        highp float _2060 = clamp((_2024 * _Globals._RimDirStrength + (-_2050)) / clamp(fwidth(_2024 * _Globals._RimDirStrength) * _Globals._AAStrength + (clamp(_Globals._RimIndirBlur * 0.5 + _Globals._RimIndirBorder, 0.0, 1.0) - _2050), 0.0, 1.0), 0.0, 1.0);
+        highp float _2064 = mix(_2043, _2043 * _1207, _Globals._RimShadowMask);
+        highp float _2066 = mix(_2060, _2060 * _1207, _Globals._RimShadowMask);
         highp float _2075;
+        highp float _2076;
         if (_Globals._RimApplyTransparency != 0u)
         {
-            _2074 = _2065 * _1972.w;
-            _2075 = _2063 * _1972.w;
+            _2075 = _2066 * _1973.w;
+            _2076 = _2064 * _1973.w;
         }
         else
         {
-            _2074 = _2065;
-            _2075 = _2063;
+            _2075 = _2066;
+            _2076 = _2064;
         }
-        highp vec3 _2081 = vec3(1.0 - _Globals._RimEnableLighting) + (_1205 * _Globals._RimEnableLighting);
-        highp vec3 _2083 = mix(_Globals._RimColor.xyz, _Globals._RimColor.xyz * _1018.xyz, vec3(_Globals._RimMainStrength)).xyz;
-        highp vec3 _2084 = _2083 * _2081;
-        highp vec3 _2090 = _2083 * _2081 + _1972.xyz;
-        highp vec3 _2091 = _1972.xyz * _2084;
-        bvec3 _2093 = bvec3(_Globals._RimBlendMode == 0u);
-        highp vec3 _2094 = vec3(_2093.x ? _2084.x : _307.x, _2093.y ? _2084.y : _307.y, _2093.z ? _2084.z : _307.z);
-        bvec3 _2096 = bvec3(_Globals._RimBlendMode == 1u);
-        bool _2098 = _Globals._RimBlendMode == 2u;
-        highp vec3 _2104;
-        if (_2098)
+        highp vec3 _2082 = vec3(1.0 - _Globals._RimEnableLighting) + (_1206 * _Globals._RimEnableLighting);
+        highp vec3 _2084 = mix(_Globals._RimColor.xyz, _Globals._RimColor.xyz * _1019.xyz, vec3(_Globals._RimMainStrength)).xyz;
+        highp vec3 _2085 = _2084 * _2082;
+        highp vec3 _2091 = _2084 * _2082 + _1973.xyz;
+        highp vec3 _2092 = _1973.xyz * _2085;
+        bvec3 _2094 = bvec3(_Globals._RimBlendMode == 0u);
+        highp vec3 _2095 = vec3(_2094.x ? _2085.x : _308.x, _2094.y ? _2085.y : _308.y, _2094.z ? _2085.z : _308.z);
+        bvec3 _2097 = bvec3(_Globals._RimBlendMode == 1u);
+        bool _2099 = _Globals._RimBlendMode == 2u;
+        highp vec3 _2105;
+        if (_2099)
         {
-            highp vec3 _2102 = (-_1972.xyz) * _2084 + _2090;
-            bvec3 _2467 = isnan(_2102);
-            bvec3 _2468 = isnan(_1972.xyz);
-            highp vec3 _2469 = max(_2102, _1972.xyz);
-            highp vec3 _2470 = vec3(_2467.x ? _1972.xyz.x : _2469.x, _2467.y ? _1972.xyz.y : _2469.y, _2467.z ? _1972.xyz.z : _2469.z);
-            _2104 = vec3(_2468.x ? _2102.x : _2470.x, _2468.y ? _2102.y : _2470.y, _2468.z ? _2102.z : _2470.z);
+            highp vec3 _2103 = (-_1973.xyz) * _2085 + _2091;
+            bvec3 _2468 = isnan(_2103);
+            bvec3 _2469 = isnan(_1973.xyz);
+            highp vec3 _2470 = max(_2103, _1973.xyz);
+            highp vec3 _2471 = vec3(_2468.x ? _1973.xyz.x : _2470.x, _2468.y ? _1973.xyz.y : _2470.y, _2468.z ? _1973.xyz.z : _2470.z);
+            _2105 = vec3(_2469.x ? _2103.x : _2471.x, _2469.y ? _2103.y : _2471.y, _2469.z ? _2103.z : _2471.z);
         }
         else
         {
-            _2104 = vec3(_2096.x ? _2090.x : _2094.x, _2096.y ? _2090.y : _2094.y, _2096.z ? _2090.z : _2094.z);
+            _2105 = vec3(_2097.x ? _2091.x : _2095.x, _2097.y ? _2091.y : _2095.y, _2097.z ? _2091.z : _2095.z);
         }
-        bvec3 _2106 = bvec3(_Globals._RimBlendMode == 3u);
-        highp vec3 _2109 = mix(_1972.xyz, vec3(_2106.x ? _2091.x : _2104.x, _2106.y ? _2091.y : _2104.y, _2106.z ? _2091.z : _2104.z), vec3(_2075 * _Globals._RimColor.w)).xyz;
-        highp vec3 _2111 = _Globals._RimIndirColor.xyz * _2081;
-        highp vec3 _2115 = _Globals._RimIndirColor.xyz * _2081 + _2109;
-        highp vec3 _2116 = _2109 * _2111;
-        highp vec3 _2117 = vec3(_2093.x ? _2111.x : _307.x, _2093.y ? _2111.y : _307.y, _2093.z ? _2111.z : _307.z);
-        highp vec3 _2124;
-        if (_2098)
+        bvec3 _2107 = bvec3(_Globals._RimBlendMode == 3u);
+        highp vec3 _2110 = mix(_1973.xyz, vec3(_2107.x ? _2092.x : _2105.x, _2107.y ? _2092.y : _2105.y, _2107.z ? _2092.z : _2105.z), vec3(_2076 * _Globals._RimColor.w)).xyz;
+        highp vec3 _2112 = _Globals._RimIndirColor.xyz * _2082;
+        highp vec3 _2116 = _Globals._RimIndirColor.xyz * _2082 + _2110;
+        highp vec3 _2117 = _2110 * _2112;
+        highp vec3 _2118 = vec3(_2094.x ? _2112.x : _308.x, _2094.y ? _2112.y : _308.y, _2094.z ? _2112.z : _308.z);
+        highp vec3 _2125;
+        if (_2099)
         {
-            highp vec3 _2122 = (-_2109) * _2111 + _2115;
-            bvec3 _2472 = isnan(_2122);
-            bvec3 _2473 = isnan(_2109);
-            highp vec3 _2474 = max(_2122, _2109);
-            highp vec3 _2475 = vec3(_2472.x ? _2109.x : _2474.x, _2472.y ? _2109.y : _2474.y, _2472.z ? _2109.z : _2474.z);
-            _2124 = vec3(_2473.x ? _2122.x : _2475.x, _2473.y ? _2122.y : _2475.y, _2473.z ? _2122.z : _2475.z);
+            highp vec3 _2123 = (-_2110) * _2112 + _2116;
+            bvec3 _2473 = isnan(_2123);
+            bvec3 _2474 = isnan(_2110);
+            highp vec3 _2475 = max(_2123, _2110);
+            highp vec3 _2476 = vec3(_2473.x ? _2110.x : _2475.x, _2473.y ? _2110.y : _2475.y, _2473.z ? _2110.z : _2475.z);
+            _2125 = vec3(_2474.x ? _2123.x : _2476.x, _2474.y ? _2123.y : _2476.y, _2474.z ? _2123.z : _2476.z);
         }
         else
         {
-            _2124 = vec3(_2096.x ? _2115.x : _2117.x, _2096.y ? _2115.y : _2117.y, _2096.z ? _2115.z : _2117.z);
+            _2125 = vec3(_2097.x ? _2116.x : _2118.x, _2097.y ? _2116.y : _2118.y, _2097.z ? _2116.z : _2118.z);
         }
-        highp vec3 _2126 = mix(_2109, vec3(_2106.x ? _2116.x : _2124.x, _2106.y ? _2116.y : _2124.y, _2106.z ? _2116.z : _2124.z), vec3(_2074 * _Globals._RimIndirColor.w));
-        _2128 = vec4(_2126.x, _2126.y, _2126.z, _1972.w);
+        highp vec3 _2127 = mix(_2110, vec3(_2107.x ? _2117.x : _2125.x, _2107.y ? _2117.y : _2125.y, _2107.z ? _2117.z : _2125.z), vec3(_2075 * _Globals._RimIndirColor.w));
+        _2129 = vec4(_2127.x, _2127.y, _2127.z, _1973.w);
     }
     else
     {
-        _2128 = _1972;
+        _2129 = _1973;
     }
-    highp vec4 _2195;
+    highp vec4 _2196;
     if (_Globals._UseEmission != 0u)
     {
-        highp vec3 _2142 = mix(_Globals._EmissionColor.xyz, _Globals._EmissionColor.xyz * _422, vec3(_Globals._EmissionFluorescence)).xyz;
-        highp float _2156 = sin(_Globals.uTime.y * _Globals._EmissionBlink.z + _Globals._EmissionBlink.w) * 0.5 + 0.5;
-        highp float _2162;
+        highp vec3 _2143 = mix(_Globals._EmissionColor.xyz, _Globals._EmissionColor.xyz * _423, vec3(_Globals._EmissionFluorescence)).xyz;
+        highp float _2157 = sin(_Globals.uTime.y * _Globals._EmissionBlink.z + _Globals._EmissionBlink.w) * 0.5 + 0.5;
+        highp float _2163;
         if (_Globals._EmissionBlink.y > 0.5)
         {
-            _2162 = roundEven(_2156);
+            _2163 = roundEven(_2157);
         }
         else
         {
-            _2162 = _2156;
+            _2163 = _2157;
         }
-        highp vec3 _2171 = mix(_2142, _2142 * _1018.xyz, vec3(_Globals._EmissionMainStrength)).xyz;
-        highp vec3 _2175 = _2128.xyz + _2171;
-        highp vec3 _2176 = _2128.xyz * _2171;
-        bvec3 _2178 = bvec3(_Globals._EmissionBlendMode == 0u);
-        highp vec3 _2179 = vec3(_2178.x ? _2171.x : _307.x, _2178.y ? _2171.y : _307.y, _2178.z ? _2171.z : _307.z);
-        bvec3 _2181 = bvec3(_Globals._EmissionBlendMode == 1u);
-        highp vec3 _2189;
+        highp vec3 _2172 = mix(_2143, _2143 * _1019.xyz, vec3(_Globals._EmissionMainStrength)).xyz;
+        highp vec3 _2176 = _2129.xyz + _2172;
+        highp vec3 _2177 = _2129.xyz * _2172;
+        bvec3 _2179 = bvec3(_Globals._EmissionBlendMode == 0u);
+        highp vec3 _2180 = vec3(_2179.x ? _2172.x : _308.x, _2179.y ? _2172.y : _308.y, _2179.z ? _2172.z : _308.z);
+        bvec3 _2182 = bvec3(_Globals._EmissionBlendMode == 1u);
+        highp vec3 _2190;
         if (_Globals._EmissionBlendMode == 2u)
         {
-            highp vec3 _2187 = (-_2128.xyz) * _2171 + _2175;
-            bvec3 _2477 = isnan(_2187);
-            bvec3 _2478 = isnan(_2128.xyz);
-            highp vec3 _2479 = max(_2187, _2128.xyz);
-            highp vec3 _2480 = vec3(_2477.x ? _2128.xyz.x : _2479.x, _2477.y ? _2128.xyz.y : _2479.y, _2477.z ? _2128.xyz.z : _2479.z);
-            _2189 = vec3(_2478.x ? _2187.x : _2480.x, _2478.y ? _2187.y : _2480.y, _2478.z ? _2187.z : _2480.z);
+            highp vec3 _2188 = (-_2129.xyz) * _2172 + _2176;
+            bvec3 _2478 = isnan(_2188);
+            bvec3 _2479 = isnan(_2129.xyz);
+            highp vec3 _2480 = max(_2188, _2129.xyz);
+            highp vec3 _2481 = vec3(_2478.x ? _2129.xyz.x : _2480.x, _2478.y ? _2129.xyz.y : _2480.y, _2478.z ? _2129.xyz.z : _2480.z);
+            _2190 = vec3(_2479.x ? _2188.x : _2481.x, _2479.y ? _2188.y : _2481.y, _2479.z ? _2188.z : _2481.z);
         }
         else
         {
-            _2189 = vec3(_2181.x ? _2175.x : _2179.x, _2181.y ? _2175.y : _2179.y, _2181.z ? _2175.z : _2179.z);
+            _2190 = vec3(_2182.x ? _2176.x : _2180.x, _2182.y ? _2176.y : _2180.y, _2182.z ? _2176.z : _2180.z);
         }
-        bvec3 _2191 = bvec3(_Globals._EmissionBlendMode == 3u);
-        highp vec3 _2193 = mix(_2128.xyz, vec3(_2191.x ? _2176.x : _2189.x, _2191.y ? _2176.y : _2189.y, _2191.z ? _2176.z : _2189.z), vec3(((_Globals._EmissionBlend * mix(1.0, _2162, _Globals._EmissionBlink.x)) * _Globals._EmissionColor.w) * _2128.w));
-        _2195 = vec4(_2193.x, _2193.y, _2193.z, _2128.w);
+        bvec3 _2192 = bvec3(_Globals._EmissionBlendMode == 3u);
+        highp vec3 _2194 = mix(_2129.xyz, vec3(_2192.x ? _2177.x : _2190.x, _2192.y ? _2177.y : _2190.y, _2192.z ? _2177.z : _2190.z), vec3(((_Globals._EmissionBlend * mix(1.0, _2163, _Globals._EmissionBlink.x)) * _Globals._EmissionColor.w) * _2129.w));
+        _2196 = vec4(_2194.x, _2194.y, _2194.z, _2129.w);
     }
     else
     {
-        _2195 = _2128;
+        _2196 = _2129;
     }
-    highp vec4 _2262;
+    highp vec4 _2263;
     if (_Globals._UseEmission2nd != 0u)
     {
-        highp vec3 _2209 = mix(_Globals._Emission2ndColor.xyz, _Globals._Emission2ndColor.xyz * _422, vec3(_Globals._Emission2ndFluorescence)).xyz;
-        highp float _2223 = sin(_Globals.uTime.y * _Globals._Emission2ndBlink.z + _Globals._Emission2ndBlink.w) * 0.5 + 0.5;
-        highp float _2229;
+        highp vec3 _2210 = mix(_Globals._Emission2ndColor.xyz, _Globals._Emission2ndColor.xyz * _423, vec3(_Globals._Emission2ndFluorescence)).xyz;
+        highp float _2224 = sin(_Globals.uTime.y * _Globals._Emission2ndBlink.z + _Globals._Emission2ndBlink.w) * 0.5 + 0.5;
+        highp float _2230;
         if (_Globals._Emission2ndBlink.y > 0.5)
         {
-            _2229 = roundEven(_2223);
+            _2230 = roundEven(_2224);
         }
         else
         {
-            _2229 = _2223;
+            _2230 = _2224;
         }
-        highp vec3 _2238 = mix(_2209, _2209 * _1018.xyz, vec3(_Globals._Emission2ndMainStrength)).xyz;
-        highp vec3 _2242 = _2195.xyz + _2238;
-        highp vec3 _2243 = _2195.xyz * _2238;
-        bvec3 _2245 = bvec3(_Globals._Emission2ndBlendMode == 0u);
-        highp vec3 _2246 = vec3(_2245.x ? _2238.x : _307.x, _2245.y ? _2238.y : _307.y, _2245.z ? _2238.z : _307.z);
-        bvec3 _2248 = bvec3(_Globals._Emission2ndBlendMode == 1u);
-        highp vec3 _2256;
+        highp vec3 _2239 = mix(_2210, _2210 * _1019.xyz, vec3(_Globals._Emission2ndMainStrength)).xyz;
+        highp vec3 _2243 = _2196.xyz + _2239;
+        highp vec3 _2244 = _2196.xyz * _2239;
+        bvec3 _2246 = bvec3(_Globals._Emission2ndBlendMode == 0u);
+        highp vec3 _2247 = vec3(_2246.x ? _2239.x : _308.x, _2246.y ? _2239.y : _308.y, _2246.z ? _2239.z : _308.z);
+        bvec3 _2249 = bvec3(_Globals._Emission2ndBlendMode == 1u);
+        highp vec3 _2257;
         if (_Globals._Emission2ndBlendMode == 2u)
         {
-            highp vec3 _2254 = (-_2195.xyz) * _2238 + _2242;
-            bvec3 _2482 = isnan(_2254);
-            bvec3 _2483 = isnan(_2195.xyz);
-            highp vec3 _2484 = max(_2254, _2195.xyz);
-            highp vec3 _2485 = vec3(_2482.x ? _2195.xyz.x : _2484.x, _2482.y ? _2195.xyz.y : _2484.y, _2482.z ? _2195.xyz.z : _2484.z);
-            _2256 = vec3(_2483.x ? _2254.x : _2485.x, _2483.y ? _2254.y : _2485.y, _2483.z ? _2254.z : _2485.z);
+            highp vec3 _2255 = (-_2196.xyz) * _2239 + _2243;
+            bvec3 _2483 = isnan(_2255);
+            bvec3 _2484 = isnan(_2196.xyz);
+            highp vec3 _2485 = max(_2255, _2196.xyz);
+            highp vec3 _2486 = vec3(_2483.x ? _2196.xyz.x : _2485.x, _2483.y ? _2196.xyz.y : _2485.y, _2483.z ? _2196.xyz.z : _2485.z);
+            _2257 = vec3(_2484.x ? _2255.x : _2486.x, _2484.y ? _2255.y : _2486.y, _2484.z ? _2255.z : _2486.z);
         }
         else
         {
-            _2256 = vec3(_2248.x ? _2242.x : _2246.x, _2248.y ? _2242.y : _2246.y, _2248.z ? _2242.z : _2246.z);
+            _2257 = vec3(_2249.x ? _2243.x : _2247.x, _2249.y ? _2243.y : _2247.y, _2249.z ? _2243.z : _2247.z);
         }
-        bvec3 _2258 = bvec3(_Globals._Emission2ndBlendMode == 3u);
-        highp vec3 _2260 = mix(_2195.xyz, vec3(_2258.x ? _2243.x : _2256.x, _2258.y ? _2243.y : _2256.y, _2258.z ? _2243.z : _2256.z), vec3(((_Globals._Emission2ndBlend * mix(1.0, _2229, _Globals._Emission2ndBlink.x)) * _Globals._Emission2ndColor.w) * _2195.w));
-        _2262 = vec4(_2260.x, _2260.y, _2260.z, _2195.w);
+        bvec3 _2259 = bvec3(_Globals._Emission2ndBlendMode == 3u);
+        highp vec3 _2261 = mix(_2196.xyz, vec3(_2259.x ? _2244.x : _2257.x, _2259.y ? _2244.y : _2257.y, _2259.z ? _2244.z : _2257.z), vec3(((_Globals._Emission2ndBlend * mix(1.0, _2230, _Globals._Emission2ndBlink.x)) * _Globals._Emission2ndColor.w) * _2196.w));
+        _2263 = vec4(_2261.x, _2261.y, _2261.z, _2196.w);
     }
     else
     {
-        _2262 = _2195;
+        _2263 = _2196;
     }
-    bvec3 _2272 = bvec3(_366 < 0.0);
-    highp vec3 _2273 = (_2262.xyz + ((_Globals._DissolveColor.xyz * _1019) * _2262.w)).xyz;
-    highp vec3 _2281 = mix(_2273, _Globals._BackfaceColor.xyz * _1205, vec3(_Globals._BackfaceColor.w));
-    highp float _2302 = (_366 < (_Globals._DistanceFade.w - 1.0)) ? _Globals._DistanceFade.z : (clamp((((_Globals._DistanceFadeMode != 0u) ? length(_Globals.uCameraPosition.xyz - (vec4(0.0, 0.0, 0.0, 1.0) * spvWorkaroundRowMajor(_Globals.uModelMatrix)).xyz) : _427) - _Globals._DistanceFade.x) / (_Globals._DistanceFade.y - _Globals._DistanceFade.x), 0.0, 1.0) * _Globals._DistanceFade.z);
-    highp vec3 _2316 = vec3(_2272.x ? _2281.x : _2273.x, _2272.y ? _2281.y : _2273.y, _2272.z ? _2281.z : _2273.z).xyz;
-    highp vec3 _2327 = mix(_2316, mix(_Globals._DistanceFadeColor.xyz, _Globals._DistanceFadeRimColor.xyz * _2316, vec3(pow(clamp(1.0 - abs(dot(_589, _434)), 0.0, 1.0), _Globals._DistanceFadeRimFresnelPower) * _Globals._DistanceFadeRimColor.w)) * _Globals._DistanceFadeColor.w, vec3(_2302));
-    highp vec4 _2328 = vec4(_2327.x, _2327.y, _2327.z, _2262.w);
-    highp float _2330 = mix(_2262.w, _2262.w * _Globals._DistanceFadeColor.w, _2302);
-    _2328.w = _2330;
-    out_var_SV_Target = mix(_Globals.unity_FogColor * _2330, _2328, vec4(out_var_TEXCOORD9));
+    bvec3 _2273 = bvec3(_367 < 0.0);
+    highp vec3 _2274 = (_2263.xyz + ((_Globals._DissolveColor.xyz * _1020) * _2263.w)).xyz;
+    highp vec3 _2282 = mix(_2274, _Globals._BackfaceColor.xyz * _1206, vec3(_Globals._BackfaceColor.w));
+    highp float _2303 = (_367 < (_Globals._DistanceFade.w - 1.0)) ? _Globals._DistanceFade.z : (clamp((((_Globals._DistanceFadeMode != 0u) ? length(_Globals.uCameraPosition.xyz - (vec4(0.0, 0.0, 0.0, 1.0) * spvWorkaroundRowMajor(_Globals.uModelMatrix)).xyz) : _428) - _Globals._DistanceFade.x) / (_Globals._DistanceFade.y - _Globals._DistanceFade.x), 0.0, 1.0) * _Globals._DistanceFade.z);
+    highp vec3 _2317 = vec3(_2273.x ? _2282.x : _2274.x, _2273.y ? _2282.y : _2274.y, _2273.z ? _2282.z : _2274.z).xyz;
+    highp vec3 _2328 = mix(_2317, mix(_Globals._DistanceFadeColor.xyz, _Globals._DistanceFadeRimColor.xyz * _2317, vec3(pow(clamp(1.0 - abs(dot(_590, _435)), 0.0, 1.0), _Globals._DistanceFadeRimFresnelPower) * _Globals._DistanceFadeRimColor.w)) * _Globals._DistanceFadeColor.w, vec3(_2303));
+    highp vec4 _2329 = vec4(_2328.x, _2328.y, _2328.z, _2263.w);
+    highp float _2331 = mix(_2263.w, _2263.w * _Globals._DistanceFadeColor.w, _2303);
+    _2329.w = _2331;
+    out_var_SV_Target = mix(_Globals.unity_FogColor * _2331, _2329, vec4(out_var_TEXCOORD9));
 }

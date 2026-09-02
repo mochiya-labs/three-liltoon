@@ -83,7 +83,7 @@ export class LilToonRendererAdapter {
     }
     const shadow = this.shadowAdapter.bind(lighting.main, material.globalUniforms);
     material.setSystemTexture("__shadow", shadow.texture);
-    material.setSystemTexture("__environment", this.environmentAdapter.read(scene));
+    material.setSystemTexture("__environment", this.environmentAdapter.bind(scene, material.globalUniforms));
   }
 
   render(scene: Scene, camera: Camera): void {

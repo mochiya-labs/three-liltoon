@@ -13,6 +13,7 @@ import type {
   ModelInspection,
   ModelSource,
 } from "@/lib/model/types";
+import { ViewerLighting } from "./viewer-lighting";
 
 type ModelCanvasProps = {
   source: ModelSource;
@@ -89,38 +90,6 @@ function ModelLoader({
   }, [onInspectionChange, onStatusChange, renderer, source.url]);
 
   return model ? <AnimatedModel model={model} /> : null;
-}
-
-function ViewerLighting() {
-  return (
-    <>
-      {/* Broad fill keeps toon bands readable when the camera sees the unlit side. */}
-      <ambientLight intensity={3.0} color="#f5f3e8" />
-      <hemisphereLight
-        intensity={1.35}
-        color="#edf4ff"
-        groundColor="#d8cbb8"
-        position={[0, 6, 0]}
-      />
-
-      {/* The first directional light remains lilToon's shadow-casting main light. */}
-      <directionalLight
-        castShadow
-        color="#fff3df"
-        intensity={2.8}
-        position={[3.5, 5.5, -4]}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-4}
-        shadow-camera-right={4}
-        shadow-camera-top={4}
-        shadow-camera-bottom={-4}
-      />
-
-      {/* These soft fills also improve ordinary glTF materials in the same viewer. */}
-      <directionalLight color="#dce9ff" intensity={0.9} position={[-4, 2.5, -3]} />
-      <directionalLight color="#fff0dc" intensity={0.65} position={[0, 1.5, -5]} />
-    </>
-  );
 }
 
 export function ModelCanvas(props: ModelCanvasProps) {

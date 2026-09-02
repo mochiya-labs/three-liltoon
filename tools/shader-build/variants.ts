@@ -50,6 +50,22 @@ const MATCAP_MASK_FEATURE_DEFINES = [
   "LIL_FEATURE_MatCap2ndBumpMap",
 ] as const;
 
+const SHADOW_BORDER_MASK_FEATURE_DEFINES = ["LIL_FEATURE_ShadowBorderMask"] as const;
+
+// Give the shadow-border mask its own sampler lane. In cutout/transparent
+// modes the full core already reaches the WebGL2 per-stage sampler ceiling,
+// so texture-backed emission and dissolve/alpha-mask features must remain in
+// their dedicated profiles instead of producing an un-linkable 17-sampler
+// fallback.
+const SHADOW_BORDER_CORE_FEATURE_DEFINES = CORE_FEATURE_DEFINES.filter(
+  (feature) => ![
+    "LIL_FEATURE_AlphaMask",
+    "LIL_FEATURE_DissolveMask",
+    "LIL_FEATURE_EmissionMap",
+    "LIL_FEATURE_Emission2ndMap",
+  ].includes(feature),
+);
+
 // Cutout and transparent standard variants already consume WebGL2's minimum
 // 16 fragment texture units. The mask profile trades the two dissolve-map
 // samplers for the two MatCap mask samplers. Runtime material selection keeps
@@ -184,6 +200,45 @@ export const SHADER_VARIANTS: ShaderVariantRecipe[] = [
     defines: ["LIL_RENDER=2", ...MATCAP_MASK_CORE_FEATURE_DEFINES, ...MATCAP_MASK_FEATURE_DEFINES],
   },
   {
+    key: "standard-opaque-matcap-shadow-border",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: [
+      "LIL_RENDER=0",
+      ...MATCAP_MASK_CORE_FEATURE_DEFINES,
+      ...MATCAP_MASK_FEATURE_DEFINES,
+      ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+      "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+    ],
+  },
+  {
+    key: "standard-cutout-matcap-shadow-border",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: [
+      "LIL_RENDER=1",
+      ...MATCAP_MASK_CORE_FEATURE_DEFINES,
+      ...MATCAP_MASK_FEATURE_DEFINES,
+      ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+      "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+    ],
+  },
+  {
+    key: "standard-transparent-matcap-shadow-border",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: [
+      "LIL_RENDER=2",
+      ...MATCAP_MASK_CORE_FEATURE_DEFINES,
+      ...MATCAP_MASK_FEATURE_DEFINES,
+      ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+      "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+    ],
+  },
+  {
     key: "standard-opaque-layered-matcap",
     renderMode: "opaque",
     sources: forwardSources,
@@ -226,6 +281,45 @@ export const SHADER_VARIANTS: ShaderVariantRecipe[] = [
     defines: ["LIL_RENDER=2", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...SURFACE_CONTROL_FEATURE_DEFINES],
   },
   {
+    key: "standard-opaque-surface-controls-shadow-border",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: [
+      "LIL_RENDER=0",
+      ...SURFACE_CONTROL_CORE_FEATURE_DEFINES,
+      ...SURFACE_CONTROL_FEATURE_DEFINES,
+      ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+      "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+    ],
+  },
+  {
+    key: "standard-cutout-surface-controls-shadow-border",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: [
+      "LIL_RENDER=1",
+      ...SURFACE_CONTROL_CORE_FEATURE_DEFINES,
+      ...SURFACE_CONTROL_FEATURE_DEFINES,
+      ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+      "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+    ],
+  },
+  {
+    key: "standard-transparent-surface-controls-shadow-border",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: [
+      "LIL_RENDER=2",
+      ...SURFACE_CONTROL_CORE_FEATURE_DEFINES,
+      ...SURFACE_CONTROL_FEATURE_DEFINES,
+      ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+      "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+    ],
+  },
+  {
     key: "standard-opaque-layered-surface-controls",
     renderMode: "opaque",
     sources: forwardSources,
@@ -245,6 +339,27 @@ export const SHADER_VARIANTS: ShaderVariantRecipe[] = [
     sources: forwardSources,
     entries,
     defines: ["LIL_RENDER=2", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...LAYERED_SURFACE_CONTROL_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-opaque-shadow-border",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=0", ...SHADOW_BORDER_CORE_FEATURE_DEFINES, ...SHADOW_BORDER_MASK_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-cutout-shadow-border",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=1", ...SHADOW_BORDER_CORE_FEATURE_DEFINES, ...SHADOW_BORDER_MASK_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-transparent-shadow-border",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=2", ...SHADOW_BORDER_CORE_FEATURE_DEFINES, ...SHADOW_BORDER_MASK_FEATURE_DEFINES],
   },
   {
     key: "outline",

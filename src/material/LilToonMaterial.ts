@@ -4,6 +4,7 @@ import {
   GLSL3,
   Matrix4,
   RawShaderMaterial,
+  SRGBColorSpace,
   Vector2,
   Vector3,
   Vector4,
@@ -79,16 +80,50 @@ function shaderProfile(textures: LilToonMaterialParameters["textures"]): LilToon
   const surfaceControls = Boolean(
     textures?._SmoothnessTex || textures?._MetallicGlossMap || textures?._ReflectionColorTex,
   );
+  const shadowBorder = Boolean(textures?._ShadowBorderMask);
+  const sharedMatCapNormal = sharesPrimaryNormalWithMatCaps(textures);
   if (surfaceControls && layered && sharesPrimaryNormalWithMatCaps(textures)) {
     return "layered-surface-controls";
+  }
+  if (surfaceControls && shadowBorder && sharedMatCapNormal) {
+    return "surface-controls-shadow-border";
   }
   if (surfaceControls) {
     return "surface-controls";
   }
   if (layered) return "layered-matcap";
+  if ((textures?._MatCapBlendMask || textures?._MatCap2ndBlendMask) && shadowBorder && sharedMatCapNormal) {
+    return "matcap-shadow-border";
+  }
   if (textures?._MatCapBlendMask || textures?._MatCap2ndBlendMask) return "matcap-mask";
   if (textures?._DissolveNoiseMask) return "dissolve-noise";
+  if (shadowBorder) return "shadow-border";
   return "standard";
+}
+
+const OUTPUT_SRGB_UNIFORM = "uLilToonOutputSrgb";
+
+function addOutputColorSpaceConversion(fragmentShader: string): string {
+  const globalsIndex = fragmentShader.indexOf("struct type_Globals");
+  const mainEnd = fragmentShader.lastIndexOf("\n}");
+  if (globalsIndex < 0 || mainEnd < 0) return fragmentShader;
+
+  const withUniform =
+    `${fragmentShader.slice(0, globalsIndex)}uniform uint ${OUTPUT_SRGB_UNIFORM};\n\n` +
+    fragmentShader.slice(globalsIndex);
+  const adjustedMainEnd = mainEnd + `uniform uint ${OUTPUT_SRGB_UNIFORM};\n\n`.length;
+  const conversion = `
+    if (${OUTPUT_SRGB_UNIFORM} != 0u)
+    {
+        highp vec3 linearColor = max(out_var_SV_Target.rgb, vec3(0.0));
+        out_var_SV_Target.rgb = mix(
+            pow(linearColor, vec3(0.41666)) * 1.055 - vec3(0.055),
+            linearColor * 12.92,
+            lessThanEqual(linearColor, vec3(0.0031308))
+        );
+    }
+`;
+  return `${withUniform.slice(0, adjustedMainEnd)}${conversion}${withUniform.slice(adjustedMainEnd)}`;
 }
 
 const morphAdapter = new LilToonMorphAdapter();
@@ -113,7 +148,10 @@ export class LilToonMaterial extends RawShaderMaterial {
       ? getOutlineShaderProgram()
       : getLilToonShaderProgram(renderMode, shaderProfile(parameters.textures));
     const globalUniforms = createGlobalUniforms(program.vertexShader, program.fragmentShader);
-    const uniforms: Record<string, IUniform> = { _Globals: { value: globalUniforms } };
+    const uniforms: Record<string, IUniform> = {
+      _Globals: { value: globalUniforms },
+      [OUTPUT_SRGB_UNIFORM]: { value: 1 },
+    };
     const cubeSamplers = new Set(
       [...`${program.vertexShader}\n${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/g)]
         .map((match) => match[1]!),
@@ -131,7 +169,7 @@ export class LilToonMaterial extends RawShaderMaterial {
       // defines even for RawShaderMaterial. Generated artifacts retain their
       // standalone directive for offline validation.
       vertexShader: program.vertexShader.replace(/^#version 300 es\s*/, ""),
-      fragmentShader: program.fragmentShader.replace(/^#version 300 es\s*/, ""),
+      fragmentShader: addOutputColorSpaceConversion(program.fragmentShader).replace(/^#version 300 es\s*/, ""),
       glslVersion: GLSL3,
       uniforms,
       lights: false,
@@ -184,6 +222,15 @@ export class LilToonMaterial extends RawShaderMaterial {
       updateObjectCameraUniforms(this.globalUniforms, renderer, camera, object, elapsed);
       this.rendererAdapter?.prepareMaterial(this, renderer, scene, camera, object, elapsed);
       this.updateDeformationUniforms(object, renderer);
+      const outputColorSpace = renderer.getRenderTarget()?.texture.colorSpace ?? renderer.outputColorSpace;
+      this.uniforms[OUTPUT_SRGB_UNIFORM]!.value = Number(outputColorSpace === SRGBColorSpace);
+
+      // The glTF loader intentionally shares one material instance between meshes.
+      // These globals include per-object model, skinning, and morph data, so Three
+      // must upload them for every draw even when the material/program did not
+      // change. This is especially important for transparent meshes because their
+      // draw order changes as the camera moves.
+      this.uniformsNeedUpdate = true;
     };
   }
 

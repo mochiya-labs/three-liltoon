@@ -40,7 +40,7 @@
     #undef LIL_TRANSFER_SHADOW
     #undef LIL_LIGHT_ATTENUATION
     #define LIL_SHADOW_COORDS(idx) float4 _ShadowCoord : TEXCOORD##idx;
-    #define LIL_TRANSFER_SHADOW(vi,uv,o) o._ShadowCoord = mul(uMainShadowMatrix, float4(vi.positionWS, 1.0))
+    #define LIL_TRANSFER_SHADOW(vi,uv,o) o._ShadowCoord = lilWebGetShadowCoord(vi.positionWS, vertexNormalInput.normalWS)
     #define LIL_LIGHT_ATTENUATION(atten,i) atten = lilWebSampleShadow(i._ShadowCoord)
 #endif
 

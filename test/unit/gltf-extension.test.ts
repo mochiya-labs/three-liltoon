@@ -1,6 +1,13 @@
-import { DataTexture, Vector4 } from "three";
+import {
+  BufferGeometry,
+  DataTexture,
+  Float32BufferAttribute,
+  Mesh,
+  Scene,
+  Vector4,
+} from "three";
 import { describe, expect, it } from "vitest";
-import type { GLTFParser } from "three/examples/jsm/loaders/GLTFLoader.js";
+import type { GLTF, GLTFParser } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GLTFLilToonExtension } from "../../src/loaders/GLTFLilToonExtension.js";
 import { LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION } from "../../src/loaders/types.js";
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
@@ -97,5 +104,51 @@ describe("GLTFLilToonExtension", () => {
     expect(material.fragmentShader).toContain("Combined_Main2ndBlendMask");
     expect(material.fragmentShader).toContain("Combined_Main3rdBlendMask");
     expect(material.fragmentShader).toContain("Combined_MatCapBlendMask");
+  });
+
+  it("reconstructs MikkTSpace tangents when a normal-mapped glTF omits them", async () => {
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute([
+      -1, -1, 0,
+      1, -1, 0,
+      1, 1, 0,
+      -1, 1, 0,
+    ], 3));
+    geometry.setAttribute("normal", new Float32BufferAttribute([
+      0, 0, 1,
+      0, 0, 1,
+      0, 0, 1,
+      0, 0, 1,
+    ], 3));
+    geometry.setAttribute("uv", new Float32BufferAttribute([
+      0, 0,
+      1, 0,
+      1, 1,
+      0, 1,
+    ], 2));
+    geometry.setIndex([0, 1, 2, 0, 2, 3]);
+
+    const material = new LilToonMaterial({
+      properties: { _UseBumpMap: 1 },
+      textures: { _BumpMap: new DataTexture() },
+    });
+    const scene = new Scene();
+    scene.add(new Mesh(geometry, material));
+    const parser = { json: {}, associations: new Map() } as unknown as GLTFParser;
+
+    await new GLTFLilToonExtension(parser, {
+      addOutlines: false,
+      configureShadowCasters: false,
+    }).afterRoot({ scene } as unknown as GLTF);
+
+    const tangent = geometry.getAttribute("tangent");
+    expect(tangent).toBeDefined();
+    expect(tangent.itemSize).toBe(4);
+    expect(tangent.count).toBe(geometry.getAttribute("position").count);
+    expect([...Array(tangent.count).keys()].every((index) =>
+      Math.abs(tangent.getX(index)) > 0.99
+      && Math.abs(tangent.getY(index)) < 0.01
+      && Math.abs(tangent.getZ(index)) < 0.01
+      && Math.abs(tangent.getW(index)) === 1)).toBe(true);
   });
 });

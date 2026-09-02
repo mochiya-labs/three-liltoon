@@ -13,8 +13,11 @@ export type LilToonShaderProfile =
   | "standard"
   | "dissolve-noise"
   | "matcap-mask"
+  | "matcap-shadow-border"
   | "layered-matcap"
   | "surface-controls"
+  | "surface-controls-shadow-border"
+  | "shadow-border"
   | "layered-surface-controls";
 
 const textureNames = Object.keys(LILTOON_TEXTURE_SEMANTICS).sort((a, b) => b.length - a.length);
