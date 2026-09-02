@@ -9,6 +9,14 @@ export interface LilToonShaderProgram {
   samplerBindings: Map<string, string>;
 }
 
+export type LilToonShaderProfile =
+  | "standard"
+  | "dissolve-noise"
+  | "matcap-mask"
+  | "layered-matcap"
+  | "surface-controls"
+  | "layered-surface-controls";
+
 const textureNames = Object.keys(LILTOON_TEXTURE_SEMANTICS).sort((a, b) => b.length - a.length);
 
 function inferTextureProperty(uniformName: string): string {
@@ -28,8 +36,12 @@ export function parseSamplerBindings(fragmentShader: string): Map<string, string
   return bindings;
 }
 
-export function getLilToonShaderProgram(renderMode: LilToonRenderMode): LilToonShaderProgram {
-  const key = `standard-${renderMode}` as keyof typeof LILTOON_SHADERS;
+export function getLilToonShaderProgram(
+  renderMode: LilToonRenderMode,
+  profile: LilToonShaderProfile = "standard",
+): LilToonShaderProgram {
+  const suffix = profile === "standard" ? "" : `-${profile}`;
+  const key = `standard-${renderMode}${suffix}` as keyof typeof LILTOON_SHADERS;
   const shader = LILTOON_SHADERS[key];
   if (!shader) throw new Error(`[three-liltoon] Shader variant not shipped: ${key}`);
   return {

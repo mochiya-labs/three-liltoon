@@ -124,8 +124,6 @@ struct type_Globals
     highp vec4 _DissolveColor;
     highp vec4 _DissolveParams;
     highp vec4 _DissolvePos;
-    highp vec4 _DissolveNoiseMask_ST;
-    highp vec4 _DissolveNoiseMask_ScrollRotate;
     highp vec4 _OutlineColor;
     highp vec4 _OutlineLitColor;
     highp vec4 _OutlineTex_ST;
@@ -232,7 +230,6 @@ struct type_Globals
     highp float _Emission2ndParallaxDepth;
     highp float _Emission2ndFluorescence;
     highp float _Emission2ndMainStrength;
-    highp float _DissolveNoiseStrength;
     highp float _lilShadowCasterBias;
     highp float _OutlineLitScale;
     highp float _OutlineLitOffset;
@@ -324,9 +321,8 @@ uniform highp sampler2D SPIRV_Cross_Combined_BumpMapsampler_MainTex;
 uniform highp sampler2D SPIRV_Cross_Combined_Bump2ndMaplil_sampler_trilinear_repeat;
 uniform highp sampler2D SPIRV_Cross_Combined_Main2ndTexsampler_Main2ndTex;
 uniform highp sampler2D SPIRV_Cross_Combined_Main3rdTexsampler_Main3rdTex;
-uniform highp samplerCube SPIRV_Cross_Combinedunity_SpecCube0SPIRV_Cross_DummySampler;
-uniform highp samplerCube SPIRV_Cross_Combined_ReflectionCubeTexlil_sampler_trilinear_repeat;
 uniform highp samplerCube SPIRV_Cross_Combinedunity_SpecCube0samplerunity_SpecCube0;
+uniform highp samplerCube SPIRV_Cross_Combined_ReflectionCubeTexlil_sampler_trilinear_repeat;
 uniform highp sampler2D SPIRV_Cross_Combined_MatCapTexlil_sampler_trilinear_repeat;
 uniform highp sampler2D SPIRV_Cross_Combined_MatCap2ndTexlil_sampler_trilinear_repeat;
 uniform highp sampler2D SPIRV_Cross_Combined_EmissionMapsampler_EmissionMap;
@@ -363,7 +359,7 @@ void main()
             _415 = 1.0;
             break;
         }
-        highp float _388 = _378 - _Globals.uShadowBias;
+        highp float _388 = _378 + _Globals.uShadowBias;
         _415 = (((step(_388, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5) + _372), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08))) + step(_388, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5, -0.5) + _372), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) + step(_388, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(-0.5, 0.5) + _372), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) + step(_388, dot(texture(SPIRV_Cross_CombineduMainShadowMapsampler_uMainShadowMap, _Globals.uShadowMapSize.zw * vec2(0.5) + _372), vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08)))) * 0.25;
         break;
     } while(false);
@@ -988,7 +984,7 @@ void main()
         highp vec4 _1749;
         if (_Globals._ApplyReflection != 0u)
         {
-            bvec3 _1668 = bvec3(((uvec2(textureSize(SPIRV_Cross_Combinedunity_SpecCube0SPIRV_Cross_DummySampler, int(0u))).x < 15u) || (_Globals.unity_SpecCube0_HDR.x == 0.0)) || (_Globals._ReflectionCubeOverride != 0u));
+            bvec3 _1668 = bvec3(((uvec2(textureSize(SPIRV_Cross_Combinedunity_SpecCube0samplerunity_SpecCube0, int(0u))).x < 15u) || (_Globals.unity_SpecCube0_HDR.x == 0.0)) || (_Globals._ReflectionCubeOverride != 0u));
             highp vec3 _1675 = reflect(-_432, mix(_644, _639, vec3(_Globals._ReflectionNormalStrength)));
             highp vec4 _1678 = textureLod(SPIRV_Cross_Combined_ReflectionCubeTexlil_sampler_trilinear_repeat, _1675, _1531 * ((-4.19999980926513671875) * _1531 + 10.19999980926513671875));
             highp vec3 _1698 = ((_1678.xyz * (_Globals._ReflectionCubeTex_HDR.x * pow(abs(_Globals._ReflectionCubeTex_HDR.w * (_1678.w - 1.0) + 1.0), _Globals._ReflectionCubeTex_HDR.y))) * _Globals._ReflectionCubeColor.xyz) * mix(vec3(1.0), _1317, vec3(_Globals._ReflectionCubeEnableLighting));

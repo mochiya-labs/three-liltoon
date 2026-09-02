@@ -389,7 +389,7 @@ export const LILTOON_DEFAULTS = {
   "_MetallicGlossMap": {
     "texture": "white"
   },
-  "_Reflectance": 0.04,
+  "_Reflectance": 0.0030959752321981426,
   "_GSAAStrength": 0,
   "_ApplySpecular": 1,
   "_ApplySpecularFA": 1,

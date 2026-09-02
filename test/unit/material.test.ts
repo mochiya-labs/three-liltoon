@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { DataTexture, Vector4 } from "three";
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
 import { LILTOON_GLTF_SPEC_VERSION } from "../../src/loaders/types.js";
+import { LILTOON_TEXTURE_SEMANTICS } from "../../src/generated/textureSemantics.js";
+import { LILTOON_DEFAULTS } from "../../src/generated/defaults.js";
 
 describe("LilToonMaterial", () => {
   it("preserves lilToon property names and updates generated uniforms", () => {
@@ -25,6 +27,101 @@ describe("LilToonMaterial", () => {
       .map(([, uniform]) => uniform.value);
     expect(bound.length).toBeGreaterThan(0);
     expect(bound.every((value) => value === texture)).toBe(true);
+  });
+
+  it("uses the MatCap-mask shader profile and preserves independent normal transforms", () => {
+    const firstNormal = new DataTexture();
+    const secondNormal = new DataTexture();
+    const matCapMask = new DataTexture();
+    const material = new LilToonMaterial({
+      properties: {
+        _UseBumpMap: 1,
+        _BumpMap_ST: [2, 3, 0.1, 0.2],
+        _UseBump2ndMap: 1,
+        _Bump2ndMap_ST: [7, 5, 0.3, 0.4],
+        _UseMatCap: 1,
+      },
+      textures: {
+        _BumpMap: firstNormal,
+        _Bump2ndMap: secondNormal,
+        _MatCapBlendMask: matCapMask,
+      },
+    });
+
+    expect(material.fragmentShader).toContain("Combined_MatCapBlendMask");
+    expect((material.globalUniforms._BumpMap_ST as Vector4).toArray()).toEqual([2, 3, 0.1, 0.2]);
+    expect((material.globalUniforms._Bump2ndMap_ST as Vector4).toArray()).toEqual([7, 5, 0.3, 0.4]);
+    expect(Object.entries(material.uniforms).some(
+      ([name, uniform]) => name.includes("Combined_MatCapBlendMask") && uniform.value === matCapMask,
+    )).toBe(true);
+  });
+
+  it("uses linear reflection data textures and a surface-control shader profile", () => {
+    const metallic = new DataTexture();
+    const smoothness = new DataTexture();
+    const reflectionColor = new DataTexture();
+    const material = new LilToonMaterial({
+      properties: { _UseReflection: 1, _Metallic: 1, _Smoothness: 1 },
+      textures: {
+        _MetallicGlossMap: metallic,
+        _SmoothnessTex: smoothness,
+        _ReflectionColorTex: reflectionColor,
+      },
+    });
+
+    expect(LILTOON_TEXTURE_SEMANTICS._MetallicGlossMap).toBe("data");
+    expect(LILTOON_TEXTURE_SEMANTICS._SmoothnessTex).toBe("data");
+    expect(LILTOON_TEXTURE_SEMANTICS._ReflectionColorTex).toBe("color");
+    expect(LILTOON_DEFAULTS._Reflectance).toBeCloseTo(0.00309598, 7);
+    expect(material.fragmentShader).toContain("Combined_MetallicGlossMap");
+    expect(material.fragmentShader).toContain("Combined_SmoothnessTex");
+    expect(material.fragmentShader).toContain("Combined_ReflectionColorTex");
+  });
+
+  it("applies independent masks to Main Color 2nd and 3rd in the layered MatCap profile", () => {
+    const material = new LilToonMaterial({
+      renderMode: "transparent",
+      textures: {
+        _Main2ndTex: new DataTexture(),
+        _Main2ndBlendMask: new DataTexture(),
+        _Main3rdTex: new DataTexture(),
+        _Main3rdBlendMask: new DataTexture(),
+        _MatCapBlendMask: new DataTexture(),
+      },
+    });
+
+    expect(material.fragmentShader).toContain("Combined_Main2ndTex");
+    expect(material.fragmentShader).toContain("Combined_Main2ndBlendMask");
+    expect(material.fragmentShader).toContain("Combined_Main3rdTex");
+    expect(material.fragmentShader).toContain("Combined_Main3rdBlendMask");
+  });
+
+  it("keeps Main Color 2nd with reflection controls when MatCap normals share the primary normal", () => {
+    const normal = new DataTexture();
+    const material = new LilToonMaterial({
+      renderMode: "transparent",
+      properties: {
+        _MatCapBumpMap_ST: [2, 3, 0.1, 0.2],
+        _MatCap2ndBumpMap_ST: [7, 5, 0.3, 0.4],
+      },
+      textures: {
+        _BumpMap: normal,
+        _MatCapBumpMap: normal,
+        _MatCap2ndBumpMap: normal,
+        _Main2ndTex: new DataTexture(),
+        _Main2ndBlendMask: new DataTexture(),
+        _MetallicGlossMap: new DataTexture(),
+        _SmoothnessTex: new DataTexture(),
+        _ReflectionColorTex: new DataTexture(),
+      },
+    });
+
+    expect(material.fragmentShader).toContain("Combined_Main2ndBlendMask");
+    expect(material.fragmentShader).toContain("Combined_MetallicGlossMap");
+    expect(material.fragmentShader).not.toContain("Combined_MatCapBumpMap");
+    expect(material.fragmentShader).not.toContain("Combined_MatCap2ndBumpMap");
+    expect((material.globalUniforms._MatCapBumpMap_ST as Vector4).toArray()).toEqual([2, 3, 0.1, 0.2]);
+    expect((material.globalUniforms._MatCap2ndBumpMap_ST as Vector4).toArray()).toEqual([7, 5, 0.3, 0.4]);
   });
 
   it("serializes stable lilToon property names and caller-owned texture references", () => {

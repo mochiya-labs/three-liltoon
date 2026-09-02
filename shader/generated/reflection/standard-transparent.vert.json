@@ -630,964 +630,949 @@
                     "offset" : 3232
                 },
                 {
-                    "name" : "_DissolveNoiseMask_ST",
+                    "name" : "_OutlineColor",
                     "type" : "vec4",
                     "offset" : 3248
                 },
                 {
-                    "name" : "_DissolveNoiseMask_ScrollRotate",
+                    "name" : "_OutlineLitColor",
                     "type" : "vec4",
                     "offset" : 3264
                 },
                 {
-                    "name" : "_OutlineColor",
+                    "name" : "_OutlineTex_ST",
                     "type" : "vec4",
                     "offset" : 3280
                 },
                 {
-                    "name" : "_OutlineLitColor",
-                    "type" : "vec4",
-                    "offset" : 3296
-                },
-                {
-                    "name" : "_OutlineTex_ST",
-                    "type" : "vec4",
-                    "offset" : 3312
-                },
-                {
                     "name" : "_AsUnlit",
                     "type" : "float",
-                    "offset" : 3328
+                    "offset" : 3296
                 },
                 {
                     "name" : "_Cutoff",
                     "type" : "float",
-                    "offset" : 3332
+                    "offset" : 3300
                 },
                 {
                     "name" : "_PreCutoff",
                     "type" : "float",
-                    "offset" : 3336
+                    "offset" : 3304
                 },
                 {
                     "name" : "_SubpassCutoff",
                     "type" : "float",
-                    "offset" : 3340
+                    "offset" : 3308
                 },
                 {
                     "name" : "_FlipNormal",
                     "type" : "float",
-                    "offset" : 3344
+                    "offset" : 3312
                 },
                 {
                     "name" : "_ShiftBackfaceUV",
                     "type" : "float",
-                    "offset" : 3348
+                    "offset" : 3316
                 },
                 {
                     "name" : "_VertexLightStrength",
                     "type" : "float",
-                    "offset" : 3352
+                    "offset" : 3320
                 },
                 {
                     "name" : "_LightMinLimit",
                     "type" : "float",
-                    "offset" : 3356
+                    "offset" : 3324
                 },
                 {
                     "name" : "_LightMaxLimit",
                     "type" : "float",
-                    "offset" : 3360
+                    "offset" : 3328
                 },
                 {
                     "name" : "_MonochromeLighting",
                     "type" : "float",
-                    "offset" : 3364
+                    "offset" : 3332
                 },
                 {
                     "name" : "_AAStrength",
                     "type" : "float",
-                    "offset" : 3368
+                    "offset" : 3336
                 },
                 {
                     "name" : "_EnvRimBorder",
                     "type" : "float",
-                    "offset" : 3372
+                    "offset" : 3340
                 },
                 {
                     "name" : "_EnvRimBlur",
                     "type" : "float",
-                    "offset" : 3376
+                    "offset" : 3344
                 },
                 {
                     "name" : "_AlphaBoostFA",
                     "type" : "float",
-                    "offset" : 3380
+                    "offset" : 3348
                 },
                 {
                     "name" : "_Main2ndTexAngle",
                     "type" : "float",
-                    "offset" : 3384
+                    "offset" : 3352
                 },
                 {
                     "name" : "_Main2ndEnableLighting",
                     "type" : "float",
-                    "offset" : 3388
+                    "offset" : 3356
                 },
                 {
                     "name" : "_Main3rdTexAngle",
                     "type" : "float",
-                    "offset" : 3392
+                    "offset" : 3360
                 },
                 {
                     "name" : "_Main3rdEnableLighting",
                     "type" : "float",
-                    "offset" : 3396
+                    "offset" : 3364
                 },
                 {
                     "name" : "_AlphaMask_ST",
                     "type" : "vec4",
-                    "offset" : 3408
+                    "offset" : 3376
                 },
                 {
                     "name" : "_AlphaMaskScale",
                     "type" : "float",
-                    "offset" : 3424
+                    "offset" : 3392
                 },
                 {
                     "name" : "_AlphaMaskValue",
                     "type" : "float",
-                    "offset" : 3428
+                    "offset" : 3396
                 },
                 {
                     "name" : "_BackfaceForceShadow",
                     "type" : "float",
-                    "offset" : 3432
+                    "offset" : 3400
                 },
                 {
                     "name" : "_ShadowStrength",
                     "type" : "float",
-                    "offset" : 3436
+                    "offset" : 3404
                 },
                 {
                     "name" : "_ShadowNormalStrength",
                     "type" : "float",
-                    "offset" : 3440
+                    "offset" : 3408
                 },
                 {
                     "name" : "_ShadowBorder",
                     "type" : "float",
-                    "offset" : 3444
+                    "offset" : 3412
                 },
                 {
                     "name" : "_ShadowBlur",
                     "type" : "float",
-                    "offset" : 3448
+                    "offset" : 3416
                 },
                 {
                     "name" : "_ShadowStrengthMaskLOD",
                     "type" : "float",
-                    "offset" : 3452
+                    "offset" : 3420
                 },
                 {
                     "name" : "_ShadowBorderMaskLOD",
                     "type" : "float",
-                    "offset" : 3456
+                    "offset" : 3424
                 },
                 {
                     "name" : "_ShadowBlurMaskLOD",
                     "type" : "float",
-                    "offset" : 3460
+                    "offset" : 3428
                 },
                 {
                     "name" : "_Shadow2ndNormalStrength",
                     "type" : "float",
-                    "offset" : 3464
+                    "offset" : 3432
                 },
                 {
                     "name" : "_Shadow2ndBorder",
                     "type" : "float",
-                    "offset" : 3468
+                    "offset" : 3436
                 },
                 {
                     "name" : "_Shadow2ndBlur",
                     "type" : "float",
-                    "offset" : 3472
+                    "offset" : 3440
                 },
                 {
                     "name" : "_Shadow3rdNormalStrength",
                     "type" : "float",
-                    "offset" : 3476
+                    "offset" : 3444
                 },
                 {
                     "name" : "_Shadow3rdBorder",
                     "type" : "float",
-                    "offset" : 3480
+                    "offset" : 3448
                 },
                 {
                     "name" : "_Shadow3rdBlur",
                     "type" : "float",
-                    "offset" : 3484
+                    "offset" : 3452
                 },
                 {
                     "name" : "_ShadowMainStrength",
                     "type" : "float",
-                    "offset" : 3488
+                    "offset" : 3456
                 },
                 {
                     "name" : "_ShadowEnvStrength",
                     "type" : "float",
-                    "offset" : 3492
+                    "offset" : 3460
                 },
                 {
                     "name" : "_ShadowBorderRange",
                     "type" : "float",
-                    "offset" : 3496
+                    "offset" : 3464
                 },
                 {
                     "name" : "_ShadowReceive",
                     "type" : "float",
-                    "offset" : 3500
+                    "offset" : 3468
                 },
                 {
                     "name" : "_Shadow2ndReceive",
                     "type" : "float",
-                    "offset" : 3504
+                    "offset" : 3472
                 },
                 {
                     "name" : "_Shadow3rdReceive",
                     "type" : "float",
-                    "offset" : 3508
+                    "offset" : 3476
                 },
                 {
                     "name" : "_ShadowFlatBlur",
                     "type" : "float",
-                    "offset" : 3512
+                    "offset" : 3480
                 },
                 {
                     "name" : "_ShadowFlatBorder",
                     "type" : "float",
-                    "offset" : 3516
+                    "offset" : 3484
                 },
                 {
                     "name" : "_RimShadeNormalStrength",
                     "type" : "float",
-                    "offset" : 3520
+                    "offset" : 3488
                 },
                 {
                     "name" : "_RimShadeBorder",
                     "type" : "float",
-                    "offset" : 3524
+                    "offset" : 3492
                 },
                 {
                     "name" : "_RimShadeBlur",
                     "type" : "float",
-                    "offset" : 3528
+                    "offset" : 3496
                 },
                 {
                     "name" : "_RimShadeFresnelPower",
                     "type" : "float",
-                    "offset" : 3532
+                    "offset" : 3500
                 },
                 {
                     "name" : "_BacklightNormalStrength",
                     "type" : "float",
-                    "offset" : 3536
+                    "offset" : 3504
                 },
                 {
                     "name" : "_BacklightBorder",
                     "type" : "float",
-                    "offset" : 3540
+                    "offset" : 3508
                 },
                 {
                     "name" : "_BacklightBlur",
                     "type" : "float",
-                    "offset" : 3544
+                    "offset" : 3512
                 },
                 {
                     "name" : "_BacklightDirectivity",
                     "type" : "float",
-                    "offset" : 3548
+                    "offset" : 3516
                 },
                 {
                     "name" : "_BacklightViewStrength",
                     "type" : "float",
-                    "offset" : 3552
+                    "offset" : 3520
                 },
                 {
                     "name" : "_BacklightBackfaceMask",
                     "type" : "float",
-                    "offset" : 3556
+                    "offset" : 3524
                 },
                 {
                     "name" : "_BacklightMainStrength",
                     "type" : "float",
-                    "offset" : 3560
+                    "offset" : 3528
                 },
                 {
                     "name" : "_BumpScale",
                     "type" : "float",
-                    "offset" : 3564
+                    "offset" : 3532
                 },
                 {
                     "name" : "_Bump2ndScale",
                     "type" : "float",
-                    "offset" : 3568
+                    "offset" : 3536
                 },
                 {
                     "name" : "_Reflectance",
                     "type" : "float",
-                    "offset" : 3572
+                    "offset" : 3540
                 },
                 {
                     "name" : "_SpecularNormalStrength",
                     "type" : "float",
-                    "offset" : 3576
+                    "offset" : 3544
                 },
                 {
                     "name" : "_SpecularBorder",
                     "type" : "float",
-                    "offset" : 3580
+                    "offset" : 3548
                 },
                 {
                     "name" : "_SpecularBlur",
                     "type" : "float",
-                    "offset" : 3584
+                    "offset" : 3552
                 },
                 {
                     "name" : "_ReflectionNormalStrength",
                     "type" : "float",
-                    "offset" : 3588
+                    "offset" : 3556
                 },
                 {
                     "name" : "_ReflectionCubeEnableLighting",
                     "type" : "float",
-                    "offset" : 3592
+                    "offset" : 3560
                 },
                 {
                     "name" : "_Smoothness",
                     "type" : "float",
-                    "offset" : 3596
+                    "offset" : 3564
                 },
                 {
                     "name" : "_Metallic",
                     "type" : "float",
-                    "offset" : 3600
+                    "offset" : 3568
                 },
                 {
                     "name" : "_GSAAStrength",
                     "type" : "float",
-                    "offset" : 3604
+                    "offset" : 3572
                 },
                 {
                     "name" : "_MatCapBlend",
                     "type" : "float",
-                    "offset" : 3608
+                    "offset" : 3576
                 },
                 {
                     "name" : "_MatCapEnableLighting",
                     "type" : "float",
-                    "offset" : 3612
+                    "offset" : 3580
                 },
                 {
                     "name" : "_MatCapShadowMask",
                     "type" : "float",
-                    "offset" : 3616
+                    "offset" : 3584
                 },
                 {
                     "name" : "_MatCapVRParallaxStrength",
                     "type" : "float",
-                    "offset" : 3620
+                    "offset" : 3588
                 },
                 {
                     "name" : "_MatCapBackfaceMask",
                     "type" : "float",
-                    "offset" : 3624
+                    "offset" : 3592
                 },
                 {
                     "name" : "_MatCapLod",
                     "type" : "float",
-                    "offset" : 3628
+                    "offset" : 3596
                 },
                 {
                     "name" : "_MatCapNormalStrength",
                     "type" : "float",
-                    "offset" : 3632
+                    "offset" : 3600
                 },
                 {
                     "name" : "_MatCapMainStrength",
                     "type" : "float",
-                    "offset" : 3636
+                    "offset" : 3604
                 },
                 {
                     "name" : "_MatCap2ndBlend",
                     "type" : "float",
-                    "offset" : 3640
+                    "offset" : 3608
                 },
                 {
                     "name" : "_MatCap2ndEnableLighting",
                     "type" : "float",
-                    "offset" : 3644
+                    "offset" : 3612
                 },
                 {
                     "name" : "_MatCap2ndShadowMask",
                     "type" : "float",
-                    "offset" : 3648
+                    "offset" : 3616
                 },
                 {
                     "name" : "_MatCap2ndVRParallaxStrength",
                     "type" : "float",
-                    "offset" : 3652
+                    "offset" : 3620
                 },
                 {
                     "name" : "_MatCap2ndBackfaceMask",
                     "type" : "float",
-                    "offset" : 3656
+                    "offset" : 3624
                 },
                 {
                     "name" : "_MatCap2ndLod",
                     "type" : "float",
-                    "offset" : 3660
+                    "offset" : 3628
                 },
                 {
                     "name" : "_MatCap2ndNormalStrength",
                     "type" : "float",
-                    "offset" : 3664
+                    "offset" : 3632
                 },
                 {
                     "name" : "_MatCap2ndMainStrength",
                     "type" : "float",
-                    "offset" : 3668
+                    "offset" : 3636
                 },
                 {
                     "name" : "_RimNormalStrength",
                     "type" : "float",
-                    "offset" : 3672
+                    "offset" : 3640
                 },
                 {
                     "name" : "_RimBorder",
                     "type" : "float",
-                    "offset" : 3676
+                    "offset" : 3644
                 },
                 {
                     "name" : "_RimBlur",
                     "type" : "float",
-                    "offset" : 3680
+                    "offset" : 3648
                 },
                 {
                     "name" : "_RimFresnelPower",
                     "type" : "float",
-                    "offset" : 3684
+                    "offset" : 3652
                 },
                 {
                     "name" : "_RimEnableLighting",
                     "type" : "float",
-                    "offset" : 3688
+                    "offset" : 3656
                 },
                 {
                     "name" : "_RimShadowMask",
                     "type" : "float",
-                    "offset" : 3692
+                    "offset" : 3660
                 },
                 {
                     "name" : "_RimVRParallaxStrength",
                     "type" : "float",
-                    "offset" : 3696
+                    "offset" : 3664
                 },
                 {
                     "name" : "_RimBackfaceMask",
                     "type" : "float",
-                    "offset" : 3700
+                    "offset" : 3668
                 },
                 {
                     "name" : "_RimMainStrength",
                     "type" : "float",
-                    "offset" : 3704
+                    "offset" : 3672
                 },
                 {
                     "name" : "_RimDirStrength",
                     "type" : "float",
-                    "offset" : 3708
+                    "offset" : 3676
                 },
                 {
                     "name" : "_RimDirRange",
                     "type" : "float",
-                    "offset" : 3712
+                    "offset" : 3680
                 },
                 {
                     "name" : "_RimIndirRange",
                     "type" : "float",
-                    "offset" : 3716
+                    "offset" : 3684
                 },
                 {
                     "name" : "_RimIndirBorder",
                     "type" : "float",
-                    "offset" : 3720
+                    "offset" : 3688
                 },
                 {
                     "name" : "_RimIndirBlur",
                     "type" : "float",
-                    "offset" : 3724
+                    "offset" : 3692
                 },
                 {
                     "name" : "_DistanceFadeRimFresnelPower",
                     "type" : "float",
-                    "offset" : 3728
+                    "offset" : 3696
                 },
                 {
                     "name" : "_EmissionBlend",
                     "type" : "float",
-                    "offset" : 3732
+                    "offset" : 3700
                 },
                 {
                     "name" : "_EmissionParallaxDepth",
                     "type" : "float",
-                    "offset" : 3736
+                    "offset" : 3704
                 },
                 {
                     "name" : "_EmissionFluorescence",
                     "type" : "float",
-                    "offset" : 3740
+                    "offset" : 3708
                 },
                 {
                     "name" : "_EmissionMainStrength",
                     "type" : "float",
-                    "offset" : 3744
+                    "offset" : 3712
                 },
                 {
                     "name" : "_Emission2ndBlend",
                     "type" : "float",
-                    "offset" : 3748
+                    "offset" : 3716
                 },
                 {
                     "name" : "_Emission2ndParallaxDepth",
                     "type" : "float",
-                    "offset" : 3752
+                    "offset" : 3720
                 },
                 {
                     "name" : "_Emission2ndFluorescence",
                     "type" : "float",
-                    "offset" : 3756
+                    "offset" : 3724
                 },
                 {
                     "name" : "_Emission2ndMainStrength",
                     "type" : "float",
-                    "offset" : 3760
-                },
-                {
-                    "name" : "_DissolveNoiseStrength",
-                    "type" : "float",
-                    "offset" : 3764
+                    "offset" : 3728
                 },
                 {
                     "name" : "_lilShadowCasterBias",
                     "type" : "float",
-                    "offset" : 3768
+                    "offset" : 3732
                 },
                 {
                     "name" : "_OutlineLitScale",
                     "type" : "float",
-                    "offset" : 3772
+                    "offset" : 3736
                 },
                 {
                     "name" : "_OutlineLitOffset",
                     "type" : "float",
-                    "offset" : 3776
+                    "offset" : 3740
                 },
                 {
                     "name" : "_OutlineWidth",
                     "type" : "float",
-                    "offset" : 3780
+                    "offset" : 3744
                 },
                 {
                     "name" : "_OutlineEnableLighting",
                     "type" : "float",
-                    "offset" : 3784
+                    "offset" : 3748
                 },
                 {
                     "name" : "_OutlineVectorScale",
                     "type" : "float",
-                    "offset" : 3788
+                    "offset" : 3752
                 },
                 {
                     "name" : "_OutlineFixWidth",
                     "type" : "float",
-                    "offset" : 3792
+                    "offset" : 3756
                 },
                 {
                     "name" : "_OutlineZBias",
                     "type" : "float",
-                    "offset" : 3796
+                    "offset" : 3760
                 },
                 {
                     "name" : "_Cull",
                     "type" : "uint",
-                    "offset" : 3800
+                    "offset" : 3764
                 },
                 {
                     "name" : "_OutlineCull",
                     "type" : "uint",
-                    "offset" : 3804
+                    "offset" : 3768
                 },
                 {
                     "name" : "_PreOutType",
                     "type" : "uint",
-                    "offset" : 3808
+                    "offset" : 3772
                 },
                 {
                     "name" : "_Main2ndTexBlendMode",
                     "type" : "uint",
-                    "offset" : 3812
+                    "offset" : 3776
                 },
                 {
                     "name" : "_Main2ndTexAlphaMode",
                     "type" : "uint",
-                    "offset" : 3816
+                    "offset" : 3780
                 },
                 {
                     "name" : "_Main2ndTex_UVMode",
                     "type" : "uint",
-                    "offset" : 3820
+                    "offset" : 3784
                 },
                 {
                     "name" : "_Main2ndTex_Cull",
                     "type" : "uint",
-                    "offset" : 3824
+                    "offset" : 3788
                 },
                 {
                     "name" : "_Main3rdTexBlendMode",
                     "type" : "uint",
-                    "offset" : 3828
+                    "offset" : 3792
                 },
                 {
                     "name" : "_Main3rdTexAlphaMode",
                     "type" : "uint",
-                    "offset" : 3832
+                    "offset" : 3796
                 },
                 {
                     "name" : "_Main3rdTex_UVMode",
                     "type" : "uint",
-                    "offset" : 3836
+                    "offset" : 3800
                 },
                 {
                     "name" : "_Main3rdTex_Cull",
                     "type" : "uint",
-                    "offset" : 3840
+                    "offset" : 3804
                 },
                 {
                     "name" : "_AlphaMaskMode",
                     "type" : "uint",
-                    "offset" : 3844
+                    "offset" : 3808
                 },
                 {
                     "name" : "_ShadowColorType",
                     "type" : "uint",
-                    "offset" : 3848
+                    "offset" : 3812
                 },
                 {
                     "name" : "_ShadowMaskType",
                     "type" : "uint",
-                    "offset" : 3852
+                    "offset" : 3816
                 },
                 {
                     "name" : "_Bump2ndMap_UVMode",
                     "type" : "uint",
-                    "offset" : 3856
+                    "offset" : 3820
                 },
                 {
                     "name" : "_ReflectionBlendMode",
                     "type" : "uint",
-                    "offset" : 3860
+                    "offset" : 3824
                 },
                 {
                     "name" : "_MatCapBlendMode",
                     "type" : "uint",
-                    "offset" : 3864
+                    "offset" : 3828
                 },
                 {
                     "name" : "_MatCap2ndBlendMode",
                     "type" : "uint",
-                    "offset" : 3868
+                    "offset" : 3832
                 },
                 {
                     "name" : "_RimBlendMode",
                     "type" : "uint",
-                    "offset" : 3872
+                    "offset" : 3836
                 },
                 {
                     "name" : "_EmissionMap_UVMode",
                     "type" : "uint",
-                    "offset" : 3876
+                    "offset" : 3840
                 },
                 {
                     "name" : "_EmissionBlendMode",
                     "type" : "uint",
-                    "offset" : 3880
+                    "offset" : 3844
                 },
                 {
                     "name" : "_Emission2ndMap_UVMode",
                     "type" : "uint",
-                    "offset" : 3884
+                    "offset" : 3848
                 },
                 {
                     "name" : "_Emission2ndBlendMode",
                     "type" : "uint",
-                    "offset" : 3888
+                    "offset" : 3852
                 },
                 {
                     "name" : "_DistanceFadeMode",
                     "type" : "uint",
-                    "offset" : 3892
+                    "offset" : 3856
                 },
                 {
                     "name" : "_OutlineVertexR2Width",
                     "type" : "uint",
-                    "offset" : 3896
+                    "offset" : 3860
                 },
                 {
                     "name" : "_OutlineVectorUVMode",
                     "type" : "uint",
-                    "offset" : 3900
+                    "offset" : 3864
                 },
                 {
                     "name" : "_Invisible",
                     "type" : "uint",
-                    "offset" : 3904
+                    "offset" : 3868
                 },
                 {
                     "name" : "_UseMain2ndTex",
                     "type" : "uint",
-                    "offset" : 3908
+                    "offset" : 3872
                 },
                 {
                     "name" : "_Main2ndTexIsMSDF",
                     "type" : "uint",
-                    "offset" : 3912
+                    "offset" : 3876
                 },
                 {
                     "name" : "_Main2ndTexIsDecal",
                     "type" : "uint",
-                    "offset" : 3916
+                    "offset" : 3880
                 },
                 {
                     "name" : "_Main2ndTexIsLeftOnly",
                     "type" : "uint",
-                    "offset" : 3920
+                    "offset" : 3884
                 },
                 {
                     "name" : "_Main2ndTexIsRightOnly",
                     "type" : "uint",
-                    "offset" : 3924
+                    "offset" : 3888
                 },
                 {
                     "name" : "_Main2ndTexShouldCopy",
                     "type" : "uint",
-                    "offset" : 3928
+                    "offset" : 3892
                 },
                 {
                     "name" : "_Main2ndTexShouldFlipMirror",
                     "type" : "uint",
-                    "offset" : 3932
+                    "offset" : 3896
                 },
                 {
                     "name" : "_Main2ndTexShouldFlipCopy",
                     "type" : "uint",
-                    "offset" : 3936
+                    "offset" : 3900
                 },
                 {
                     "name" : "_UseMain3rdTex",
                     "type" : "uint",
-                    "offset" : 3940
+                    "offset" : 3904
                 },
                 {
                     "name" : "_Main3rdTexIsMSDF",
                     "type" : "uint",
-                    "offset" : 3944
+                    "offset" : 3908
                 },
                 {
                     "name" : "_Main3rdTexIsDecal",
                     "type" : "uint",
-                    "offset" : 3948
+                    "offset" : 3912
                 },
                 {
                     "name" : "_Main3rdTexIsLeftOnly",
                     "type" : "uint",
-                    "offset" : 3952
+                    "offset" : 3916
                 },
                 {
                     "name" : "_Main3rdTexIsRightOnly",
                     "type" : "uint",
-                    "offset" : 3956
+                    "offset" : 3920
                 },
                 {
                     "name" : "_Main3rdTexShouldCopy",
                     "type" : "uint",
-                    "offset" : 3960
+                    "offset" : 3924
                 },
                 {
                     "name" : "_Main3rdTexShouldFlipMirror",
                     "type" : "uint",
-                    "offset" : 3964
+                    "offset" : 3928
                 },
                 {
                     "name" : "_Main3rdTexShouldFlipCopy",
                     "type" : "uint",
-                    "offset" : 3968
+                    "offset" : 3932
                 },
                 {
                     "name" : "_UseShadow",
                     "type" : "uint",
-                    "offset" : 3972
+                    "offset" : 3936
                 },
                 {
                     "name" : "_ShadowPostAO",
                     "type" : "uint",
-                    "offset" : 3976
+                    "offset" : 3940
                 },
                 {
                     "name" : "_UseRimShade",
                     "type" : "uint",
-                    "offset" : 3980
+                    "offset" : 3944
                 },
                 {
                     "name" : "_UseBacklight",
                     "type" : "uint",
-                    "offset" : 3984
+                    "offset" : 3948
                 },
                 {
                     "name" : "_BacklightReceiveShadow",
                     "type" : "uint",
-                    "offset" : 3988
+                    "offset" : 3952
                 },
                 {
                     "name" : "_UseBumpMap",
                     "type" : "uint",
-                    "offset" : 3992
+                    "offset" : 3956
                 },
                 {
                     "name" : "_UseBump2ndMap",
                     "type" : "uint",
-                    "offset" : 3996
+                    "offset" : 3960
                 },
                 {
                     "name" : "_UseReflection",
                     "type" : "uint",
-                    "offset" : 4000
+                    "offset" : 3964
                 },
                 {
                     "name" : "_ApplySpecular",
                     "type" : "uint",
-                    "offset" : 4004
+                    "offset" : 3968
                 },
                 {
                     "name" : "_ApplySpecularFA",
                     "type" : "uint",
-                    "offset" : 4008
+                    "offset" : 3972
                 },
                 {
                     "name" : "_ApplyReflection",
                     "type" : "uint",
-                    "offset" : 4012
+                    "offset" : 3976
                 },
                 {
                     "name" : "_SpecularToon",
                     "type" : "uint",
-                    "offset" : 4016
+                    "offset" : 3980
                 },
                 {
                     "name" : "_ReflectionApplyTransparency",
                     "type" : "uint",
-                    "offset" : 4020
+                    "offset" : 3984
                 },
                 {
                     "name" : "_ReflectionCubeOverride",
                     "type" : "uint",
-                    "offset" : 4024
+                    "offset" : 3988
                 },
                 {
                     "name" : "_UseMatCap",
                     "type" : "uint",
-                    "offset" : 4028
+                    "offset" : 3992
                 },
                 {
                     "name" : "_MatCapApplyTransparency",
                     "type" : "uint",
-                    "offset" : 4032
+                    "offset" : 3996
                 },
                 {
                     "name" : "_MatCapPerspective",
                     "type" : "uint",
-                    "offset" : 4036
+                    "offset" : 4000
                 },
                 {
                     "name" : "_MatCapZRotCancel",
                     "type" : "uint",
-                    "offset" : 4040
+                    "offset" : 4004
                 },
                 {
                     "name" : "_UseMatCap2nd",
                     "type" : "uint",
-                    "offset" : 4044
+                    "offset" : 4008
                 },
                 {
                     "name" : "_MatCap2ndApplyTransparency",
                     "type" : "uint",
-                    "offset" : 4048
+                    "offset" : 4012
                 },
                 {
                     "name" : "_MatCap2ndPerspective",
                     "type" : "uint",
-                    "offset" : 4052
+                    "offset" : 4016
                 },
                 {
                     "name" : "_MatCap2ndZRotCancel",
                     "type" : "uint",
-                    "offset" : 4056
+                    "offset" : 4020
                 },
                 {
                     "name" : "_UseRim",
                     "type" : "uint",
-                    "offset" : 4060
+                    "offset" : 4024
                 },
                 {
                     "name" : "_RimApplyTransparency",
                     "type" : "uint",
-                    "offset" : 4064
+                    "offset" : 4028
                 },
                 {
                     "name" : "_UseEmission",
                     "type" : "uint",
-                    "offset" : 4068
+                    "offset" : 4032
                 },
                 {
                     "name" : "_UseEmission2nd",
                     "type" : "uint",
-                    "offset" : 4072
+                    "offset" : 4036
                 },
                 {
                     "name" : "_OutlineLitApplyTex",
                     "type" : "uint",
-                    "offset" : 4076
+                    "offset" : 4040
                 },
                 {
                     "name" : "_OutlineLitShadowReceive",
                     "type" : "uint",
-                    "offset" : 4080
+                    "offset" : 4044
                 },
                 {
                     "name" : "_OutlineDeleteMesh",
                     "type" : "uint",
-                    "offset" : 4084
+                    "offset" : 4048
                 },
                 {
                     "name" : "_OutlineDisableInVR",
                     "type" : "uint",
-                    "offset" : 4088
+                    "offset" : 4052
                 },
                 {
                     "name" : "_UdonForceSceneLighting",
                     "type" : "uint",
-                    "offset" : 4092
+                    "offset" : 4056
                 }
             ]
         }
@@ -1714,7 +1699,7 @@
         {
             "type" : "_25",
             "name" : "type.$Globals",
-            "block_size" : 4096,
+            "block_size" : 4060,
             "set" : 0,
             "binding" : 0
         }

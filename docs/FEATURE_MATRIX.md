@@ -6,14 +6,14 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Base color / main texture | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Property names and main UV transform preserved |
 | Main UV animation / tone correction | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Compiled in standard variants |
-| Main2nd / Main3rd / decal | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core textures included; advanced per-layer masks are not shipped |
+| Main2nd / Main3rd / decal | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Main2nd/Main3rd blend masks and independent texture transforms are included in layered profiles; advanced dissolve/decal combinations remain budget-dependent |
 | Main toon shadow, 2nd, 3rd | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | lilToon bands retained; lighting ABI differs from Unity |
-| Normal map / normal map 2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Tangent fallback exists; authored tangents recommended |
-| MatCap / MatCap2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core textures included |
+| Normal map / normal map 2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Independent `_BumpMap_ST` / `_Bump2ndMap_ST`; authored tangents recommended |
+| MatCap / MatCap2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Both blend masks and custom normal maps select WebGL2-safe shader profiles |
 | Rim / directional rim | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Exercised in smoke example |
 | Rim shade / backlight | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | One-light approximation |
 | Emission / emission2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core emission maps included; blend masks/gradations omitted |
-| Reflection / specular | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | CubeTexture environment only; no Unity probe blending |
+| Reflection / specular | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Metallic, smoothness, and reflection-color textures supported; no Unity probe blending |
 | Distance fade / dissolve | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core dissolve textures included |
 | Cutout / alpha mask | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | Forward and shadow-caster cutoff supported |
 | Transparent blending | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | Single ordinary Three transparent pass; no Unity prepass variants |
@@ -28,7 +28,7 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | Instancing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Compatibility macros are neutral no-ops |
 | Stereo / WebXR | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Stereo macros are neutral no-ops in this alpha |
 | Multiple Unity light modes / probes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Additional lights and probe blending are not reproduced |
-| Advanced masks, gradations, glitter, anisotropy, parallax/POM | ⏳ | ⏳ | ⏳ | ⏳ | ❌ | ❌ | Not defined in shipped standard recipes |
+| Advanced masks, gradations, glitter, anisotropy, parallax/POM | ⏳ | ⏳ | ⏳ | ⏳ | ❌ | ❌ | Main2nd/Main3rd and MatCap blend masks are supported; other advanced masks are not defined in shipped recipes |
 | AudioLink / VRC Light Volumes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | VRC Light Volumes warn and fall back to Three lighting |
 | Refraction | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Requires scene-color capture; constructor diagnoses |
 | Gem | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Independent future pass |

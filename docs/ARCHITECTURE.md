@@ -24,7 +24,9 @@ vendor/lilToon ShaderLab + HLSL (pinned, untouched)
 
 `tools/shader-build/` compiles wrapper entrypoints rather than `.shader` files. Every SPIR-V module is validated, reflected, cross-compiled to ESSL 3.00, optionally checked by glslang, hashed, and emitted into `shader/generated/`. `src/generated/shaders.ts` embeds the validated GLSL for bundlers. Runtime consumers do not need compiler binaries or the vendor submodule.
 
-The shipped variants are smoke, minimal opaque, standard opaque, standard cutout, standard transparent, and outline. Standard variants deliberately keep a common alpha feature set active to prioritize correctness and predictable loading. They are held below WebGL2's guaranteed 16 sampler units per shader stage. Specialized feature-bit variants can be added later without changing the ABI.
+The shipped variants are smoke, minimal opaque, standard opaque/cutout/transparent, dissolve-noise, MatCap-mask, layered-MatCap, reflection/MatCap surface-control, layered-surface-control, and outline. The loader selects a profile from the textures actually assigned to each material. Layered profiles retain `_Main2ndTex` / `_Main3rdTex` and their blend masks; MatCap profiles retain both MatCap masks and custom normals; surface-control profiles retain metallic, smoothness, and reflection-color textures. A layered surface-control material can also retain Main Color 2nd when its MatCap custom-normal slots reference the same glTF texture as the primary normal map. The shader aliases that shared image sampler while preserving each property's independent `_ST` transform and strength.
+
+Three allocates sampler units across the linked vertex and fragment program. Skinned/morphed avatar shaders require two vertex samplers, so generated lilToon profiles are limited to fourteen additional fragment samplers. Compiler tests count the union of vertex and fragment sampler uniforms and reject any program above sixteen. Generated GLSL also reuses a real sampler for upstream texture-size queries instead of consuming a duplicate dummy binding.
 
 ## Compatibility ABI
 
@@ -43,7 +45,7 @@ The ABI uses one generated `_Globals` structured uniform value in Three.js plus 
 
 ## Runtime integration
 
-`LilToonMaterial` is a public `RawShaderMaterial`. It preserves upstream property names, applies generated Unity-to-Three render-state mappings, selects the forward variant by render mode, normalizes texture color spaces, binds safe neutral textures, and updates deformation resources per object.
+`LilToonMaterial` is a public `RawShaderMaterial`. It preserves upstream property names, applies generated Unity-to-Three render-state mappings, selects the forward variant by render mode and assigned layer/mask/surface-control textures, normalizes color textures as sRGB and metallic/smoothness/mask textures as linear data, binds safe neutral textures, and updates deformation resources per object. Unity texture transforms remain property-scoped shader uniforms, so two normal-map slots can share an image while retaining independent `_ST` tiling and offsets.
 
 `LilToonRendererAdapter` uses public Three.js state. Once per scene/render frame it selects the first visible directional light, reads ambient or hemisphere lighting, binds its shadow target and matrix, and binds a CubeTexture environment. The material then receives object/camera state in its `onBeforeRender` callback.
 

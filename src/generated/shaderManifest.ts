@@ -110,8 +110,7 @@ export const LILTOON_SHADER_MANIFEST = {
         "LIL_FEATURE_MatCap2ndTex",
         "LIL_FEATURE_EmissionMap",
         "LIL_FEATURE_Emission2ndMap",
-        "LIL_FEATURE_DissolveMask",
-        "LIL_FEATURE_DissolveNoiseMask"
+        "LIL_FEATURE_DissolveMask"
       ],
       "stages": {
         "vertex": {
@@ -126,7 +125,7 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "533743dd283c6486fcd9905bc91caf578df14eb4796a7fb65518717ff6ff3549"
+          "sha256": "19d92cadb7dd7415038f1e25c3fa60432526c075ef5e269a96c539ac4bb8f8ad"
         },
         "fragment": {
           "stage": "fragment",
@@ -140,7 +139,7 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "403863e00bcde4605172abe2b059bbb921944e63a3aabb57392941ba7c45c9d3"
+          "sha256": "7854e089e4e9adc6777acc9d75e01b2cd75ee8e014414a032ec591d8ee87f0d7"
         }
       }
     },
@@ -186,8 +185,7 @@ export const LILTOON_SHADER_MANIFEST = {
         "LIL_FEATURE_MatCap2ndTex",
         "LIL_FEATURE_EmissionMap",
         "LIL_FEATURE_Emission2ndMap",
-        "LIL_FEATURE_DissolveMask",
-        "LIL_FEATURE_DissolveNoiseMask"
+        "LIL_FEATURE_DissolveMask"
       ],
       "stages": {
         "vertex": {
@@ -202,7 +200,7 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "533743dd283c6486fcd9905bc91caf578df14eb4796a7fb65518717ff6ff3549"
+          "sha256": "19d92cadb7dd7415038f1e25c3fa60432526c075ef5e269a96c539ac4bb8f8ad"
         },
         "fragment": {
           "stage": "fragment",
@@ -216,7 +214,7 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "4add9d66a674a8d7cddfae8d5e6c45c634651b7e2f61744fc6293a0cb3357484"
+          "sha256": "6e92d6f932106c8b34e6751fe2e12311c67808015722945b54ee9f8584ea9a36"
         }
       }
     },
@@ -262,8 +260,7 @@ export const LILTOON_SHADER_MANIFEST = {
         "LIL_FEATURE_MatCap2ndTex",
         "LIL_FEATURE_EmissionMap",
         "LIL_FEATURE_Emission2ndMap",
-        "LIL_FEATURE_DissolveMask",
-        "LIL_FEATURE_DissolveNoiseMask"
+        "LIL_FEATURE_DissolveMask"
       ],
       "stages": {
         "vertex": {
@@ -278,7 +275,7 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "1c01515beda861269f6633a906056dde57bf9d860d9cf32958e9263612f06f17"
+          "sha256": "b064b532d905a117afc24efa7f30fe34a5c143ca4e7b6a11e02115decd7c2f3d"
         },
         "fragment": {
           "stage": "fragment",
@@ -292,7 +289,1135 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "97afbb63d2ff16d24e3c80c369e612663ed3dc39fb19e3fa3fac8115308d6021"
+          "sha256": "e4f5e1e10ca3fb799f6578c588593028ddca2794aef68f2623ae70476b738734"
+        }
+      }
+    },
+    {
+      "key": "standard-opaque-dissolve-noise",
+      "renderMode": "opaque",
+      "defines": [
+        "LIL_RENDER=0",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_AlphaMask",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_EmissionMap",
+        "LIL_FEATURE_DissolveMask",
+        "LIL_FEATURE_DissolveNoiseMask"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-opaque-dissolve-noise.vert.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-dissolve-noise.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-dissolve-noise.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "533743dd283c6486fcd9905bc91caf578df14eb4796a7fb65518717ff6ff3549"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-opaque-dissolve-noise.frag.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-dissolve-noise.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-dissolve-noise.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "2e7a2b4cdc07f20b04979fcfdb2c8cca1048b61c7ab6a3a3d7612cf2ae772b9a"
+        }
+      }
+    },
+    {
+      "key": "standard-cutout-dissolve-noise",
+      "renderMode": "cutout",
+      "defines": [
+        "LIL_RENDER=1",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_AlphaMask",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_EmissionMap",
+        "LIL_FEATURE_DissolveMask",
+        "LIL_FEATURE_DissolveNoiseMask"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-cutout-dissolve-noise.vert.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-dissolve-noise.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-dissolve-noise.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "533743dd283c6486fcd9905bc91caf578df14eb4796a7fb65518717ff6ff3549"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-cutout-dissolve-noise.frag.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-dissolve-noise.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-dissolve-noise.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "4e5dbda9fa886749c49ce02e777b62791a02323d57223f0a7095dfc6060790bf"
+        }
+      }
+    },
+    {
+      "key": "standard-transparent-dissolve-noise",
+      "renderMode": "transparent",
+      "defines": [
+        "LIL_RENDER=2",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_AlphaMask",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_EmissionMap",
+        "LIL_FEATURE_DissolveMask",
+        "LIL_FEATURE_DissolveNoiseMask"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-transparent-dissolve-noise.vert.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-dissolve-noise.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-dissolve-noise.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "1c01515beda861269f6633a906056dde57bf9d860d9cf32958e9263612f06f17"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-transparent-dissolve-noise.frag.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-dissolve-noise.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-dissolve-noise.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "4a3f3283fead8869999b8820c296455096a83f49298a1078762b062c625743bd"
+        }
+      }
+    },
+    {
+      "key": "standard-opaque-matcap-mask",
+      "renderMode": "opaque",
+      "defines": [
+        "LIL_RENDER=0",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-opaque-matcap-mask.vert.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-matcap-mask.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-matcap-mask.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "484959d3d8212e532cc17fd59b61b3f10c22ec136f86540370636c50077c7540"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-opaque-matcap-mask.frag.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-matcap-mask.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-matcap-mask.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "57620e0c98670e5062322c3cf29f297a096b45705b428c25608d039e9d6543bb"
+        }
+      }
+    },
+    {
+      "key": "standard-cutout-matcap-mask",
+      "renderMode": "cutout",
+      "defines": [
+        "LIL_RENDER=1",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-cutout-matcap-mask.vert.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-matcap-mask.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-matcap-mask.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "484959d3d8212e532cc17fd59b61b3f10c22ec136f86540370636c50077c7540"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-cutout-matcap-mask.frag.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-matcap-mask.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-matcap-mask.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "1808467bc3c5e6e1ec7be264aa3fc925a9e9a0436e13920784a9eec138310d2c"
+        }
+      }
+    },
+    {
+      "key": "standard-transparent-matcap-mask",
+      "renderMode": "transparent",
+      "defines": [
+        "LIL_RENDER=2",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-transparent-matcap-mask.vert.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-matcap-mask.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-matcap-mask.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "06b45f6ce9bba35170bfc341829f9f8ac240f68b621c676845d6b4014ca08cc2"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-transparent-matcap-mask.frag.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-matcap-mask.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-matcap-mask.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "9fbbafaaea8be7f2f19bf330b977a12489aa8bb7c514095303f6f0875a257d84"
+        }
+      }
+    },
+    {
+      "key": "standard-opaque-layered-matcap",
+      "renderMode": "opaque",
+      "defines": [
+        "LIL_RENDER=0",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_Main2ndBlendMask",
+        "LIL_FEATURE_Main3rdBlendMask",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-opaque-layered-matcap.vert.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-layered-matcap.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-layered-matcap.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "f7bbaf563ac3be460b1606343f79613a478c8d44fa3fe8e83c0e6f642a405020"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-opaque-layered-matcap.frag.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-layered-matcap.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-layered-matcap.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "5e78a9592adced205bf81c8320a98a533ba9236541b71ec2a26c5467b8dbb9ef"
+        }
+      }
+    },
+    {
+      "key": "standard-cutout-layered-matcap",
+      "renderMode": "cutout",
+      "defines": [
+        "LIL_RENDER=1",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_Main2ndBlendMask",
+        "LIL_FEATURE_Main3rdBlendMask",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-cutout-layered-matcap.vert.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-layered-matcap.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-layered-matcap.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "f7bbaf563ac3be460b1606343f79613a478c8d44fa3fe8e83c0e6f642a405020"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-cutout-layered-matcap.frag.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-layered-matcap.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-layered-matcap.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "b35996abd7f2e601be75a4913348cd44140d9b42712a579cade143f4a32c94e6"
+        }
+      }
+    },
+    {
+      "key": "standard-transparent-layered-matcap",
+      "renderMode": "transparent",
+      "defines": [
+        "LIL_RENDER=2",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_MAIN3RD",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main3rdTex",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_Bump2ndMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_Main2ndBlendMask",
+        "LIL_FEATURE_Main3rdBlendMask",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-transparent-layered-matcap.vert.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-layered-matcap.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-layered-matcap.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "914398222d7f67576fa8219b047b268d9d951529b4bfbcae664aaf1df2b63be4"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-transparent-layered-matcap.frag.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-layered-matcap.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-layered-matcap.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "53b23ce614290c923e5a837282eef91a46576a457f14720b38121b9cf6ea078e"
+        }
+      }
+    },
+    {
+      "key": "standard-opaque-surface-controls",
+      "renderMode": "opaque",
+      "defines": [
+        "LIL_RENDER=0",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_SmoothnessTex",
+        "LIL_FEATURE_MetallicGlossMap",
+        "LIL_FEATURE_ReflectionColorTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-opaque-surface-controls.vert.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-surface-controls.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-surface-controls.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "8e350365b915d53a33237747ccf46694cf46b18bba2a99b076e989b46d23dbee"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-opaque-surface-controls.frag.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-surface-controls.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-surface-controls.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "736677b48b0e87aceb24fd1c7734099925e493eeaa7090292f41898a54ae7009"
+        }
+      }
+    },
+    {
+      "key": "standard-cutout-surface-controls",
+      "renderMode": "cutout",
+      "defines": [
+        "LIL_RENDER=1",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_SmoothnessTex",
+        "LIL_FEATURE_MetallicGlossMap",
+        "LIL_FEATURE_ReflectionColorTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-cutout-surface-controls.vert.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-surface-controls.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-surface-controls.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "8e350365b915d53a33237747ccf46694cf46b18bba2a99b076e989b46d23dbee"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-cutout-surface-controls.frag.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-surface-controls.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-surface-controls.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "48d4b7a1873da25389fe2924824a829150e5c0c52693037eef15a6d19349fc6f"
+        }
+      }
+    },
+    {
+      "key": "standard-transparent-surface-controls",
+      "renderMode": "transparent",
+      "defines": [
+        "LIL_RENDER=2",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_SmoothnessTex",
+        "LIL_FEATURE_MetallicGlossMap",
+        "LIL_FEATURE_ReflectionColorTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-transparent-surface-controls.vert.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-surface-controls.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-surface-controls.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "725454b67cb2aa22aafd7ebc96f1c7cc01f0e35a9b9873d6ecf2887099b29a2d"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-transparent-surface-controls.frag.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-surface-controls.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-surface-controls.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "57f398359b966362ffffe2022b5e85ae0f6c3578ed73bfe87cfb692ea031c52e"
+        }
+      }
+    },
+    {
+      "key": "standard-opaque-layered-surface-controls",
+      "renderMode": "opaque",
+      "defines": [
+        "LIL_RENDER=0",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main2ndBlendMask",
+        "LIL_FEATURE_SmoothnessTex",
+        "LIL_FEATURE_MetallicGlossMap",
+        "LIL_FEATURE_ReflectionColorTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap",
+        "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-opaque-layered-surface-controls.vert.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-layered-surface-controls.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-layered-surface-controls.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "3d033df4aaa77e4bc33d39b38e56e5852353b3766a2b18b0da35e92fdd0368d3"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-opaque-layered-surface-controls.frag.spv",
+          "glsl": "shader/generated/glsl/standard-opaque-layered-surface-controls.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-opaque-layered-surface-controls.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "e5346e925ef2ade96644f06b43721e4bb3397e83824971ac3c3b7bad977a2417"
+        }
+      }
+    },
+    {
+      "key": "standard-cutout-layered-surface-controls",
+      "renderMode": "cutout",
+      "defines": [
+        "LIL_RENDER=1",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main2ndBlendMask",
+        "LIL_FEATURE_SmoothnessTex",
+        "LIL_FEATURE_MetallicGlossMap",
+        "LIL_FEATURE_ReflectionColorTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap",
+        "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-cutout-layered-surface-controls.vert.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-layered-surface-controls.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-layered-surface-controls.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "3d033df4aaa77e4bc33d39b38e56e5852353b3766a2b18b0da35e92fdd0368d3"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-cutout-layered-surface-controls.frag.spv",
+          "glsl": "shader/generated/glsl/standard-cutout-layered-surface-controls.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-cutout-layered-surface-controls.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "82179376a6fbef0c2eb4b80137b37c1484c1349cc6e7ab93e30b27196408d5d1"
+        }
+      }
+    },
+    {
+      "key": "standard-transparent-layered-surface-controls",
+      "renderMode": "transparent",
+      "defines": [
+        "LIL_RENDER=2",
+        "LIL_WEB_DEFORMATION",
+        "LIL_WEB_SKINNING",
+        "LIL_WEB_MORPHTARGETS",
+        "LIL_USE_SHADOW",
+        "LIL_FEATURE_ANIMATE_MAIN_UV",
+        "LIL_FEATURE_MAIN_TONE_CORRECTION",
+        "LIL_FEATURE_DECAL",
+        "LIL_FEATURE_ANIMATE_DECAL",
+        "LIL_FEATURE_ALPHAMASK",
+        "LIL_FEATURE_SHADOW",
+        "LIL_FEATURE_RECEIVE_SHADOW",
+        "LIL_FEATURE_SHADOW_3RD",
+        "LIL_FEATURE_RIMSHADE",
+        "LIL_FEATURE_EMISSION_1ST",
+        "LIL_FEATURE_EMISSION_2ND",
+        "LIL_FEATURE_ANIMATE_EMISSION_UV",
+        "LIL_FEATURE_NORMAL_1ST",
+        "LIL_FEATURE_NORMAL_2ND",
+        "LIL_FEATURE_REFLECTION",
+        "LIL_FEATURE_MATCAP",
+        "LIL_FEATURE_MATCAP_2ND",
+        "LIL_FEATURE_RIMLIGHT",
+        "LIL_FEATURE_RIMLIGHT_DIRECTION",
+        "LIL_FEATURE_BACKLIGHT",
+        "LIL_FEATURE_DISTANCE_FADE",
+        "LIL_FEATURE_DISSOLVE",
+        "LIL_FEATURE_BumpMap",
+        "LIL_FEATURE_MatCapTex",
+        "LIL_FEATURE_MatCap2ndTex",
+        "LIL_FEATURE_MAIN2ND",
+        "LIL_FEATURE_Main2ndTex",
+        "LIL_FEATURE_Main2ndBlendMask",
+        "LIL_FEATURE_SmoothnessTex",
+        "LIL_FEATURE_MetallicGlossMap",
+        "LIL_FEATURE_ReflectionColorTex",
+        "LIL_FEATURE_MatCapBlendMask",
+        "LIL_FEATURE_MatCapBumpMap",
+        "LIL_FEATURE_MatCap2ndBlendMask",
+        "LIL_FEATURE_MatCap2ndBumpMap",
+        "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN"
+      ],
+      "stages": {
+        "vertex": {
+          "stage": "vertex",
+          "spirv": "shader/generated/spirv/standard-transparent-layered-surface-controls.vert.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-layered-surface-controls.vert.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-layered-surface-controls.vert.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "82a88f15fc828250157be8492234966a99fb288bbc9aef020ee529a3504c0d58"
+        },
+        "fragment": {
+          "stage": "fragment",
+          "spirv": "shader/generated/spirv/standard-transparent-layered-surface-controls.frag.spv",
+          "glsl": "shader/generated/glsl/standard-transparent-layered-surface-controls.frag.glsl",
+          "reflection": "shader/generated/reflection/standard-transparent-layered-surface-controls.frag.json",
+          "sourceIncludes": [
+            "forward.hlsl",
+            "../compat/lil_pipeline_web.hlsl",
+            "lil_common.hlsl",
+            "../generated/hlsl/lil_common_appdata.web.hlsl",
+            "lil_pass_forward.hlsl"
+          ],
+          "sha256": "ed76007a36a7f0ecafd71ee8b922e3169816d89ddbfdc19a0aaacb6a6a6e2d0a"
         }
       }
     },
@@ -339,7 +1464,7 @@ export const LILTOON_SHADER_MANIFEST = {
             "../generated/hlsl/lil_common_appdata.web.hlsl",
             "lil_pass_forward.hlsl"
           ],
-          "sha256": "a41edd8c7d81751a532245c9449970d4c12b26a618b18f5ed7ca079a2f435657"
+          "sha256": "e5031527bd307c0a67ae02ddd08fb12d9cbabbc55f2640cf19fdff3a64eb860c"
         }
       }
     }

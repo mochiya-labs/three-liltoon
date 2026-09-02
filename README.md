@@ -87,6 +87,8 @@ scene.add(gltf.scene);
 
 The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT.md).
 
+The runtime chooses a material-specific shader profile so layered-color masks, MatCap masks, custom normals, or reflection controls fit Three/WebGL's texture-unit budget. A maximal lilToon shader is intentionally not used: skinned/morphed avatars reserve two of the renderer's sixteen allocated units for deformation, and every generated profile is tested to keep the complete linked program within that limit.
+
 Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`com.mochiya.liltoon-exporter`](../mochiya-liltoon-unity/README.md) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
 ## Develop and verify
@@ -111,6 +113,16 @@ Useful checks:
 - `npm pack --dry-run`
 
 The browser test installs no browser automatically. On a developer machine or CI image, run `npx playwright install chromium firefox` first.
+
+## Viewer example
+
+[`examples/mochiya-liltoon-viewer`](examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI follows the Mochiya site's installed `radix-mira` shadcn preset and olive theme.
+
+```bash
+cd examples/mochiya-liltoon-viewer
+npm install
+npm run dev
+```
 
 ## Documentation
 

@@ -27,7 +27,11 @@ import {
 } from "../renderer/LilToonUniformBinder.js";
 import type { LilToonRendererAdapter } from "../renderer/LilToonRendererAdapter.js";
 import { LilToonMorphAdapter } from "../renderer/LilToonMorphAdapter.js";
-import { getLilToonShaderProgram, getOutlineShaderProgram } from "../shader/ShaderProgramLibrary.js";
+import {
+  getLilToonShaderProgram,
+  getOutlineShaderProgram,
+  type LilToonShaderProfile,
+} from "../shader/ShaderProgramLibrary.js";
 import { assertSupportedMaterial } from "../utils/diagnostics.js";
 import { applyLilToonRenderState } from "../utils/renderState.js";
 import { getNeutralTexture, normalizeLilToonTexture } from "../utils/texture.js";
@@ -63,6 +67,30 @@ function textureDefault(property: string): string {
   return "white";
 }
 
+function sharesPrimaryNormalWithMatCaps(textures: LilToonMaterialParameters["textures"]): boolean {
+  const primary = textures?._BumpMap;
+  if (!primary) return false;
+  return (!textures?._MatCapBumpMap || textures._MatCapBumpMap === primary) &&
+    (!textures?._MatCap2ndBumpMap || textures._MatCap2ndBumpMap === primary);
+}
+
+function shaderProfile(textures: LilToonMaterialParameters["textures"]): LilToonShaderProfile {
+  const layered = Boolean(textures?._Main2ndBlendMask || textures?._Main3rdBlendMask);
+  const surfaceControls = Boolean(
+    textures?._SmoothnessTex || textures?._MetallicGlossMap || textures?._ReflectionColorTex,
+  );
+  if (surfaceControls && layered && sharesPrimaryNormalWithMatCaps(textures)) {
+    return "layered-surface-controls";
+  }
+  if (surfaceControls) {
+    return "surface-controls";
+  }
+  if (layered) return "layered-matcap";
+  if (textures?._MatCapBlendMask || textures?._MatCap2ndBlendMask) return "matcap-mask";
+  if (textures?._DissolveNoiseMask) return "dissolve-noise";
+  return "standard";
+}
+
 const morphAdapter = new LilToonMorphAdapter();
 
 export class LilToonMaterial extends RawShaderMaterial {
@@ -81,7 +109,9 @@ export class LilToonMaterial extends RawShaderMaterial {
   constructor(parameters: LilToonMaterialParameters = {}) {
     const renderMode = parameters.renderMode ?? "opaque";
     const pass = parameters.pass ?? "forward";
-    const program = pass === "outline" ? getOutlineShaderProgram() : getLilToonShaderProgram(renderMode);
+    const program = pass === "outline"
+      ? getOutlineShaderProgram()
+      : getLilToonShaderProgram(renderMode, shaderProfile(parameters.textures));
     const globalUniforms = createGlobalUniforms(program.vertexShader, program.fragmentShader);
     const uniforms: Record<string, IUniform> = { _Globals: { value: globalUniforms } };
     const cubeSamplers = new Set(

@@ -8,12 +8,23 @@ import type { ShaderProperty } from "../shaderlab/types.js";
 const source = readFileSync(resolve(LILTOON_SHADER, "lts.shader"), "utf8");
 const parsed = parseShaderLab(source);
 const properties = [...new Map(parsed.properties.map((property) => [property.name, property])).values()];
-const defaults = Object.fromEntries(properties.map((property) => [property.name, property.defaultValue]));
+
+function srgbToLinear(value: number): number {
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+}
+
+const defaults = Object.fromEntries(properties.map((property) => {
+  const gamma = property.attributes.some((attribute) => /^Gamma\b/i.test(attribute));
+  const value = gamma && typeof property.defaultValue === "number"
+    ? srgbToLinear(property.defaultValue)
+    : property.defaultValue;
+  return [property.name, value];
+}));
 
 function classifyTexture(property: ShaderProperty): "color" | "normal" | "data" | undefined {
   if (!/^(2D|3D|Cube)$/i.test(property.type)) return undefined;
   if (property.attributes.some((attribute) => /^Normal\b/i.test(attribute))) return "normal";
-  if (/(_Mask|Mask$|Normal|Bump|Dither|Parallax|Noise|UDIM|AudioLink)/i.test(property.name)) return "data";
+  if (/(_Mask|Mask$|Normal|Bump|Dither|Parallax|Noise|UDIM|AudioLink|Metallic|Smoothness)/i.test(property.name)) return "data";
   return "color";
 }
 

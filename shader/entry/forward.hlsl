@@ -15,6 +15,16 @@
 #include "../compat/lil_pipeline_web.hlsl"
 #include "lil_common.hlsl"
 
+// Some optimized web profiles are selected only when lilToon's MatCap custom
+// normals reference the same texture as the primary normal map. Alias those
+// texture objects after their declarations but before the fragment functions
+// are included, preserving each feature's independent scale and strength while
+// consuming one WebGL texture unit instead of three.
+#if defined(LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN)
+    #define _MatCapBumpMap _BumpMap
+    #define _MatCap2ndBumpMap _BumpMap
+#endif
+
 #if defined(LIL_WEB_DEFORMATION)
     #include "../generated/hlsl/lil_common_appdata.web.hlsl"
 #endif

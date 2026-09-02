@@ -5,7 +5,28 @@ import { describe, expect, it } from "vitest";
 import { PROJECT_ROOT } from "../../tools/paths.js";
 
 describe("generated shader artifacts", () => {
-  const variants = ["minimal-opaque", "standard-opaque", "standard-cutout", "standard-transparent", "outline"];
+  const variants = [
+    "minimal-opaque",
+    "standard-opaque",
+    "standard-cutout",
+    "standard-transparent",
+    "standard-opaque-dissolve-noise",
+    "standard-cutout-dissolve-noise",
+    "standard-transparent-dissolve-noise",
+    "standard-opaque-matcap-mask",
+    "standard-cutout-matcap-mask",
+    "standard-transparent-matcap-mask",
+    "standard-opaque-layered-matcap",
+    "standard-cutout-layered-matcap",
+    "standard-transparent-layered-matcap",
+    "standard-opaque-surface-controls",
+    "standard-cutout-surface-controls",
+    "standard-transparent-surface-controls",
+    "standard-opaque-layered-surface-controls",
+    "standard-cutout-layered-surface-controls",
+    "standard-transparent-layered-surface-controls",
+    "outline",
+  ];
 
   it.each(variants)("ships validated artifacts for %s", (variant) => {
     for (const stage of ["vert", "frag"]) {
@@ -28,15 +49,95 @@ describe("generated shader artifacts", () => {
     expect(vertex).toContain("sampler2DArray");
   });
 
-  it.each(variants)("stays within WebGL2's minimum per-stage texture-unit limits for %s", (variant) => {
+  it.each(["opaque", "cutout", "transparent"])(
+    "samples both MatCap masks in the %s mask profile",
+    (renderMode) => {
+      const fragment = readFileSync(
+        resolve(PROJECT_ROOT, `shader/generated/glsl/standard-${renderMode}-matcap-mask.frag.glsl`),
+        "utf8",
+      );
+      expect(fragment).toContain("Combined_MatCapBlendMask");
+      expect(fragment).toContain("Combined_MatCap2ndBlendMask");
+      expect(fragment).toContain("_Globals._MatCapBlendMask_ST.xy");
+      expect(fragment).toContain("_Globals._MatCap2ndBlendMask_ST.xy");
+    },
+  );
+
+  it.each(["opaque", "cutout", "transparent"])(
+    "samples layered color masks and masked MatCaps in the %s layered profile",
+    (renderMode) => {
+      const fragment = readFileSync(
+        resolve(PROJECT_ROOT, `shader/generated/glsl/standard-${renderMode}-layered-matcap.frag.glsl`),
+        "utf8",
+      );
+      for (const texture of [
+        "Main2ndTex",
+        "Main2ndBlendMask",
+        "Main3rdTex",
+        "Main3rdBlendMask",
+        "MatCapBlendMask",
+        "MatCapBumpMap",
+        "MatCap2ndBlendMask",
+        "MatCap2ndBumpMap",
+      ]) {
+        expect(fragment).toContain(`Combined_${texture}`);
+      }
+    },
+  );
+
+  it.each(["opaque", "cutout", "transparent"])(
+    "samples Main Color 2nd and reflection controls in the %s layered surface profile",
+    (renderMode) => {
+      const fragment = readFileSync(
+        resolve(PROJECT_ROOT, `shader/generated/glsl/standard-${renderMode}-layered-surface-controls.frag.glsl`),
+        "utf8",
+      );
+      expect(fragment).toContain("Combined_Main2ndTex");
+      expect(fragment).toContain("Combined_Main2ndBlendMask");
+      expect(fragment).toContain("Combined_MetallicGlossMap");
+      expect(fragment).toContain("Combined_SmoothnessTex");
+      expect(fragment).toContain("Combined_ReflectionColorTex");
+      expect(fragment).toContain("_Globals._MatCapBumpMap_ST.xy");
+      expect(fragment).toContain("_Globals._MatCap2ndBumpMap_ST.xy");
+    },
+  );
+
+  it.each(["opaque", "cutout", "transparent"])(
+    "samples reflection controls, MatCap masks, and custom normals in the %s surface profile",
+    (renderMode) => {
+      const fragment = readFileSync(
+        resolve(PROJECT_ROOT, `shader/generated/glsl/standard-${renderMode}-surface-controls.frag.glsl`),
+        "utf8",
+      );
+      for (const texture of [
+        "SmoothnessTex",
+        "MetallicGlossMap",
+        "ReflectionColorTex",
+        "MatCapBlendMask",
+        "MatCapBumpMap",
+        "MatCap2ndBlendMask",
+        "MatCap2ndBumpMap",
+      ]) {
+        expect(fragment).toContain(`Combined_${texture}`);
+      }
+      expect(fragment).toContain("_Globals._BumpMap_ST.xy");
+      expect(fragment).toContain("_Globals._MatCapBumpMap_ST.xy");
+      expect(fragment).toContain("_Globals._MatCap2ndBumpMap_ST.xy");
+    },
+  );
+
+  it.each(variants)("stays within Three.js's 16 allocated texture units for %s", (variant) => {
+    const samplers = new Set<string>();
     for (const stage of ["vert", "frag"] as const) {
       const glsl = readFileSync(
         resolve(PROJECT_ROOT, `shader/generated/glsl/${variant}.${stage}.glsl`),
         "utf8",
       );
-      const samplerCount = [...glsl.matchAll(/uniform\s+(?:\w+\s+)?sampler(?:2D|2DArray|Cube|2DShadow)\s+/g)].length;
-      expect(samplerCount, `${variant}.${stage} has ${samplerCount} active samplers`).toBeLessThanOrEqual(16);
+      for (const match of glsl.matchAll(
+        /uniform\s+(?:\w+\s+)?sampler(?:2D|2DArray|Cube|2DShadow)\s+([A-Za-z_][A-Za-z0-9_]*)/g,
+      )) samplers.add(match[1]!);
     }
+    expect(samplers.size, `${variant} makes Three.js allocate ${samplers.size} texture units`).toBeLessThanOrEqual(16);
   });
 
   it.each(variants)("uses matching WebGL2 varying names for %s", (variant) => {

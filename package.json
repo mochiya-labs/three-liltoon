@@ -43,6 +43,8 @@
     "test:parity:required": "tsx test/parity/run.ts --require-fixtures",
     "example:dev": "vite examples/basic-three",
     "example:build": "npm run build:package && vite build examples/basic-three",
+    "example:viewer:dev": "npm --prefix examples/mochiya-liltoon-viewer run dev",
+    "example:viewer:build": "npm --prefix examples/mochiya-liltoon-viewer run build",
     "typecheck": "tsc --noEmit",
     "build:package": "tsup",
     "build": "npm run generate && npm run shaders:build && npm run typecheck && npm run build:package",

@@ -41,8 +41,89 @@ export const CORE_FEATURE_DEFINES = [
   "LIL_FEATURE_EmissionMap",
   "LIL_FEATURE_Emission2ndMap",
   "LIL_FEATURE_DissolveMask",
-  "LIL_FEATURE_DissolveNoiseMask",
 ] as const;
+
+const MATCAP_MASK_FEATURE_DEFINES = [
+  "LIL_FEATURE_MatCapBlendMask",
+  "LIL_FEATURE_MatCapBumpMap",
+  "LIL_FEATURE_MatCap2ndBlendMask",
+  "LIL_FEATURE_MatCap2ndBumpMap",
+] as const;
+
+// Cutout and transparent standard variants already consume WebGL2's minimum
+// 16 fragment texture units. The mask profile trades the two dissolve-map
+// samplers for the two MatCap mask samplers. Runtime material selection keeps
+// dissolve materials on the standard profile and masked MatCap materials on
+// this profile instead of producing an un-linkable >16-sampler shader.
+const MATCAP_MASK_CORE_FEATURE_DEFINES = CORE_FEATURE_DEFINES.filter(
+  (feature) => ![
+    "LIL_FEATURE_AlphaMask",
+    "LIL_FEATURE_DissolveMask",
+    "LIL_FEATURE_EmissionMap",
+    "LIL_FEATURE_Emission2ndMap",
+  ].includes(feature),
+);
+
+const LAYERED_MATCAP_FEATURE_DEFINES = [
+  "LIL_FEATURE_Main2ndBlendMask",
+  "LIL_FEATURE_Main3rdBlendMask",
+  ...MATCAP_MASK_FEATURE_DEFINES,
+] as const;
+
+// This lane mirrors lilToon's material optimizer for layered MatCap materials:
+// keep both color layers and masks, both MatCaps and custom normals, and both
+// general normal maps. Reflection, alpha-mask, dissolve, and texture-backed
+// emission live in other lanes so an animated avatar stays within 14 fragment
+// samplers plus its bone and morph samplers.
+const LAYERED_MATCAP_CORE_FEATURE_DEFINES = CORE_FEATURE_DEFINES.filter(
+  (feature) => ![
+    "LIL_FEATURE_REFLECTION",
+    "LIL_FEATURE_AlphaMask",
+    "LIL_FEATURE_DissolveMask",
+    "LIL_FEATURE_EmissionMap",
+    "LIL_FEATURE_Emission2ndMap",
+  ].includes(feature),
+);
+
+const SURFACE_CONTROL_FEATURE_DEFINES = [
+  "LIL_FEATURE_SmoothnessTex",
+  "LIL_FEATURE_MetallicGlossMap",
+  "LIL_FEATURE_ReflectionColorTex",
+  "LIL_FEATURE_MatCapBlendMask",
+  "LIL_FEATURE_MatCapBumpMap",
+  "LIL_FEATURE_MatCap2ndBlendMask",
+  "LIL_FEATURE_MatCap2ndBumpMap",
+] as const;
+
+// A reflection-heavy lilToon material needs three reflection control textures
+// in addition to MatCap masks/custom normals. Exchange texture-backed main
+// layers, emissions, and dissolve maps to keep the full surface-control path
+// linkable on the WebGL2-guaranteed sampler budget.
+const SURFACE_CONTROL_CORE_FEATURE_DEFINES = CORE_FEATURE_DEFINES.filter(
+  (feature) => ![
+    "LIL_FEATURE_MAIN2ND",
+    "LIL_FEATURE_MAIN3RD",
+    "LIL_FEATURE_Main2ndTex",
+    "LIL_FEATURE_Main3rdTex",
+    "LIL_FEATURE_EmissionMap",
+    "LIL_FEATURE_Emission2ndMap",
+    "LIL_FEATURE_DissolveMask",
+    "LIL_FEATURE_AlphaMask",
+    "LIL_FEATURE_Bump2ndMap",
+  ].includes(feature),
+);
+
+const LAYERED_SURFACE_CONTROL_FEATURE_DEFINES = [
+  "LIL_FEATURE_MAIN2ND",
+  "LIL_FEATURE_Main2ndTex",
+  "LIL_FEATURE_Main2ndBlendMask",
+  ...SURFACE_CONTROL_FEATURE_DEFINES,
+  "LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN",
+] as const;
+
+const DISSOLVE_NOISE_CORE_FEATURE_DEFINES = CORE_FEATURE_DEFINES.filter(
+  (feature) => feature !== "LIL_FEATURE_Emission2ndMap",
+);
 
 const entry = (name: string) => resolve(PROJECT_ROOT, `shader/entry/${name}.hlsl`);
 const forwardSources = { vertex: entry("forward"), fragment: entry("forward") } as const;
@@ -60,6 +141,111 @@ export const SHADER_VARIANTS: ShaderVariantRecipe[] = [
   { key: "standard-opaque", renderMode: "opaque", sources: forwardSources, entries, defines: ["LIL_RENDER=0", ...CORE_FEATURE_DEFINES] },
   { key: "standard-cutout", renderMode: "cutout", sources: forwardSources, entries, defines: ["LIL_RENDER=1", ...CORE_FEATURE_DEFINES] },
   { key: "standard-transparent", renderMode: "transparent", sources: forwardSources, entries, defines: ["LIL_RENDER=2", ...CORE_FEATURE_DEFINES] },
+  {
+    key: "standard-opaque-dissolve-noise",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=0", ...DISSOLVE_NOISE_CORE_FEATURE_DEFINES, "LIL_FEATURE_DissolveNoiseMask"],
+  },
+  {
+    key: "standard-cutout-dissolve-noise",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=1", ...DISSOLVE_NOISE_CORE_FEATURE_DEFINES, "LIL_FEATURE_DissolveNoiseMask"],
+  },
+  {
+    key: "standard-transparent-dissolve-noise",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=2", ...DISSOLVE_NOISE_CORE_FEATURE_DEFINES, "LIL_FEATURE_DissolveNoiseMask"],
+  },
+  {
+    key: "standard-opaque-matcap-mask",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=0", ...MATCAP_MASK_CORE_FEATURE_DEFINES, ...MATCAP_MASK_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-cutout-matcap-mask",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=1", ...MATCAP_MASK_CORE_FEATURE_DEFINES, ...MATCAP_MASK_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-transparent-matcap-mask",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=2", ...MATCAP_MASK_CORE_FEATURE_DEFINES, ...MATCAP_MASK_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-opaque-layered-matcap",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=0", ...LAYERED_MATCAP_CORE_FEATURE_DEFINES, ...LAYERED_MATCAP_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-cutout-layered-matcap",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=1", ...LAYERED_MATCAP_CORE_FEATURE_DEFINES, ...LAYERED_MATCAP_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-transparent-layered-matcap",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=2", ...LAYERED_MATCAP_CORE_FEATURE_DEFINES, ...LAYERED_MATCAP_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-opaque-surface-controls",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=0", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...SURFACE_CONTROL_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-cutout-surface-controls",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=1", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...SURFACE_CONTROL_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-transparent-surface-controls",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=2", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...SURFACE_CONTROL_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-opaque-layered-surface-controls",
+    renderMode: "opaque",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=0", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...LAYERED_SURFACE_CONTROL_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-cutout-layered-surface-controls",
+    renderMode: "cutout",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=1", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...LAYERED_SURFACE_CONTROL_FEATURE_DEFINES],
+  },
+  {
+    key: "standard-transparent-layered-surface-controls",
+    renderMode: "transparent",
+    sources: forwardSources,
+    entries,
+    defines: ["LIL_RENDER=2", ...SURFACE_CONTROL_CORE_FEATURE_DEFINES, ...LAYERED_SURFACE_CONTROL_FEATURE_DEFINES],
+  },
   {
     key: "outline",
     renderMode: "outline",

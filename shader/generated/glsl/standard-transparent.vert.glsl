@@ -122,8 +122,6 @@ struct type_Globals
     vec4 _DissolveColor;
     vec4 _DissolveParams;
     vec4 _DissolvePos;
-    vec4 _DissolveNoiseMask_ST;
-    vec4 _DissolveNoiseMask_ScrollRotate;
     vec4 _OutlineColor;
     vec4 _OutlineLitColor;
     vec4 _OutlineTex_ST;
@@ -231,7 +229,6 @@ struct type_Globals
     float _Emission2ndParallaxDepth;
     float _Emission2ndFluorescence;
     float _Emission2ndMainStrength;
-    float _DissolveNoiseStrength;
     float _lilShadowCasterBias;
     float _OutlineLitScale;
     float _OutlineLitOffset;
