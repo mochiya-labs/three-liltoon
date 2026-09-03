@@ -28,8 +28,13 @@ export class LilToonLightAdapter {
         ambient.add(object.color.clone().add(object.groundColor).multiplyScalar(object.intensity * 0.5));
       }
     });
-    const direction = new Vector3(0, 1, 0);
-    const color = new Color(1, 1, 1);
+    // A missing Three.js DirectionalLight is the equivalent of Unity having no
+    // main light. Keep both uniforms at zero so OpenLit can derive its fallback
+    // direction from SH and the material's _LightDirectionOverride. Supplying
+    // an artificial white, upward-facing light here drives lilToon's direct
+    // specular and toon terms even in an otherwise unlit Three.js scene.
+    const direction = new Vector3();
+    const color = new Color(0, 0, 0);
     if (main) {
       main.getWorldPosition(lightPosition);
       main.target.getWorldPosition(targetPosition);

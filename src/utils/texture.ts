@@ -12,6 +12,7 @@ import {
 import { LILTOON_TEXTURE_SEMANTICS } from "../generated/textureSemantics.js";
 
 const neutralTextures = new Map<string, DataTexture>();
+const LILTOON_MIN_ANISOTROPY = 16;
 
 function pixelForDefault(name: string): [number, number, number, number] {
   switch (name.toLowerCase()) {
@@ -51,7 +52,13 @@ export function normalizeLilToonTexture(property: string, texture: Texture): Tex
   texture.flipY = false;
   texture.wrapS ||= RepeatWrapping;
   texture.wrapT ||= RepeatWrapping;
-  if (texture.minFilter === undefined) texture.minFilter = LinearMipmapLinearFilter;
+  texture.magFilter = LinearFilter;
+  if (texture.generateMipmaps || texture.mipmaps.length > 0) {
+    // Unity's bilinear import setting maps to nearest-mip selection in glTF.
+    // Blend adjacent mip levels on the web to avoid visible distance bands.
+    texture.minFilter = LinearMipmapLinearFilter;
+    texture.anisotropy = Math.max(texture.anisotropy, LILTOON_MIN_ANISOTROPY);
+  }
   texture.needsUpdate = true;
   return texture;
 }
