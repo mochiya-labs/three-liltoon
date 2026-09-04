@@ -8,7 +8,8 @@ export default defineConfig({
   format: ["esm"],
   dts: true,
   clean: true,
-  sourcemap: true,
+  // Keep the checked-in runtime package minimal for the deployable viewer.
+  sourcemap: false,
   splitting: true,
   // Three.js is a peer dependency, including its examples/addons entrypoints.
   external: ["three", /^three\//],

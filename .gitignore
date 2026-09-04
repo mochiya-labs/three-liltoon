@@ -1,5 +1,6 @@
 node_modules/
-dist/
+/dist/*.map
+examples/basic-three/dist/
 .tmp/
 coverage/
 playwright-report/

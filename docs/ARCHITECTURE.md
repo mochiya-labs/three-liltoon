@@ -22,7 +22,7 @@ vendor/lilToon ShaderLab + HLSL (pinned, untouched)
 
 `tools/shaderlab/` scans ShaderLab without assuming that braces, comments, strings, attributes, or nested blocks are line-oriented. The generators extract all 517 properties from `lts.shader`, defaults, texture semantics, render-state recipes, upstream identity, manifests, and notices.
 
-`tools/shader-build/` compiles wrapper entrypoints rather than `.shader` files. Every SPIR-V module is validated, reflected, cross-compiled to ESSL 3.00, optionally checked by glslang, hashed, and emitted into `shader/generated/`. `src/generated/shaders.ts` embeds the validated GLSL for bundlers. Runtime consumers do not need compiler binaries or the vendor submodule.
+`tools/shader-build/` compiles wrapper entrypoints rather than `.shader` files. Every SPIR-V module is validated, reflected, cross-compiled to ESSL 3.00, optionally checked by glslang, hashed, and emitted into `shader/generated/`. `src/generated/shaders.ts` embeds the validated GLSL for bundlers, and `dist/` contains the committed runtime package consumed by deployable examples. Runtime consumers do not need compiler binaries or the vendor submodule.
 
 The shipped variants are smoke, minimal opaque, standard opaque/cutout/transparent, dissolve-noise, MatCap-mask, layered-MatCap, reflection/MatCap surface-control, layered-surface-control, and outline. The loader selects a profile from the textures actually assigned to each material. Layered profiles retain `_Main2ndTex` / `_Main3rdTex` and their blend masks; MatCap profiles retain both MatCap masks and custom normals; surface-control profiles retain metallic, smoothness, and reflection-color textures. A layered surface-control material can also retain Main Color 2nd when its MatCap custom-normal slots reference the same glTF texture as the primary normal map. The shader aliases that shared image sampler while preserving each property's independent `_ST` transform and strength.
 
@@ -57,4 +57,4 @@ The ABI uses one generated `_Globals` structured uniform value in Three.js plus 
 
 ## Generated versus maintained files
 
-Maintained source lives under `shader/compat`, `shader/entry`, `src` (except `src/generated`), and `tools`. Generated files live under `shader/generated`, `src/generated`, and `THIRD_PARTY_NOTICES.md`; rebuild them with `npm run generate` and `npm run shaders:build`. Never edit `vendor/lilToon` or generated artifacts by hand.
+Maintained source lives under `shader/compat`, `shader/entry`, `src` (except `src/generated`), and `tools`. Generated files live under `shader/generated`, `src/generated`, `dist`, and `THIRD_PARTY_NOTICES.md`; rebuild them with `npm run build:package`. Only the runtime JavaScript and TypeScript declarations in `dist/` are committed; compiler intermediates and source maps remain untracked. Never edit `vendor/lilToon` or generated artifacts by hand.

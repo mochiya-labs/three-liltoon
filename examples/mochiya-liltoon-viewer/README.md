@@ -13,7 +13,7 @@ The file never leaves the browser. It is exposed to `GLTFLoader` through a tempo
 - `three-liltoon` for `MOCHIYA_materials_liltoon`
 - shadcn/ui with Mochiya's `radix-mira`, olive, and Phosphor configuration
 
-`three-liltoon` is installed from the repository root through `file:../..`. The local `.npmrc` enables npm's packed-file installation mode so the viewer and library resolve exactly one copy of Three.js.
+`three-liltoon` is installed from the repository root through `file:../..`. The repository commits the package's runtime JavaScript and TypeScript declarations under `dist/`, so the viewer does not need the lilToon submodule or shader compiler toolchain. The local `.npmrc` enables npm's packed-file installation mode so the viewer and library resolve exactly one copy of Three.js.
 
 ## Run it
 
@@ -25,9 +25,11 @@ npm install
 npm run dev
 ```
 
-`npm run dev` and `npm run build` now rebuild the repository package and force-refresh the viewer's packed `three-liltoon` dependency before Next.js starts. This is required because npm caches `file:` dependencies by package version; without the refresh, local shader fixes can be absent from the viewer even though the repository `dist/` is current.
+`npm run dev` and `npm run build` pack and force-refresh the checked-in `three-liltoon` artifact before Next.js starts. They do not regenerate or compile shaders. The refresh is required because npm caches `file:` dependencies by package version.
 
-Open `http://localhost:3000`, then choose or drop a `.glb` or `.vrm` file. Restart the development server after changing `three-liltoon`; the pre-run sync installs the new build.
+Open `http://localhost:3000`, then choose or drop a `.glb` or `.vrm` file. After changing `three-liltoon` package or shader source, run `npm run build:package` from the repository root to regenerate `dist/`, then restart the viewer so its pre-run sync installs the updated artifact.
+
+For Vercel, set the project Root Directory to `examples/mochiya-liltoon-viewer` and enable source files outside the Root Directory. The normal `npm run build` command then uses the committed package artifact without a submodule checkout or native shader compilation.
 
 ## Loading architecture
 

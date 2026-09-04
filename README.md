@@ -13,6 +13,8 @@ This is an alpha and is not affiliated with or endorsed by lilToon. See the exac
 
 Compiler binaries are development dependencies only. The npm package embeds generated GLSL strings and does not compile shaders in the browser.
 
+The runtime JavaScript and TypeScript declarations under `dist/` are committed so deployable examples can consume the package without initializing the lilToon submodule or installing the shader toolchain. Source maps and compiler intermediates remain untracked. After changing package or shader source, run `npm run build:package` and commit the updated `dist/` files with the source change.
+
 ## Install
 
 ```bash
@@ -117,6 +119,8 @@ The browser test installs no browser automatically. On a developer machine or CI
 ## Viewer example
 
 [`examples/mochiya-liltoon-viewer`](examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI follows the Mochiya site's installed `radix-mira` shadcn preset and olive theme.
+
+The viewer installs the checked-in package artifact from the repository root. Its development and deployment commands refresh that local package without rebuilding shaders.
 
 ```bash
 cd examples/mochiya-liltoon-viewer

@@ -17,11 +17,11 @@ function run(args, options = {}) {
   });
 }
 
-run(["run", "build:package"], { cwd: libraryDirectory });
-
-// npm caches file: dependencies by their package version. Pack a fresh,
-// addressable artifact so shader changes are installed even before a release
-// version is bumped. Keeping it packed also prevents a second Three.js copy.
+// The repository commits the package's runtime JS and declarations in dist/.
+// Pack those artifacts without rebuilding shaders so the viewer can run in a
+// clean deployment that has neither the lilToon submodule nor compiler tools.
+// Installing the fresh tarball also avoids npm's cache for file: dependencies
+// when the package version has not changed and prevents a second Three.js copy.
 rmSync(packageDirectory, { recursive: true, force: true });
 mkdirSync(packageDirectory, { recursive: true });
 mkdirSync(cacheDirectory, { recursive: true });
