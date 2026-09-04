@@ -97,6 +97,42 @@ describe("LilToonMaterial", () => {
     expect(material.fragmentShader).toContain("Combined_ReflectionColorTex");
   });
 
+  it.each(["opaque", "cutout", "transparent"] as const)(
+    "initializes a safe material cubemap decode for %s MatCap materials and clones",
+    (renderMode) => {
+      const material = new LilToonMaterial({
+        renderMode,
+        properties: { _UseReflection: 1, _ApplyReflection: 1, _ReflectionCubeOverride: 1, _UseMatCap: 1 },
+        textures: {
+          _BumpMap: new DataTexture(),
+          _MatCapBlendMask: new DataTexture(),
+          _SmoothnessTex: new DataTexture(),
+          _ShadowBorderMask: new DataTexture(),
+        },
+      });
+      const clone = material.clone();
+
+      for (const candidate of [material, clone]) {
+        expect((candidate.globalUniforms._ReflectionCubeTex_HDR as Vector4).toArray()).toEqual([1, 1, 0, 0]);
+        expect(candidate.getProperty("_ApplyReflection")).toBe(1);
+        expect(candidate.getProperty("_UseMatCap")).toBe(1);
+        const cubeBindings = Object.entries(candidate.uniforms).filter(([name]) => name.includes("Combined_ReflectionCubeTex"));
+        expect(cubeBindings.length).toBeGreaterThan(0);
+        expect(cubeBindings.every(([, uniform]) => uniform.value === null)).toBe(true);
+      }
+      expect(clone.globalUniforms._ReflectionCubeTex_HDR).not.toBe(material.globalUniforms._ReflectionCubeTex_HDR);
+    },
+  );
+
+  it("preserves explicitly supplied material HDR decode parameters through updates and cloning", () => {
+    const material = new LilToonMaterial({ properties: { _ReflectionCubeTex_HDR: [2, 2.2, 0, 1] } });
+    expect((material.globalUniforms._ReflectionCubeTex_HDR as Vector4).toArray()).toEqual([2, 2.2, 0, 1]);
+    expect((material.clone().globalUniforms._ReflectionCubeTex_HDR as Vector4).toArray()).toEqual([2, 2.2, 0, 1]);
+
+    material.setProperty("_ReflectionCubeTex_HDR", new Vector4(3, 1, 0, 0));
+    expect((material.clone().globalUniforms._ReflectionCubeTex_HDR as Vector4).toArray()).toEqual([3, 1, 0, 0]);
+  });
+
   it("applies independent masks to Main Color 2nd and 3rd in the layered MatCap profile", () => {
     const material = new LilToonMaterial({
       renderMode: "transparent",

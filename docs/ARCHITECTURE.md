@@ -28,6 +28,8 @@ The shipped variants are smoke, minimal opaque, standard opaque/cutout/transpare
 
 Three allocates sampler units across the linked vertex and fragment program. Skinned/morphed avatar shaders require two vertex samplers, so generated lilToon profiles are limited to fourteen additional fragment samplers. Compiler tests count the union of vertex and fragment sampler uniforms and reject any program above sixteen. Generated GLSL also reuses a real sampler for upstream texture-size queries instead of consuming a duplicate dummy binding.
 
+Materials assigning `_EmissionBlendMask` or `_Emission2ndBlendMask` select the `emission-mask` profile for their render mode. It compiles upstream RGBA emission masking, both emission maps, independent mask `_ST` and `_ScrollRotate`, and the shadow-border mask. It retains main-layer maps, normals, unmasked MatCaps, and the alpha mask, but exchanges reflection and the dissolve texture for the extra sampler slots (15 linked samplers for opaque, 16 for cutout/transparent). Combinations requiring reflection, textured dissolve, layered blend masks, or masked/custom-normal MatCaps are outside this profile's budget and require another profile; this is not an all-features variant. Materials without emission masks keep their previous selection. DXC compilation explicitly selects HLSL 2018 so newer compiler defaults do not change upstream vector-ternary semantics.
+
 ## Compatibility ABI
 
 `shader/compat/lil_pipeline_web.hlsl` is the web platform boundary. Its headers supply:

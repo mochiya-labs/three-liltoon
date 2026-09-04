@@ -17,6 +17,9 @@ export function compileHlsl(options: DxcCompileOptions): void {
   const profile = options.stage === "vertex" ? "vs_6_0" : "ps_6_0";
   const args = [
     "-spirv",
+    // lilToon uses pre-2021 vector ternaries. Pin the language version instead
+    // of inheriting a newer DXC installation's short-circuiting defaults.
+    "-HV", "2018",
     "-T", profile,
     "-E", options.entry,
     "-fspv-target-env=vulkan1.0",

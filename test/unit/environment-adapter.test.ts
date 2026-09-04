@@ -23,4 +23,17 @@ describe("LilToonEnvironmentAdapter", () => {
     expect(bound).toBeNull();
     expect(hdr.toArray()).toEqual([0, 1, 0, 0]);
   });
+
+  it("does not overwrite the independent material cubemap decode", () => {
+    const materialHdr = new Vector4(2, 2.2, 0, 1);
+    const globals = { unity_SpecCube0_HDR: new Vector4(), _ReflectionCubeTex_HDR: materialHdr };
+    const adapter = new LilToonEnvironmentAdapter();
+    const scene = new Scene();
+
+    adapter.bind(scene, globals);
+    expect(materialHdr.toArray()).toEqual([2, 2.2, 0, 1]);
+    scene.environment = new CubeTexture();
+    adapter.bind(scene, globals);
+    expect(materialHdr.toArray()).toEqual([2, 2.2, 0, 1]);
+  });
 });

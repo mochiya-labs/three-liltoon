@@ -62,6 +62,12 @@ export function createGlobalUniforms(vertexShader: string, fragmentShader: strin
     if (name.endsWith("_ST") && value instanceof Vector4) value.set(1, 1, 0, 0);
     if (name.endsWith("_TexelSize") && value instanceof Vector4) value.set(1, 1, 1, 1);
   }
+  // Unity supplies this texture decode uniform outside ShaderLab properties.
+  // Three cube textures need identity decoding, including its empty RGBA-zero
+  // fallback. Vector4's [0, 0, 0, 1] default instead evaluates pow(0, 0), which
+  // can produce NaN and erase later MatCap blending. Authored properties are
+  // applied after these defaults by the material constructor/copy path.
+  (globals._ReflectionCubeTex_HDR as Vector4 | undefined)?.set(1, 1, 0, 0);
   (globals.uWorldTransformParams as Vector4 | undefined)?.set(0, 0, 0, 1);
   (globals.uScreenParams as Vector4 | undefined)?.set(1, 1, 1, 1);
   (globals.uProjectionParams as Vector4 | undefined)?.set(1, 0.1, 1000, 0.001);

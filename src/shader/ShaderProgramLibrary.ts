@@ -11,6 +11,7 @@ export interface LilToonShaderProgram {
 
 export type LilToonShaderProfile =
   | "standard"
+  | "emission-mask"
   | "dissolve-noise"
   | "matcap-mask"
   | "matcap-shadow-border"

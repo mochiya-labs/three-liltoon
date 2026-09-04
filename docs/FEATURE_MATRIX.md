@@ -12,7 +12,7 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | MatCap / MatCap2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Both blend masks and custom normal maps select WebGL2-safe shader profiles |
 | Rim / directional rim | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Exercised in smoke example |
 | Rim shade / backlight | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | One-light approximation |
-| Emission / emission2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core emission maps included; blend masks/gradations omitted |
+| Emission / emission2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Both RGBA blend masks, independent UV transforms/animation, and emission maps supported in the emission-mask profile; gradations omitted |
 | Reflection / specular | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Metallic, smoothness, and reflection-color textures supported; no Unity probe blending |
 | Distance fade / dissolve | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core dissolve textures included |
 | Cutout / alpha mask | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | Forward and shadow-caster cutoff supported |
@@ -28,7 +28,7 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | Instancing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Compatibility macros are neutral no-ops |
 | Stereo / WebXR | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Stereo macros are neutral no-ops in this alpha |
 | Multiple Unity light modes / probes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Additional lights and probe blending are not reproduced |
-| Advanced masks, gradations, glitter, anisotropy, parallax/POM | ⏳ | ⏳ | ⏳ | ⏳ | ❌ | ❌ | Main2nd/Main3rd and MatCap blend masks are supported; other advanced masks are not defined in shipped recipes |
+| Advanced masks, gradations, glitter, anisotropy, parallax/POM | ⏳ | ⏳ | ⏳ | ⏳ | ❌ | ❌ | Main2nd/Main3rd, MatCap, and emission blend masks are supported in dedicated profiles; other advanced masks remain unsupported |
 | AudioLink / VRC Light Volumes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | VRC Light Volumes warn and fall back to Three lighting |
 | Refraction | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Requires scene-color capture; constructor diagnoses |
 | Gem | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Independent future pass |

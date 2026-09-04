@@ -76,6 +76,7 @@ function sharesPrimaryNormalWithMatCaps(textures: LilToonMaterialParameters["tex
 }
 
 function shaderProfile(textures: LilToonMaterialParameters["textures"]): LilToonShaderProfile {
+  if (textures?._EmissionBlendMask || textures?._Emission2ndBlendMask) return "emission-mask";
   const layered = Boolean(textures?._Main2ndBlendMask || textures?._Main3rdBlendMask);
   const surfaceControls = Boolean(
     textures?._SmoothnessTex || textures?._MetallicGlossMap || textures?._ReflectionColorTex,

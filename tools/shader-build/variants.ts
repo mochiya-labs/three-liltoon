@@ -52,6 +52,21 @@ const MATCAP_MASK_FEATURE_DEFINES = [
 
 const SHADOW_BORDER_MASK_FEATURE_DEFINES = ["LIL_FEATURE_ShadowBorderMask"] as const;
 
+// Emission masks need two additional samplers. Keep both emission maps, main
+// layers, normals, MatCaps, alpha mask, and the face's shadow-border mask;
+// exchange cubemap reflection and the dissolve texture to stay within the
+// 16 linked texture units available with bone/morph deformation.
+const EMISSION_MASK_FEATURE_DEFINES = [
+  ...CORE_FEATURE_DEFINES.filter((feature) => ![
+    "LIL_FEATURE_REFLECTION",
+    "LIL_FEATURE_DissolveMask",
+  ].includes(feature)),
+  "LIL_FEATURE_EmissionBlendMask",
+  "LIL_FEATURE_Emission2ndBlendMask",
+  "LIL_FEATURE_ANIMATE_EMISSION_MASK_UV",
+  ...SHADOW_BORDER_MASK_FEATURE_DEFINES,
+] as const;
+
 // Give the shadow-border mask its own sampler lane. In cutout/transparent
 // modes the full core already reaches the WebGL2 per-stage sampler ceiling,
 // so texture-backed emission and dissolve/alpha-mask features must remain in
@@ -157,6 +172,13 @@ export const SHADER_VARIANTS: ShaderVariantRecipe[] = [
   { key: "standard-opaque", renderMode: "opaque", sources: forwardSources, entries, defines: ["LIL_RENDER=0", ...CORE_FEATURE_DEFINES] },
   { key: "standard-cutout", renderMode: "cutout", sources: forwardSources, entries, defines: ["LIL_RENDER=1", ...CORE_FEATURE_DEFINES] },
   { key: "standard-transparent", renderMode: "transparent", sources: forwardSources, entries, defines: ["LIL_RENDER=2", ...CORE_FEATURE_DEFINES] },
+  ...(["opaque", "cutout", "transparent"] as const).map((renderMode, index) => ({
+    key: `standard-${renderMode}-emission-mask`,
+    renderMode,
+    sources: forwardSources,
+    entries,
+    defines: [`LIL_RENDER=${index}`, ...EMISSION_MASK_FEATURE_DEFINES],
+  })),
   {
     key: "standard-opaque-dissolve-noise",
     renderMode: "opaque",

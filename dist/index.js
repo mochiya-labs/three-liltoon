@@ -1,5 +1,5 @@
-import { warnLilToon, LilToonMaterial, UnsupportedFeatureError } from './chunk-EYLZPB6D.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-EYLZPB6D.js';
+import { warnLilToon, LilToonMaterial, UnsupportedFeatureError } from './chunk-ZJPS6YGR.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-ZJPS6YGR.js';
 import { Vector3, CubeTexture, Vector4, Color, AmbientLight, HemisphereLight, Matrix4, DirectionalLight } from 'three';
 
 var LilToonEnvironmentAdapter = class {

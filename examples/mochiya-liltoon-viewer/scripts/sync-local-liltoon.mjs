@@ -7,10 +7,12 @@ const viewerDirectory = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const libraryDirectory = resolve(viewerDirectory, "../..");
 const packageDirectory = resolve(viewerDirectory, ".local-packages");
 const cacheDirectory = resolve(viewerDirectory, ".npm-cache");
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCli = process.env.npm_execpath;
+const npm = npmCli ? process.execPath : process.platform === "win32" ? "npm.cmd" : "npm";
+const npmArgs = (args) => (npmCli ? [npmCli, ...args] : args);
 
 function run(args, options = {}) {
-  return execFileSync(npm, args, {
+  return execFileSync(npm, npmArgs(args), {
     cwd: options.cwd ?? viewerDirectory,
     encoding: "utf8",
     stdio: options.capture ? ["inherit", "pipe", "inherit"] : "inherit",
@@ -28,7 +30,7 @@ mkdirSync(cacheDirectory, { recursive: true });
 
 const packResult = execFileSync(
   npm,
-  ["pack", "--json", "--cache", cacheDirectory, "--pack-destination", packageDirectory],
+  npmArgs(["pack", "--json", "--cache", cacheDirectory, "--pack-destination", packageDirectory]),
   {
     cwd: libraryDirectory,
     encoding: "utf8",
