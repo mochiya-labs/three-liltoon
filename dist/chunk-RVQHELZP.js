@@ -1,4 +1,4 @@
-import { Matrix4, Vector3, Vector2, RawShaderMaterial, GLSL3, BackSide, SRGBColorSpace, Vector4, SkinnedMesh, Mesh, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, Loader, FileLoader, DataTexture, RGBAFormat, UnsignedByteType, RepeatWrapping, LinearFilter, Color, CustomBlending, LinearSRGBColorSpace, LinearMipmapLinearFilter, DataArrayTexture, FloatType, FrontSide, DoubleSide, LessEqualDepth, AlwaysDepth, GreaterEqualDepth, NotEqualDepth, GreaterDepth, EqualDepth, LessDepth, NeverDepth, SrcAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaSaturateFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusDstColorFactor, SrcColorFactor, DstColorFactor, OneFactor, ZeroFactor, AddEquation, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, AlwaysStencilFunc, GreaterEqualStencilFunc, NotEqualStencilFunc, GreaterStencilFunc, LessEqualStencilFunc, EqualStencilFunc, LessStencilFunc, NeverStencilFunc, KeepStencilOp, DecrementWrapStencilOp, IncrementWrapStencilOp, InvertStencilOp, DecrementStencilOp, IncrementStencilOp, ReplaceStencilOp, ZeroStencilOp } from 'three';
+import { Matrix4, Vector3, Vector2, DataTexture, RGBAFormat, UnsignedByteType, RepeatWrapping, LinearFilter, RawShaderMaterial, GLSL3, BackSide, SRGBColorSpace, Vector4, SkinnedMesh, Mesh, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, Loader, FileLoader, Color, CustomBlending, LinearSRGBColorSpace, LinearMipmapLinearFilter, DataArrayTexture, FloatType, FrontSide, DoubleSide, LessEqualDepth, AlwaysDepth, GreaterEqualDepth, NotEqualDepth, GreaterDepth, EqualDepth, LessDepth, NeverDepth, SrcAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaSaturateFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusDstColorFactor, SrcColorFactor, DstColorFactor, OneFactor, ZeroFactor, AddEquation, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, AlwaysStencilFunc, GreaterEqualStencilFunc, NotEqualStencilFunc, GreaterStencilFunc, LessEqualStencilFunc, EqualStencilFunc, LessStencilFunc, NeverStencilFunc, KeepStencilOp, DecrementWrapStencilOp, IncrementWrapStencilOp, InvertStencilOp, DecrementStencilOp, IncrementStencilOp, ReplaceStencilOp, ZeroStencilOp } from 'three';
 
 // src/generated/defaults.ts
 var LILTOON_DEFAULTS = {
@@ -1166,16 +1166,6 @@ var UnsupportedFeatureError = class extends Error {
 function warnLilToon(message) {
   console.warn(`[three-liltoon] ${message}`);
 }
-function assertSupportedMaterial(properties) {
-  if (Number(properties._TessellationMode ?? 0) !== 0) {
-    throw new UnsupportedFeatureError(
-      "lilToon tessellation is not supported by the WebGL2 backend. Use pre-subdivided geometry."
-    );
-  }
-  if (Number(properties._UseVRCLightVolumes ?? 0) !== 0) {
-    warnLilToon("VRC Light Volumes are unavailable; explicit Three.js lighting is used.");
-  }
-}
 
 // src/material/LilToonFeatureSet.ts
 function enabled(properties, name) {
@@ -1624,6 +1614,124 @@ function getOutlineShaderProgram() {
     ])
   };
 }
+
+// src/utils/materialWarnings.ts
+var FEATURE_GATES = {
+  _UseMain2ndTex: void 0,
+  _UseMain3rdTex: void 0,
+  _Main2ndDissolveParams: "_UseMain2ndTex",
+  _Main3rdDissolveParams: "_UseMain3rdTex",
+  _UseShadow: void 0,
+  _UseRimShade: void 0,
+  _UseEmission: void 0,
+  _UseEmission2nd: void 0,
+  _UseBumpMap: void 0,
+  _UseBump2ndMap: void 0,
+  _UseReflection: void 0,
+  _UseMatCap: void 0,
+  _UseMatCap2nd: void 0,
+  _UseRim: void 0,
+  _UseBacklight: void 0,
+  _UseGlitter: void 0,
+  _UseAnisotropy: void 0,
+  _UseParallax: void 0,
+  _UsePOM: "_UseParallax",
+  _UseAudioLink: void 0,
+  _UseDither: void 0,
+  _EmissionUseGrad: "_UseEmission",
+  _Emission2ndUseGrad: "_UseEmission2nd",
+  _MatCapCustomNormal: "_UseMatCap",
+  _MatCap2ndCustomNormal: "_UseMatCap2nd",
+  _MainGradationStrength: void 0,
+  _AlphaMaskMode: void 0,
+  _DissolveParams: void 0,
+  _TessellationMode: void 0,
+  _UseVRCLightVolumes: void 0
+};
+function firstComponent(value) {
+  if (Array.isArray(value)) return Number(value[0] ?? 0);
+  if (value && typeof value === "object" && "x" in value) return Number(value.x);
+  return Number(value ?? 0);
+}
+function shaderPropertyReferences(vertex, fragment) {
+  return new Set([...`${vertex}
+${fragment}`.matchAll(/\b_Globals\.([A-Za-z_]\w*)/g)].map((match) => match[1]));
+}
+function textureGates(property) {
+  if (["_BaseMap", "_BaseColorMap"].includes(property) || property.startsWith("_Outline")) return null;
+  if (property.startsWith("_MatCap2nd")) return ["_UseMatCap2nd", ...property.includes("Bump") ? ["_MatCap2ndCustomNormal"] : []];
+  if (property.startsWith("_MatCap")) return ["_UseMatCap", ...property.includes("Bump") ? ["_MatCapCustomNormal"] : []];
+  if (property.startsWith("_Emission2nd")) return ["_UseEmission2nd", ...property.includes("GradTex") ? ["_Emission2ndUseGrad"] : []];
+  if (property.startsWith("_Emission")) return ["_UseEmission", ...property.includes("GradTex") ? ["_EmissionUseGrad"] : []];
+  if (property.startsWith("_Main2nd")) return ["_UseMain2ndTex", ...property.includes("Dissolve") ? ["_Main2ndDissolveParams"] : []];
+  if (property.startsWith("_Main3rd")) return ["_UseMain3rdTex", ...property.includes("Dissolve") ? ["_Main3rdDissolveParams"] : []];
+  if (property === "_MainGradationTex") return ["_MainGradationStrength"];
+  if (property.startsWith("_Bump2nd")) return ["_UseBump2ndMap"];
+  if (property.startsWith("_Bump")) return ["_UseBumpMap"];
+  if (property.startsWith("_Shadow")) return ["_UseShadow"];
+  if (property.startsWith("_RimShade")) return ["_UseRimShade"];
+  if (property.startsWith("_Rim")) return ["_UseRim"];
+  if (property.startsWith("_ReflectionCube")) return ["_UseReflection", "_ApplyReflection"];
+  if (/^_(Reflection|Smoothness|Metallic)/.test(property)) return ["_UseReflection"];
+  if (property.startsWith("_Dissolve")) return ["_DissolveParams"];
+  if (property.startsWith("_AlphaMask")) return ["_AlphaMaskMode"];
+  if (property.startsWith("_AudioLink")) return ["_UseAudioLink"];
+  if (property.startsWith("_Anisotropy")) return ["_UseAnisotropy"];
+  if (property.startsWith("_Glitter")) return ["_UseGlitter"];
+  if (property.startsWith("_Backlight")) return ["_UseBacklight"];
+  if (property.startsWith("_Parallax")) return ["_UseParallax"];
+  return [];
+}
+function collectMaterialWarnings(context) {
+  const { properties, textures, usedProperties, samplerBindings, cubeSamplers } = context;
+  const warnings = [];
+  const unsupported = /* @__PURE__ */ new Set();
+  const enabled2 = (name) => firstComponent(properties[name]) !== 0;
+  const add = (code, property, message) => {
+    warnings.push({ severity: "warning", code, materialName: context.materialName, shaderKey: context.shaderKey, property, message });
+  };
+  for (const [property, parent] of Object.entries(FEATURE_GATES)) {
+    if (!enabled2(property) || parent && (!enabled2(parent) || unsupported.has(parent))) continue;
+    const unavailable = property === "_TessellationMode" || property === "_UseVRCLightVolumes";
+    if (!unavailable && usedProperties.has(property)) continue;
+    unsupported.add(property);
+    add(
+      "unsupported-feature",
+      property,
+      `${property} is enabled, but ${context.shaderKey} does not implement it. The model will load without this feature.`
+    );
+  }
+  const boundProperties = new Set(samplerBindings.values());
+  for (const [property, texture] of Object.entries(textures).sort(([a], [b]) => a.localeCompare(b))) {
+    if (!texture) continue;
+    const gates = textureGates(property);
+    if (gates === null || gates.some((gate) => !enabled2(gate) || unsupported.has(gate))) continue;
+    if (property === "_MainColorAdjustMask") {
+      const hsvg = properties._MainTexHSVG;
+      const components = Array.isArray(hsvg) ? hsvg : hsvg?.toArray?.();
+      if (!enabled2("_MainGradationStrength") && (!components || components.every((value, i) => value === [0, 1, 1, 1][i]))) continue;
+    }
+    const sharedNormal = /^_MatCap(?:2nd)?BumpMap$/.test(property) && boundProperties.has("_BumpMap") && texture === textures._BumpMap && usedProperties.has(`${property}_ST`);
+    if (!boundProperties.has(property) && !sharedNormal) {
+      add(
+        "unused-texture",
+        property,
+        `${property} is assigned to an enabled feature, but ${context.shaderKey} has no sampler for it. This texture is ignored; the result may be unmasked or use a fallback.`
+      );
+      continue;
+    }
+    const expectsCube = [...samplerBindings].some(([uniform, slot]) => slot === property && cubeSamplers.has(uniform));
+    const isCube = Boolean(texture.isCubeTexture);
+    if (expectsCube !== isCube) {
+      add(
+        "texture-type-mismatch",
+        property,
+        `${property} requires a ${expectsCube ? "CubeTexture" : "2D texture"}; the incompatible texture is ignored.`
+      );
+    }
+  }
+  return warnings;
+}
 var cullMap = { 0: DoubleSide, 1: BackSide, 2: FrontSide, Off: DoubleSide, Front: BackSide, Back: FrontSide };
 var depthMap = {
   1: NeverDepth,
@@ -1896,6 +2004,8 @@ var LilToonMaterial = class extends RawShaderMaterial {
   rendererAdapter;
   #samplerBindings;
   #cubeSamplers;
+  #shaderKey;
+  #usedProperties;
   #startedAt = performance.now();
   constructor(parameters = {}) {
     const renderMode = parameters.renderMode ?? "opaque";
@@ -1912,7 +2022,7 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
     );
     for (const [uniformName, property] of program.samplerBindings) {
       uniforms[uniformName] = {
-        value: property.startsWith("__") || cubeSamplers.has(uniformName) ? null : getNeutralTexture(textureDefault(property))
+        value: property === "__shadow" ? getNeutralTexture("white") : property.startsWith("__") || cubeSamplers.has(uniformName) ? null : getNeutralTexture(textureDefault(property))
       };
     }
     super({
@@ -1932,6 +2042,8 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
     this.globalUniforms = globalUniforms;
     this.#samplerBindings = program.samplerBindings;
     this.#cubeSamplers = cubeSamplers;
+    this.#shaderKey = program.key;
+    this.#usedProperties = shaderPropertyReferences(program.vertexShader, program.fragmentShader);
     this.lilToonProperties = propertyDefaults();
     if (renderMode === "transparent") {
       this.lilToonProperties._ZWrite = 0;
@@ -1945,7 +2057,6 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
       setGlobalProperty(this.globalUniforms, name, value);
     }
     for (const [name, value] of Object.entries(parameters.textures ?? {})) this.setTexture(name, value);
-    assertSupportedMaterial(this.lilToonProperties);
     this.featureSet = detectLilToonFeatures(this.lilToonProperties);
     applyLilToonRenderState(this, renderMode, this.lilToonProperties);
     if (pass === "outline") {
@@ -1971,6 +2082,23 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
       this.uniforms[OUTPUT_SRGB_UNIFORM].value = Number(outputColorSpace === SRGBColorSpace);
       this.uniformsNeedUpdate = true;
     };
+  }
+  /** The actual compiled program; edits do not automatically reselect it. */
+  get shaderKey() {
+    return this.#shaderKey;
+  }
+  /** Recheck active forward features and textures without logging or changing the material. */
+  getWarnings() {
+    if (this.pass !== "forward") return [];
+    return collectMaterialWarnings({
+      materialName: this.name,
+      shaderKey: this.shaderKey,
+      properties: this.lilToonProperties,
+      textures: this.lilToonTextures,
+      usedProperties: this.#usedProperties,
+      samplerBindings: this.#samplerBindings,
+      cubeSamplers: this.#cubeSamplers
+    });
   }
   setProperty(name, value) {
     this.lilToonProperties[name] = copyValue(value);
@@ -2007,13 +2135,11 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
     this.lilToonTextures[name] = normalized;
     for (const [uniformName, property] of this.#samplerBindings) {
       if (property !== name) continue;
+      const isCube = Boolean(normalized?.isCubeTexture);
       if (this.#cubeSamplers.has(uniformName)) {
-        if (normalized && !normalized.isCubeTexture) {
-          warnLilToon(`${name} requires a THREE.CubeTexture; the incompatible texture was ignored.`);
-        }
-        this.uniforms[uniformName].value = normalized?.isCubeTexture ? normalized : null;
+        this.uniforms[uniformName].value = isCube ? normalized : null;
       } else {
-        this.uniforms[uniformName].value = normalized ?? getNeutralTexture(textureDefault(name));
+        this.uniforms[uniformName].value = !isCube && normalized ? normalized : getNeutralTexture(textureDefault(name));
       }
     }
     return this;
@@ -2026,6 +2152,8 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
     super.copy(source);
     this.renderMode = source.renderMode;
     this.pass = source.pass;
+    this.#shaderKey = source.#shaderKey;
+    this.#usedProperties = source.#usedProperties;
     this.globalUniforms = createGlobalUniforms(source.vertexShader, source.fragmentShader);
     this.uniforms._Globals = { value: this.globalUniforms };
     for (const name of Object.keys(this.lilToonProperties)) delete this.lilToonProperties[name];
@@ -2047,8 +2175,9 @@ ${program.fragmentShader}`.matchAll(/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z
   }
   /** @internal Renderer ABI texture binding. */
   setSystemTexture(binding, texture) {
+    const value = binding === "__shadow" && !texture ? getNeutralTexture("white") : texture;
     for (const [uniformName, property] of this.#samplerBindings) {
-      if (property === binding) this.uniforms[uniformName].value = texture;
+      if (property === binding) this.uniforms[uniformName].value = value;
     }
   }
   updateDeformationUniforms(object, renderer) {
@@ -2191,16 +2320,12 @@ var GLTFLilToonExtension = class {
   name = LILTOON_GLTF_EXTENSION;
   #outlinePass = new OutlinePass();
   #shadowCasterPass = new ShadowCasterPass();
+  #materialWarnings = /* @__PURE__ */ new Map();
   loadMaterial(materialIndex) {
     const materialDefinition = this.parser.json.materials?.[materialIndex];
     const definition = materialDefinition?.extensions?.[this.name];
     if (!definition) return null;
     return (async () => {
-      if (definition.specVersion && definition.specVersion !== LILTOON_GLTF_SPEC_VERSION) {
-        warnLilToon(
-          `Material ${materialIndex} uses ${this.name} spec ${definition.specVersion}; this build implements ${LILTOON_GLTF_SPEC_VERSION}. Attempting a best-effort load.`
-        );
-      }
       const textures = {};
       await Promise.all(
         Object.entries(definition.textures ?? {}).map(async ([property, textureInfo]) => {
@@ -2217,6 +2342,28 @@ var GLTFLilToonExtension = class {
       });
       material.setRendererAdapter(this.options.rendererAdapter);
       this.parser.associations.set(material, { materials: materialIndex });
+      const warnings = material.getWarnings();
+      if (definition.specVersion && definition.specVersion !== LILTOON_GLTF_SPEC_VERSION) {
+        warnings.push({
+          severity: "warning",
+          code: "spec-version-mismatch",
+          materialName: material.name,
+          shaderKey: material.shaderKey,
+          property: "specVersion",
+          message: `Material uses ${this.name} spec ${definition.specVersion}; this build implements ${LILTOON_GLTF_SPEC_VERSION}. Attempting a best-effort load.`
+        });
+      }
+      if (/fur|gem|refraction|tessellation|liltoonlite/i.test(definition.shaderVariant ?? "")) {
+        warnings.push({
+          severity: "warning",
+          code: "unsupported-shader-variant",
+          materialName: material.name,
+          shaderKey: material.shaderKey,
+          property: "shaderVariant",
+          message: `Unity shader ${definition.shaderVariant} is not reproduced by ${material.shaderKey}. Loading with the standard forward fallback.`
+        });
+      }
+      this.#materialWarnings.set(materialIndex, warnings.map((warning) => ({ ...warning, materialIndex })));
       return material;
     })();
   }
@@ -2236,15 +2383,29 @@ var GLTFLilToonExtension = class {
       }
     }
     if (this.options.rendererAdapter) this.options.rendererAdapter.attach(result.scene);
+    const warnings = [...this.#materialWarnings].sort(([a], [b]) => a - b).flatMap(([, entries]) => entries);
+    result.userData ??= {};
+    result.userData.lilToonWarnings = warnings;
+    for (const warning of warnings) {
+      if (this.options.onWarning) this.options.onWarning({ ...warning });
+      else warnLilToon(`${warning.materialName} (material ${warning.materialIndex}, ${warning.shaderKey}): ${warning.message}`);
+    }
   }
 };
 var LilToonMaterialLoader = class extends Loader {
+  /** Non-fatal compatibility warnings. Omit to log them to the console. */
+  onWarning;
   constructor(manager) {
     super(manager);
   }
   parse(json) {
     const value = typeof json === "string" ? JSON.parse(json) : json;
-    return new LilToonMaterialFactory().create(value);
+    const material = new LilToonMaterialFactory().create(value);
+    for (const warning of material.getWarnings()) {
+      if (this.onWarning) this.onWarning(warning);
+      else warnLilToon(`${warning.materialName} (${warning.shaderKey}): ${warning.message}`);
+    }
+    return material;
   }
   load(url, onLoad, onProgress, onError) {
     const loader = new FileLoader(this.manager);
@@ -2267,4 +2428,4 @@ var LilToonMaterialLoader = class extends Loader {
   }
 };
 
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures, warnLilToon };
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures, getNeutralTexture, warnLilToon };

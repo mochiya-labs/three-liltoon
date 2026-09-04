@@ -1,5 +1,5 @@
-import { warnLilToon, LilToonMaterial, UnsupportedFeatureError } from './chunk-ZJPS6YGR.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-ZJPS6YGR.js';
+import { warnLilToon, getNeutralTexture, LilToonMaterial, UnsupportedFeatureError } from './chunk-RVQHELZP.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-RVQHELZP.js';
 import { Vector3, CubeTexture, Vector4, Color, AmbientLight, HemisphereLight, Matrix4, DirectionalLight } from 'three';
 
 var LilToonEnvironmentAdapter = class {
@@ -47,11 +47,12 @@ var LilToonLightAdapter = class {
   }
 };
 var LilToonShadowAdapter = class {
-  bind(light, globals) {
-    const shadow = light?.castShadow ? light.shadow : void 0;
+  bind(light, globals, shadowsEnabled = true) {
+    const shadow = shadowsEnabled && light?.castShadow && light.shadow.map?.texture ? light.shadow : void 0;
     const targetMatrix = globals.uMainShadowMatrix;
     if (targetMatrix instanceof Matrix4) {
-      targetMatrix.copy(shadow?.matrix ?? new Matrix4()).transpose();
+      if (shadow) targetMatrix.copy(shadow.matrix).transpose();
+      else targetMatrix.identity();
     }
     const targetSize = globals.uShadowMapSize;
     if (targetSize instanceof Vector4) {
@@ -61,7 +62,7 @@ var LilToonShadowAdapter = class {
     }
     globals.uShadowBias = shadow?.bias ?? 0;
     globals.uShadowNormalBias = shadow?.normalBias ?? 0;
-    return { texture: shadow?.map?.texture ?? null };
+    return { texture: shadow?.map?.texture ?? getNeutralTexture("white") };
   }
 };
 
@@ -125,7 +126,7 @@ var LilToonRendererAdapter = class {
       material.globalUniforms._MonochromeLighting = 0;
       material.globalUniforms._AsUnlit = 0;
     }
-    const shadow = this.shadowAdapter.bind(lighting.main, material.globalUniforms);
+    const shadow = this.shadowAdapter.bind(lighting.main, material.globalUniforms, renderer.shadowMap.enabled);
     material.setSystemTexture("__shadow", shadow.texture);
     material.setSystemTexture("__environment", this.environmentAdapter.bind(scene, material.globalUniforms));
   }

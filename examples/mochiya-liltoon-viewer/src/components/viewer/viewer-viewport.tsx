@@ -105,7 +105,10 @@ export function ViewerViewport({
           ) : null}
         </div>
         {status.phase === "ready" && (
-          <Badge className="shrink-0"><CheckCircleIcon /> Ready</Badge>
+          <Badge className="shrink-0" role="status">
+            {inspection?.warnings.length ? <WarningCircleIcon /> : <CheckCircleIcon />}
+            Ready{inspection?.warnings.length ? ` · ${inspection.warnings.length} warnings` : ""}
+          </Badge>
         )}
       </div>
 

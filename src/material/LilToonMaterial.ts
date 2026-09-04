@@ -33,10 +33,9 @@ import {
   getOutlineShaderProgram,
   type LilToonShaderProfile,
 } from "../shader/ShaderProgramLibrary.js";
-import { assertSupportedMaterial } from "../utils/diagnostics.js";
+import { collectMaterialWarnings, shaderPropertyReferences, type LilToonWarning } from "../utils/materialWarnings.js";
 import { applyLilToonRenderState } from "../utils/renderState.js";
 import { getNeutralTexture, normalizeLilToonTexture } from "../utils/texture.js";
-import { warnLilToon } from "../utils/diagnostics.js";
 import { detectLilToonFeatures, type LilToonFeatureSet } from "./LilToonFeatureSet.js";
 import type {
   LilToonMaterialParameters,
@@ -140,6 +139,8 @@ export class LilToonMaterial extends RawShaderMaterial {
   rendererAdapter?: LilToonRendererAdapter;
   readonly #samplerBindings: Map<string, string>;
   readonly #cubeSamplers: Set<string>;
+  #shaderKey: string;
+  #usedProperties: ReadonlySet<string>;
   readonly #startedAt = performance.now();
 
   constructor(parameters: LilToonMaterialParameters = {}) {
@@ -159,7 +160,9 @@ export class LilToonMaterial extends RawShaderMaterial {
     );
     for (const [uniformName, property] of program.samplerBindings) {
       uniforms[uniformName] = {
-        value: property.startsWith("__") || cubeSamplers.has(uniformName)
+        value: property === "__shadow"
+          ? getNeutralTexture("white")
+          : property.startsWith("__") || cubeSamplers.has(uniformName)
           ? null
           : getNeutralTexture(textureDefault(property)),
       };
@@ -181,6 +184,8 @@ export class LilToonMaterial extends RawShaderMaterial {
     this.globalUniforms = globalUniforms;
     this.#samplerBindings = program.samplerBindings;
     this.#cubeSamplers = cubeSamplers;
+    this.#shaderKey = program.key;
+    this.#usedProperties = shaderPropertyReferences(program.vertexShader, program.fragmentShader);
     this.lilToonProperties = propertyDefaults();
     if (renderMode === "transparent") {
       this.lilToonProperties._ZWrite = 0;
@@ -194,7 +199,6 @@ export class LilToonMaterial extends RawShaderMaterial {
       setGlobalProperty(this.globalUniforms, name, value);
     }
     for (const [name, value] of Object.entries(parameters.textures ?? {})) this.setTexture(name, value);
-    assertSupportedMaterial(this.lilToonProperties);
     this.featureSet = detectLilToonFeatures(this.lilToonProperties);
     applyLilToonRenderState(this, renderMode, this.lilToonProperties);
     if (pass === "outline") {
@@ -233,6 +237,25 @@ export class LilToonMaterial extends RawShaderMaterial {
       // draw order changes as the camera moves.
       this.uniformsNeedUpdate = true;
     };
+  }
+
+  /** The actual compiled program; edits do not automatically reselect it. */
+  get shaderKey(): string {
+    return this.#shaderKey;
+  }
+
+  /** Recheck active forward features and textures without logging or changing the material. */
+  getWarnings(): LilToonWarning[] {
+    if (this.pass !== "forward") return [];
+    return collectMaterialWarnings({
+      materialName: this.name,
+      shaderKey: this.shaderKey,
+      properties: this.lilToonProperties,
+      textures: this.lilToonTextures,
+      usedProperties: this.#usedProperties,
+      samplerBindings: this.#samplerBindings,
+      cubeSamplers: this.#cubeSamplers,
+    });
   }
 
   setProperty(name: string, value: LilToonScalarOrVector): this {
@@ -275,15 +298,13 @@ export class LilToonMaterial extends RawShaderMaterial {
     this.lilToonTextures[name] = normalized;
     for (const [uniformName, property] of this.#samplerBindings) {
       if (property !== name) continue;
+      const isCube = Boolean((normalized as Texture & { isCubeTexture?: boolean } | null)?.isCubeTexture);
       if (this.#cubeSamplers.has(uniformName)) {
-        if (normalized && !(normalized as Texture & { isCubeTexture?: boolean }).isCubeTexture) {
-          warnLilToon(`${name} requires a THREE.CubeTexture; the incompatible texture was ignored.`);
-        }
-        this.uniforms[uniformName]!.value = (normalized as Texture & { isCubeTexture?: boolean })?.isCubeTexture
+        this.uniforms[uniformName]!.value = isCube
           ? normalized
           : null;
       } else {
-        this.uniforms[uniformName]!.value = normalized ?? getNeutralTexture(textureDefault(name));
+        this.uniforms[uniformName]!.value = !isCube && normalized ? normalized : getNeutralTexture(textureDefault(name));
       }
     }
     return this;
@@ -298,6 +319,8 @@ export class LilToonMaterial extends RawShaderMaterial {
     super.copy(source);
     this.renderMode = source.renderMode;
     this.pass = source.pass;
+    this.#shaderKey = source.#shaderKey;
+    this.#usedProperties = source.#usedProperties;
 
     this.globalUniforms = createGlobalUniforms(source.vertexShader, source.fragmentShader);
     this.uniforms._Globals = { value: this.globalUniforms };
@@ -325,8 +348,11 @@ export class LilToonMaterial extends RawShaderMaterial {
 
   /** @internal Renderer ABI texture binding. */
   setSystemTexture(binding: "__environment" | "__shadow" | "__bones" | "__morphs", texture: Texture | null): void {
+    // An empty packed-depth sampler must mean far depth, not Three's zero-depth
+    // null fallback. Leave other system samplers' fallback semantics unchanged.
+    const value = binding === "__shadow" && !texture ? getNeutralTexture("white") : texture;
     for (const [uniformName, property] of this.#samplerBindings) {
-      if (property === binding) this.uniforms[uniformName]!.value = texture;
+      if (property === binding) this.uniforms[uniformName]!.value = value;
     }
   }
 

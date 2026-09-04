@@ -1,5 +1,5 @@
 import { VRMLoaderPlugin, VRMUtils, type VRM } from "@pixiv/three-vrm";
-import { LilToonRendererAdapter } from "three-liltoon";
+import { LilToonRendererAdapter, type LilToonWarning } from "three-liltoon";
 import { GLTFLilToonExtension } from "three-liltoon/gltf";
 import { Mesh, type WebGLRenderer } from "three";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
@@ -22,12 +22,14 @@ export function loadModel(
 ): Promise<LoadedModel> {
   const adapter = new LilToonRendererAdapter(renderer);
   const loader = new GLTFLoader();
+  const warnings: LilToonWarning[] = [];
   loader.register(
     (parser) =>
       new GLTFLilToonExtension(parser, {
         rendererAdapter: adapter,
         addOutlines: true,
         configureShadowCasters: true,
+        onWarning: (warning) => warnings.push(warning),
       }),
   );
   loader.register((parser) => new VRMLoaderPlugin(parser));
@@ -50,7 +52,7 @@ export function loadModel(
           scene: vrm?.scene ?? gltf.scene,
           vrm,
           animations: gltf.animations,
-          inspection: inspectModel(gltf),
+          inspection: inspectModel(gltf, warnings),
         });
       },
       (event) => {

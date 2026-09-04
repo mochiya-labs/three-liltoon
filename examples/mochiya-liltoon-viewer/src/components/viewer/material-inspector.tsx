@@ -8,9 +8,11 @@ import {
   InfoIcon,
   MagnifyingGlassIcon,
   SlidersHorizontalIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -180,6 +182,14 @@ function InspectorBody({ material }: { material: MaterialInspection }) {
 
       <TabsContent value="details" className="min-h-0">
         <ScrollArea className="h-full border-t">
+          {material.warnings.length > 0 && (
+            <div className="space-y-2 border-b p-3 text-xs" aria-label="Selected material warnings">
+              <p className="font-medium">Rendering warnings</p>
+              {material.warnings.map((warning) => (
+                <p key={`${warning.code}:${warning.property}`} className="break-words text-muted-foreground">{warning.message}</p>
+              ))}
+            </div>
+          )}
           <PropertyRows entries={material.details} query="" />
         </ScrollArea>
       </TabsContent>
@@ -203,6 +213,31 @@ export function MaterialInspector({ inspection }: { inspection: ModelInspection 
           </div>
           {materials.length > 0 && <Badge variant="outline">{materials.length}</Badge>}
         </div>
+        {inspection && inspection.warnings.length > 0 && (
+          <details className="min-w-0 rounded-md border bg-muted/40 p-2 text-xs">
+            <summary className="cursor-pointer font-medium">
+              <WarningCircleIcon className="mr-1 inline size-3.5" />
+              {inspection.warnings.length} rendering warnings
+            </summary>
+            <p className="mt-2 text-muted-foreground">Model loaded. Some material settings cannot be reproduced by the selected shader profiles.</p>
+            <ul className="mt-2 max-h-48 space-y-3 overflow-y-auto" aria-label="Rendering warnings">
+              {inspection.warnings.map((warning) => (
+                <li key={`${warning.materialIndex}:${warning.code}:${warning.property}`} className="min-w-0 break-words">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto max-w-full justify-start whitespace-normal p-0 text-left text-xs underline underline-offset-2"
+                    onClick={() => setRequestedMaterialId(`material-${warning.materialIndex}`)}
+                  >
+                    {warning.materialName}
+                  </Button>
+                  <p className="mt-0.5 text-muted-foreground">{warning.message}</p>
+                  <p className="mt-1 break-all font-mono text-[0.625rem] text-muted-foreground">{warning.shaderKey} · {warning.code}</p>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </CardHeader>
 
       {!selected ? (
@@ -226,6 +261,7 @@ export function MaterialInspector({ inspection }: { inspection: ModelInspection 
                 {materials.map((material) => (
                   <SelectItem key={material.id} value={material.id}>
                     {material.name}
+                    {material.warnings.length > 0 && ` (${material.warnings.length} warnings)`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -234,6 +270,7 @@ export function MaterialInspector({ inspection }: { inspection: ModelInspection 
               <Badge variant={selected.isLilToon ? "default" : "secondary"}>{selected.type}</Badge>
               <Badge variant="outline">{selected.properties.length} properties</Badge>
               <Badge variant="outline">{selected.textures.length} textures</Badge>
+              {selected.warnings.length > 0 && <Badge variant="outline"><WarningCircleIcon />{selected.warnings.length} warnings</Badge>}
             </div>
           </div>
           <Separator />

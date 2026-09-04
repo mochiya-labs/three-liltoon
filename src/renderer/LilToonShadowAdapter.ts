@@ -1,16 +1,20 @@
 import { Matrix4, Vector4, type DirectionalLight, type Texture } from "three";
 import type { LilToonGlobalUniforms } from "./LilToonUniformBinder.js";
+import { getNeutralTexture } from "../utils/texture.js";
 
 export interface LilToonShadowBinding {
   texture: Texture | null;
 }
 
 export class LilToonShadowAdapter {
-  bind(light: DirectionalLight | undefined, globals: LilToonGlobalUniforms): LilToonShadowBinding {
-    const shadow = light?.castShadow ? light.shadow : undefined;
+  bind(light: DirectionalLight | undefined, globals: LilToonGlobalUniforms, shadowsEnabled = true): LilToonShadowBinding {
+    // A disabled renderer can retain an old map. A casting light can also have
+    // no map yet. Neither case may leave an active projection/bias behind.
+    const shadow = shadowsEnabled && light?.castShadow && light.shadow.map?.texture ? light.shadow : undefined;
     const targetMatrix = globals.uMainShadowMatrix;
     if (targetMatrix instanceof Matrix4) {
-      targetMatrix.copy(shadow?.matrix ?? new Matrix4()).transpose();
+      if (shadow) targetMatrix.copy(shadow.matrix).transpose();
+      else targetMatrix.identity();
     }
     const targetSize = globals.uShadowMapSize;
     if (targetSize instanceof Vector4) {
@@ -20,6 +24,8 @@ export class LilToonShadowAdapter {
     }
     globals.uShadowBias = shadow?.bias ?? 0;
     globals.uShadowNormalBias = shadow?.normalBias ?? 0;
-    return { texture: shadow?.map?.texture ?? null };
+    // Null sampler2D uniforms become zero-depth textures in Three. White RGBA
+    // decodes to far depth 1, so the identity projection is unoccluded everywhere.
+    return { texture: shadow?.map?.texture ?? getNeutralTexture("white") };
   }
 }

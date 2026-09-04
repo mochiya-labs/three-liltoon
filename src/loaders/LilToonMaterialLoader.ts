@@ -2,15 +2,25 @@ import { FileLoader, Loader, type LoadingManager } from "three";
 import { LilToonMaterialFactory } from "../material/LilToonMaterialFactory.js";
 import type { LilToonMaterial } from "../material/LilToonMaterial.js";
 import type { SerializedLilToonMaterial } from "../material/LilToonMaterialState.js";
+import type { LilToonWarning } from "../utils/materialWarnings.js";
+import { warnLilToon } from "../utils/diagnostics.js";
 
 export class LilToonMaterialLoader extends Loader<LilToonMaterial> {
+  /** Non-fatal compatibility warnings. Omit to log them to the console. */
+  onWarning?: (warning: LilToonWarning) => void;
+
   constructor(manager?: LoadingManager) {
     super(manager);
   }
 
   parse(json: string | SerializedLilToonMaterial) {
     const value = typeof json === "string" ? JSON.parse(json) as SerializedLilToonMaterial : json;
-    return new LilToonMaterialFactory().create(value);
+    const material = new LilToonMaterialFactory().create(value);
+    for (const warning of material.getWarnings()) {
+      if (this.onWarning) this.onWarning(warning);
+      else warnLilToon(`${warning.materialName} (${warning.shaderKey}): ${warning.message}`);
+    }
+    return material;
   }
 
   load(

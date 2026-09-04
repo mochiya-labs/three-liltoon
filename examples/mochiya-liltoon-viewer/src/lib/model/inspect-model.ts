@@ -1,4 +1,4 @@
-import { LilToonMaterial, LILTOON_GLTF_EXTENSION } from "three-liltoon";
+import { LilToonMaterial, LILTOON_GLTF_EXTENSION, type LilToonWarning } from "three-liltoon";
 import {
   Color,
   Material,
@@ -155,7 +155,7 @@ function genericProperties(material: Material): InspectorEntry[] {
   return properties.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function inspectMaterial(parser: GLTFParser, material: Material): MaterialInspection {
+function inspectMaterial(parser: GLTFParser, material: Material, warnings: LilToonWarning[]): MaterialInspection {
   const isLilToon = material instanceof LilToonMaterial;
   const materialIndex = sourceMaterialIndex(parser, material);
   const extension = extensionDefinition(parser, materialIndex);
@@ -180,6 +180,7 @@ function inspectMaterial(parser: GLTFParser, material: Material): MaterialInspec
       { name: "Unity shader", value: extension?.shaderVariant ?? "Not declared" },
       { name: "Render mode", value: extension?.renderMode ?? material.renderMode },
       { name: "Runtime pass", value: material.pass },
+      { name: "Shader profile", value: material.shaderKey },
     );
   }
 
@@ -198,6 +199,7 @@ function inspectMaterial(parser: GLTFParser, material: Material): MaterialInspec
     properties,
     textures: inspectTextures(material),
     details,
+    warnings: materialIndex == null ? [] : warnings.filter((warning) => warning.materialIndex === materialIndex),
   };
 }
 
@@ -224,7 +226,7 @@ function isGeneratedOutlineMaterial(material: Material) {
   return mtoon.isMToonMaterial === true && mtoon.isOutline === true;
 }
 
-export function inspectModel(gltf: GLTF): ModelInspection {
+export function inspectModel(gltf: GLTF, warnings: LilToonWarning[] = []): ModelInspection {
   let meshCount = 0;
   let nodeCount = 0;
   gltf.scene.traverse((object) => {
@@ -239,7 +241,7 @@ export function inspectModel(gltf: GLTF): ModelInspection {
     ? [...gltf.parser.json.extensionsUsed].sort()
     : [];
   const materials = materialsFromScene(gltf.parser, gltf.scene).map((material) =>
-    inspectMaterial(gltf.parser, material),
+    inspectMaterial(gltf.parser, material, warnings),
   );
   const hasVrm = extensions.some((extension) =>
     String(extension).startsWith("VRMC_vrm"),
@@ -255,5 +257,6 @@ export function inspectModel(gltf: GLTF): ModelInspection {
     nodeCount,
     animationNames: gltf.animations.map((clip, index) => clip.name || `Animation ${index + 1}`),
     materials,
+    warnings: [...warnings],
   };
 }

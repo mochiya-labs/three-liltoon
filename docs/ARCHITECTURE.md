@@ -51,11 +51,21 @@ The ABI uses one generated `_Globals` structured uniform value in Three.js plus 
 
 `LilToonRendererAdapter` uses public Three.js state. Once per scene/render frame it selects the first visible directional light, reads ambient or hemisphere lighting, binds its shadow target and matrix, and binds a CubeTexture environment. The material then receives object/camera state in its `onBeforeRender` callback.
 
+Inactive directional shadow maps must contribute no occlusion. The shadow adapter requires renderer shadows to be enabled, a shadow-casting main light, and an allocated map. Otherwise it binds a shared white RGBA texture (packed far depth `1`), resets the projection to identity, resets the map size to `1 × 1`, and clears both biases. This prevents the ordinary sampler2D null-texture fallback (zero depth) from creating world-axis-aligned false shadows, and prevents disabled renderers from sampling stale maps. Material construction and null system-shadow bindings also use the white fallback, including outline programs. This is a runtime binding correction: generated shaders, sampler budgets, material `_UseShadow`, and authored toon shading remain unchanged. Regression tests cover absent/disabled maps, state reset, re-enabling shadows, and neutral attenuation across world-space boundaries.
+
 `LilToonPassManager` is a small owner for this adapter. `OutlinePass` adds a back-face outline child, including shared skeleton and copied morph influences. `ShadowCasterPass` installs Three depth/distance materials with main-texture alpha cutoff. Refraction, gem, and fur expose explicit unsupported diagnostics rather than silently producing a wrong pass.
 
 ## glTF loading
 
 `GLTFLilToonExtension` implements the public `GLTFLoaderPlugin` interface. It only handles a material with `MOCHIYA_materials_liltoon`, resolves referenced glTF textures through the parser, constructs `LilToonMaterial`, and configures the adapter, caster, and optional outline after the root loads. Ordinary glTF materials remain untouched.
+
+### Non-fatal profile diagnostics and viewer lighting
+
+The loading contract includes structured rendering warnings: compare enabled forward features and active assigned textures against the selected shader's executable uniform references and sampler bindings, rather than merely its declared globals (which include compiled-out features). Ignore disabled features, exporter texture aliases, and supported shared MatCap normal bindings. Diagnostics must not change authored parameters, select a different profile, or reject a model. Unsupported material feature requests fall back with warnings; actual resource/parse failures and explicit unsupported pass APIs remain errors.
+
+`LilToonMaterial.getWarnings()` reports current material state and `shaderKey` identifies the selected program. Texture/property edits do not reselect a profile; callers can recheck warnings after edits. The glTF plugin publishes deduplicated, material-indexed warnings through `onWarning` (console fallback) and `gltf.userData.lilToonWarnings`. The viewer presents the successful load with a warning count and expandable material/parameter/profile details. This is a compatibility check, not a guarantee of visual parity: arbitrary parameter interactions, GPU compilation, missing UVs, and lighting differences need separate verification.
+
+The example viewer uses a fixed world-space directional light, aimed at the origin; its position and intensity are tunable in `viewer-lighting.tsx`. Neither the light nor its target follows camera orbit, pan, or zoom. Authored MatCaps and specular highlights can still respond to the view direction; a fixed light does not freeze those material effects. The viewer renders directly without an EffectComposer or post-processing exposure control. Regression coverage belongs under `test/`, without per-fix example pages or issue documents.
 
 ## Generated versus maintained files
 

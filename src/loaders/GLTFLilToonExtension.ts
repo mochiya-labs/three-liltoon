@@ -14,12 +14,15 @@ import {
   type GLTFLilToonMaterialDefinition,
 } from "./types.js";
 import { warnLilToon } from "../utils/diagnostics.js";
+import type { LilToonWarning } from "../utils/materialWarnings.js";
 import { ensureLilToonTangents } from "./LilToonTangentGenerator.js";
 
 export interface GLTFLilToonExtensionOptions {
   rendererAdapter?: LilToonRendererAdapter;
   addOutlines?: boolean;
   configureShadowCasters?: boolean;
+  /** Non-fatal compatibility warnings. Omit to log them to the console. */
+  onWarning?: (warning: LilToonWarning) => void;
 }
 
 function renderModeFromDefinition(definition: GLTFLilToonMaterialDefinition) {
@@ -34,6 +37,7 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
   readonly name = LILTOON_GLTF_EXTENSION;
   readonly #outlinePass = new OutlinePass();
   readonly #shadowCasterPass = new ShadowCasterPass();
+  readonly #materialWarnings = new Map<number, LilToonWarning[]>();
 
   constructor(
     readonly parser: GLTFParser,
@@ -45,12 +49,6 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
     const definition = materialDefinition?.extensions?.[this.name] as GLTFLilToonMaterialDefinition | undefined;
     if (!definition) return null;
     return (async () => {
-      if (definition.specVersion && definition.specVersion !== LILTOON_GLTF_SPEC_VERSION) {
-        warnLilToon(
-          `Material ${materialIndex} uses ${this.name} spec ${definition.specVersion}; ` +
-          `this build implements ${LILTOON_GLTF_SPEC_VERSION}. Attempting a best-effort load.`,
-        );
-      }
       const textures: Record<string, Texture> = {};
       await Promise.all(
         Object.entries(definition.textures ?? {}).map(async ([property, textureInfo]) => {
@@ -67,6 +65,22 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
       });
       material.setRendererAdapter(this.options.rendererAdapter);
       this.parser.associations.set(material, { materials: materialIndex });
+      const warnings = material.getWarnings();
+      if (definition.specVersion && definition.specVersion !== LILTOON_GLTF_SPEC_VERSION) {
+        warnings.push({
+          severity: "warning", code: "spec-version-mismatch", materialName: material.name,
+          shaderKey: material.shaderKey, property: "specVersion",
+          message: `Material uses ${this.name} spec ${definition.specVersion}; this build implements ${LILTOON_GLTF_SPEC_VERSION}. Attempting a best-effort load.`,
+        });
+      }
+      if (/fur|gem|refraction|tessellation|liltoonlite/i.test(definition.shaderVariant ?? "")) {
+        warnings.push({
+          severity: "warning", code: "unsupported-shader-variant", materialName: material.name,
+          shaderKey: material.shaderKey, property: "shaderVariant",
+          message: `Unity shader ${definition.shaderVariant} is not reproduced by ${material.shaderKey}. Loading with the standard forward fallback.`,
+        });
+      }
+      this.#materialWarnings.set(materialIndex, warnings.map((warning) => ({ ...warning, materialIndex })));
       return material;
     })();
   }
@@ -87,5 +101,13 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
       }
     }
     if (this.options.rendererAdapter) this.options.rendererAdapter.attach(result.scene);
+    // Source material indices deduplicate warnings across shared meshes and loader clones.
+    const warnings = [...this.#materialWarnings].sort(([a], [b]) => a - b).flatMap(([, entries]) => entries);
+    result.userData ??= {};
+    result.userData.lilToonWarnings = warnings;
+    for (const warning of warnings) {
+      if (this.options.onWarning) this.options.onWarning({ ...warning });
+      else warnLilToon(`${warning.materialName} (material ${warning.materialIndex}, ${warning.shaderKey}): ${warning.message}`);
+    }
   }
 }

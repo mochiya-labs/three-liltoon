@@ -1,5 +1,6 @@
 import type { VRM } from "@pixiv/three-vrm";
 import type { AnimationClip, Group } from "three";
+import type { LilToonWarning } from "three-liltoon";
 
 export type ModelSource = {
   id: string;
@@ -34,6 +35,7 @@ export type MaterialInspection = {
   properties: InspectorEntry[];
   textures: TextureInspection[];
   details: InspectorEntry[];
+  warnings: LilToonWarning[];
 };
 
 export type ModelInspection = {
@@ -46,6 +48,7 @@ export type ModelInspection = {
   nodeCount: number;
   animationNames: string[];
   materials: MaterialInspection[];
+  warnings: LilToonWarning[];
 };
 
 export type LoadedModel = {

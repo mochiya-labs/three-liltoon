@@ -81,7 +81,7 @@ export class LilToonRendererAdapter {
       material.globalUniforms._MonochromeLighting = 0;
       material.globalUniforms._AsUnlit = 0;
     }
-    const shadow = this.shadowAdapter.bind(lighting.main, material.globalUniforms);
+    const shadow = this.shadowAdapter.bind(lighting.main, material.globalUniforms, renderer.shadowMap.enabled);
     material.setSystemTexture("__shadow", shadow.texture);
     material.setSystemTexture("__environment", this.environmentAdapter.bind(scene, material.globalUniforms));
   }

@@ -36,3 +36,5 @@ Status meanings: ✅ supported and exercised; 🟡 supported with known renderer
 | Hardware tessellation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Unavailable in WebGL2; use pre-subdivided geometry |
 
 The current browser smoke covers static rendering, live morph deformation, bone-texture skinning, outlines, lighting, and directional shadow maps in Chromium. Approved Unity reference images are not committed yet, so no appearance feature is represented as parity-tested.
+
+At load time, known enabled forward features and active texture slots are checked against the selected program. Unsupported combinations generate structured warnings through `onWarning` and `gltf.userData.lilToonWarnings`, not load errors. Direct materials expose `getWarnings()` and `shaderKey`. The viewer displays the warnings and uses fixed world-space directional lighting; neither diagnostics nor viewer lighting imply Unity parity. See [Architecture](ARCHITECTURE.md) for scope and limitations.

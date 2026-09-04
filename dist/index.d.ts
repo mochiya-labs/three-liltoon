@@ -1,5 +1,5 @@
-import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonRendererAdapter } from './gltf-DKztiKIG.js';
-export { G as GLTFLilToonExtension, b as LILTOON_GLTF_EXTENSION, c as LILTOON_GLTF_SPEC_VERSION, d as LilToonEnvironmentAdapter, e as LilToonFeatureSet, f as LilToonLightAdapter, g as LilToonMaterialLoader, h as LilToonMaterialParameters, i as LilToonRenderMode, j as LilToonScalarOrVector, k as LilToonShadowAdapter, l as detectLilToonFeatures } from './gltf-DKztiKIG.js';
+import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonRendererAdapter } from './gltf-HpUJqscG.js';
+export { G as GLTFLilToonExtension, b as GLTFLilToonExtensionOptions, c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonEnvironmentAdapter, f as LilToonFeatureSet, g as LilToonLightAdapter, h as LilToonMaterialLoader, i as LilToonMaterialParameters, j as LilToonRenderMode, k as LilToonScalarOrVector, l as LilToonShadowAdapter, m as LilToonWarning, n as LilToonWarningCode, o as detectLilToonFeatures } from './gltf-HpUJqscG.js';
 import { Texture, WebGLRenderer, Scene, Camera, Mesh } from 'three';
 import 'three/examples/jsm/loaders/GLTFLoader.js';
 

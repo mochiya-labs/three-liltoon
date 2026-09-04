@@ -17,6 +17,18 @@ interface LilToonMaterialParameters {
 type UniformPrimitive = number | Matrix4 | Vector2 | Vector3 | Vector4 | UniformPrimitive[];
 type LilToonGlobalUniforms = Record<string, UniformPrimitive>;
 
+type LilToonWarningCode = "unsupported-feature" | "unused-texture" | "texture-type-mismatch" | "spec-version-mismatch" | "unsupported-shader-variant";
+/** Serializable, non-fatal compatibility diagnostic. */
+interface LilToonWarning {
+    severity: "warning";
+    code: LilToonWarningCode;
+    materialName: string;
+    materialIndex?: number;
+    shaderKey: string;
+    property: string;
+    message: string;
+}
+
 interface LilToonFeatureSet {
     main2nd: boolean;
     main3rd: boolean;
@@ -56,6 +68,10 @@ declare class LilToonMaterial extends RawShaderMaterial {
     featureSet: LilToonFeatureSet;
     rendererAdapter?: LilToonRendererAdapter;
     constructor(parameters?: LilToonMaterialParameters);
+    /** The actual compiled program; edits do not automatically reselect it. */
+    get shaderKey(): string;
+    /** Recheck active forward features and textures without logging or changing the material. */
+    getWarnings(): LilToonWarning[];
     setProperty(name: string, value: LilToonScalarOrVector): this;
     getProperty<T extends LilToonScalarOrVector = LilToonScalarOrVector>(name: string): T | undefined;
     toLilToonJSON(resolveTexture?: (texture: Texture, property: string) => string | number | null): SerializedLilToonMaterial;
@@ -87,7 +103,7 @@ interface LilToonShadowBinding {
     texture: Texture | null;
 }
 declare class LilToonShadowAdapter {
-    bind(light: DirectionalLight | undefined, globals: LilToonGlobalUniforms): LilToonShadowBinding;
+    bind(light: DirectionalLight | undefined, globals: LilToonGlobalUniforms, shadowsEnabled?: boolean): LilToonShadowBinding;
 }
 
 declare class LilToonRendererAdapter {
@@ -106,6 +122,8 @@ interface GLTFLilToonExtensionOptions {
     rendererAdapter?: LilToonRendererAdapter;
     addOutlines?: boolean;
     configureShadowCasters?: boolean;
+    /** Non-fatal compatibility warnings. Omit to log them to the console. */
+    onWarning?: (warning: LilToonWarning) => void;
 }
 declare class GLTFLilToonExtension implements GLTFLoaderPlugin {
     #private;
@@ -118,6 +136,8 @@ declare class GLTFLilToonExtension implements GLTFLoaderPlugin {
 }
 
 declare class LilToonMaterialLoader extends Loader<LilToonMaterial> {
+    /** Non-fatal compatibility warnings. Omit to log them to the console. */
+    onWarning?: (warning: LilToonWarning) => void;
     constructor(manager?: LoadingManager);
     parse(json: string | SerializedLilToonMaterial): LilToonMaterial;
     load(url: string, onLoad: (material: ReturnType<LilToonMaterialLoader["parse"]>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (error: unknown) => void): void;
@@ -138,4 +158,4 @@ interface GLTFLilToonMaterialDefinition {
     textures?: Record<string, GLTFLilToonTextureInfo | number>;
 }
 
-export { GLTFLilToonExtension as G, LilToonMaterial as L, type SerializedLilToonMaterial as S, LilToonRendererAdapter as a, LILTOON_GLTF_EXTENSION as b, LILTOON_GLTF_SPEC_VERSION as c, LilToonEnvironmentAdapter as d, type LilToonFeatureSet as e, LilToonLightAdapter as f, LilToonMaterialLoader as g, type LilToonMaterialParameters as h, type LilToonRenderMode as i, type LilToonScalarOrVector as j, LilToonShadowAdapter as k, detectLilToonFeatures as l, type GLTFLilToonExtensionOptions as m, type GLTFLilToonMaterialDefinition as n, type GLTFLilToonTextureInfo as o };
+export { GLTFLilToonExtension as G, LilToonMaterial as L, type SerializedLilToonMaterial as S, LilToonRendererAdapter as a, type GLTFLilToonExtensionOptions as b, LILTOON_GLTF_EXTENSION as c, LILTOON_GLTF_SPEC_VERSION as d, LilToonEnvironmentAdapter as e, type LilToonFeatureSet as f, LilToonLightAdapter as g, LilToonMaterialLoader as h, type LilToonMaterialParameters as i, type LilToonRenderMode as j, type LilToonScalarOrVector as k, LilToonShadowAdapter as l, type LilToonWarning as m, type LilToonWarningCode as n, detectLilToonFeatures as o, type GLTFLilToonMaterialDefinition as p, type GLTFLilToonTextureInfo as q };

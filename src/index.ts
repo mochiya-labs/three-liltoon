@@ -19,6 +19,8 @@ export { RefractionPass } from "./passes/RefractionPass.js";
 export { GemPass } from "./passes/GemPass.js";
 export { FurPass } from "./passes/FurPass.js";
 export { GLTFLilToonExtension } from "./loaders/GLTFLilToonExtension.js";
+export type { GLTFLilToonExtensionOptions } from "./loaders/GLTFLilToonExtension.js";
+export type { LilToonWarning, LilToonWarningCode } from "./utils/materialWarnings.js";
 export { LilToonMaterialLoader } from "./loaders/LilToonMaterialLoader.js";
 export { LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION } from "./loaders/types.js";
 export { UnsupportedFeatureError } from "./utils/diagnostics.js";

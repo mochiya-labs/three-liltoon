@@ -73,14 +73,16 @@ The package defines `MOCHIYA_materials_liltoon`; it only replaces materials that
 ```ts
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { LilToonRendererAdapter } from "three-liltoon";
-import { GLTFLilToonExtension } from "three-liltoon/gltf";
+import { GLTFLilToonExtension, type LilToonWarning } from "three-liltoon/gltf";
 
 const adapter = new LilToonRendererAdapter(renderer);
 const loader = new GLTFLoader();
+const renderingWarnings: LilToonWarning[] = [];
 loader.register((parser) => new GLTFLilToonExtension(parser, {
   rendererAdapter: adapter,
   addOutlines: true,
   configureShadowCasters: true,
+  onWarning: (warning) => renderingWarnings.push(warning), // optional frontend collection
 }));
 
 const gltf = await loader.loadAsync("/avatar.glb");
@@ -90,6 +92,14 @@ scene.add(gltf.scene);
 The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT.md).
 
 The runtime chooses a material-specific shader profile so layered-color masks, MatCap masks, custom normals, or reflection controls fit Three/WebGL's texture-unit budget. A maximal lilToon shader is intentionally not used: skinned/morphed avatars reserve two of the renderer's sixteen allocated units for deformation, and every generated profile is tested to keep the complete linked program within that limit.
+
+### Rendering warnings
+
+`LilToonWarning` is exported from both `three-liltoon` and `three-liltoon/gltf`. Warnings contain `severity: "warning"`, a stable `code`, `materialName`, glTF `materialIndex`, `property`, `shaderKey`, and a readable `message`. They do not reject loading or change authored settings. With no callback they are logged to the console; the completed load also exposes them as `gltf.userData.lilToonWarnings`. Use a fresh collection per load if reusing a loader.
+
+Checks cover known enabled forward features missing from the selected program, active assigned textures without samplers, incompatible 2D/cube textures, extension-version differences, and unsupported Unity shader families. Dormant texture slots and supported shared MatCap normals do not produce warnings. For example, enabling reflection and assigning a MatCap mask alongside an emission mask reports what the emission-mask profile cannot reproduce. A lack of warnings is not a guarantee of Unity visual parity or GPU/geometry correctness.
+
+Direct material users can call `material.getWarnings()` and inspect `material.shaderKey`; this check is side-effect-free. Recheck after `setProperty` / `setTexture`: edits do not automatically choose a new shader profile. `LilToonMaterialLoader.onWarning` provides the same feature diagnostics for standalone JSON loads (that loader does not resolve serialized texture references). Outline, shadow, and other passes are outside the forward-profile check. Real file/parse failures still reject; explicit unsupported pass constructors still throw.
 
 Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.liltoon-exporter`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
