@@ -120,7 +120,7 @@ The browser test installs no browser automatically. On a developer machine or CI
 
 [`examples/mochiya-liltoon-viewer`](examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI follows the Mochiya site's installed `radix-mira` shadcn preset and olive theme.
 
-The viewer installs the checked-in package artifact from the repository root. Its development and deployment commands refresh that local package without rebuilding shaders.
+The viewer installs the checked-in package artifact from the repository root. Its development command refreshes that local package without rebuilding shaders; deployment uses the artifact installed during Vercel's dependency-install step and does not mutate dependencies during `next build`.
 
 ```bash
 cd examples/mochiya-liltoon-viewer

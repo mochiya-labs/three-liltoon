@@ -25,9 +25,9 @@ npm install
 npm run dev
 ```
 
-`npm run dev` and `npm run build` pack and force-refresh the checked-in `three-liltoon` artifact before Next.js starts. They do not regenerate or compile shaders. The refresh is required because npm caches `file:` dependencies by package version.
+`npm run dev` packs and force-refreshes the checked-in `three-liltoon` artifact before Next.js starts. It does not regenerate or compile shaders. The refresh is required for local development because npm caches `file:` dependencies by package version. `npm run build` uses the package installed by the preceding dependency-install step and does not modify `node_modules` during the Next.js build.
 
-Open `http://localhost:3000`, then choose or drop a `.glb` or `.vrm` file. After changing `three-liltoon` package or shader source, run `npm run build:package` from the repository root to regenerate `dist/`, then restart the viewer so its pre-run sync installs the updated artifact.
+Open `http://localhost:3000`, then choose or drop a `.glb` or `.vrm` file. After changing `three-liltoon` package or shader source, run `npm run build:package` from the repository root to regenerate `dist/`, then restart the development server. Before a local production build with an existing install, run `npm run sync:liltoon` explicitly to refresh the package.
 
 For Vercel, set the project Root Directory to `examples/mochiya-liltoon-viewer` and enable source files outside the Root Directory. The normal `npm run build` command then uses the committed package artifact without a submodule checkout or native shader compilation.
 

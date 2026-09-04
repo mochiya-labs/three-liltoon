@@ -9,7 +9,6 @@
     "sync:liltoon": "node scripts/sync-local-liltoon.mjs",
     "predev": "npm run sync:liltoon",
     "dev": "next dev",
-    "prebuild": "npm run sync:liltoon",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
