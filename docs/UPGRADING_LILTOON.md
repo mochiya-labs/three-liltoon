@@ -1,5 +1,7 @@
 # Upgrading lilToon
 
+This page is for contributors updating the upstream shader source used by `three-liltoon`.
+
 Upstream upgrades are deliberate compatibility changes, not an implicit branch update.
 
 1. Record the current package version, submodule commit, generated hashes, compiler versions, browser results, and parity results.

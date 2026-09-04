@@ -1,7 +1,7 @@
 # lilToon → Three.js Porting Plan
 ## Untouched lilToon Submodule + DXC → SPIR-V → GLSL ES
 
-> **Purpose:** Implementation plan for Codex to build a maintainable Three.js port of lilToon while keeping the upstream lilToon source tree unmodified.
+> **Purpose:** Technical implementation and maintenance guide for contributors building a Three.js port of lilToon while keeping the upstream lilToon source tree unmodified.
 >
 > **Primary target:** Three.js `WebGLRenderer` / WebGL2 using generated GLSL ES 3.00 shaders and `THREE.RawShaderMaterial`.
 >
@@ -54,7 +54,7 @@ Build a reusable package that:
 
 # 2. Hard architectural rules
 
-Codex MUST follow these rules.
+All contributions must follow these rules.
 
 ## 2.1 Never modify the lilToon submodule
 
@@ -2971,7 +2971,7 @@ This makes it possible to determine whether errors originate from:
 
 ---
 
-# 40. Porting error triage rules for Codex
+# 40. Porting error triage rules
 
 When DXC fails:
 
@@ -3142,9 +3142,9 @@ This is useful in CI and developer machines.
 
 ---
 
-# 45. Initial Codex execution order
+# 45. Recommended implementation order
 
-Codex should implement in exactly this order unless blocked.
+For a new implementation, follow this order unless a documented dependency requires a different sequence.
 
 ## Step 1
 
@@ -3380,9 +3380,9 @@ Mitigation:
 
 ---
 
-# 50. Deliverables expected from Codex
+# 50. Expected implementation deliverables
 
-Codex should produce:
+A complete implementation includes:
 
 ```text
 1. Working repository scaffold

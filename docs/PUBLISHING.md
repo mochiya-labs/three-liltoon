@@ -1,5 +1,7 @@
 # Publishing
 
+This page is for package maintainers preparing a public release.
+
 The package uses its own SemVer. A minor alpha bump may add a renderer feature; a patch must not silently change a material ABI or accepted visual baseline.
 
 ## Release checklist

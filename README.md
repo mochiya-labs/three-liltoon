@@ -15,10 +15,10 @@ Compiler binaries are development dependencies only. The npm package embeds gene
 
 The runtime JavaScript and TypeScript declarations under `dist/` are committed so deployable examples can consume the package without initializing the lilToon submodule or installing the shader toolchain. Source maps and compiler intermediates remain untracked. After changing package or shader source, run `npm run build:package` and commit the updated `dist/` files with the source change.
 
-## Install
+## Install from Git
 
 ```bash
-npm install three-liltoon three
+npm install three https://github.com/zekailin00/three-liltoon.git
 ```
 
 ## Basic use
@@ -91,7 +91,7 @@ The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT
 
 The runtime chooses a material-specific shader profile so layered-color masks, MatCap masks, custom normals, or reflection controls fit Three/WebGL's texture-unit budget. A maximal lilToon shader is intentionally not used: skinned/morphed avatars reserve two of the renderer's sixteen allocated units for deformation, and every generated profile is tested to keep the complete linked program within that limit.
 
-Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`com.mochiya.liltoon-exporter`](../mochiya-liltoon-unity/README.md) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
+Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.liltoon-exporter`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
 ## Develop and verify
 
@@ -118,7 +118,7 @@ The browser test installs no browser automatically. On a developer machine or CI
 
 ## Viewer example
 
-[`examples/mochiya-liltoon-viewer`](examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI follows the Mochiya site's installed `radix-mira` shadcn preset and olive theme.
+[`examples/mochiya-liltoon-viewer`](examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI uses the `radix-mira` shadcn preset, olive color tokens, and Phosphor icons.
 
 The viewer installs the checked-in package artifact from the repository root. Its development command refreshes that local package without rebuilding shaders; deployment uses the artifact installed during Vercel's dependency-install step and does not mutate dependencies during `next build`.
 
