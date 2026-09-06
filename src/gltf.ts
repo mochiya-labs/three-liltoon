@@ -11,5 +11,6 @@ export {
 } from "./loaders/types.js";
 export type {
 	GLTFLilToonMaterialDefinition,
+	GLTFLilToonPropertyValue,
 	GLTFLilToonTextureInfo,
 } from "./loaders/types.js";

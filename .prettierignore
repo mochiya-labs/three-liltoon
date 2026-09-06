@@ -5,6 +5,7 @@ tools/bin/
 **/dist/
 src/generated/
 shader/generated/
+schema/
 THIRD_PARTY_NOTICES.md
 **/package-lock.json
 **/next-env.d.ts

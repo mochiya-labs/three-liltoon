@@ -81,7 +81,7 @@ const gltf = await loader.loadAsync("/avatar.glb");
 scene.add(gltf.scene);
 ```
 
-Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT.md).
+Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. See the [format guide](docs/MATERIAL_FORMAT.md) and [JSON Schema](schema/MOCHIYA_materials_liltoon.schema.json), also available as `three-liltoon/schema`. The schema validates each material's extension payload, not an entire glTF document or rendered feature support.
 
 ## Load VRM and glTF/GLB
 
@@ -157,6 +157,7 @@ npm run example:dev
 
 Useful checks:
 
+- `npm run generate:gltf-schema` (schema only; no shader toolchain needed)
 - `npm run shaders:preprocess -- --variant standard-opaque`
 - `npm run shaders:rebuild`
 - `npm run test:browser`

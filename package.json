@@ -12,6 +12,8 @@
 	"sideEffects": false,
 	"files": [
 		"dist",
+		"schema",
+		"docs/MATERIAL_FORMAT.md",
 		"README.md",
 		"LICENSE",
 		"THIRD_PARTY_NOTICES.md"
@@ -31,7 +33,8 @@
 		"./vrm": {
 			"types": "./dist/vrm.d.ts",
 			"import": "./dist/vrm.js"
-		}
+		},
+		"./schema": "./schema/MOCHIYA_materials_liltoon.schema.json"
 	},
 	"engines": {
 		"node": ">=20"
@@ -41,7 +44,8 @@
 		"format:check": "prettier --check .",
 		"tools:setup": "tsx tools/shader-build/setup-toolchain.ts",
 		"tools:check": "tsx tools/shader-build/check-toolchain.ts",
-		"generate": "tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts && tsx tools/generators/generate-third-party-notices.ts",
+		"generate": "npm run generate:gltf-schema && tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts && tsx tools/generators/generate-third-party-notices.ts",
+		"generate:gltf-schema": "tsx tools/generators/generate-gltf-schema.ts",
 		"generate:all": "npm run generate && npm run shaders:build",
 		"shaders:build": "tsx tools/shader-build/build-all.ts",
 		"shaders:preprocess": "tsx tools/shader-build/preprocess.ts",
@@ -76,11 +80,13 @@
 		"@types/node": "^24.3.0",
 		"@types/pngjs": "^6.0.5",
 		"@types/three": "^0.185.4",
+		"ajv": "^8.20.0",
 		"pixelmatch": "^7.2.0",
 		"pngjs": "^7.0.0",
 		"prettier": "3.9.6",
 		"rimraf": "^6.0.1",
 		"three": "^0.180.0",
+		"ts-json-schema-generator": "2.4.0",
 		"tsup": "^8.5.0",
 		"tsx": "^4.20.5",
 		"typescript": "^5.9.2",
