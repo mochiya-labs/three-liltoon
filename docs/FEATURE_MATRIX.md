@@ -2,38 +2,38 @@
 
 Status meanings: ✅ supported and exercised; 🟡 supported with known renderer differences; 🧪 compiled/implemented but not yet approved by Unity visual parity; ❌ unsupported; ⏳ planned. "Browser" means the automated WebGL2 smoke path, not Unity parity.
 
-| Feature | Shader | Static | Skinned | Browser | WebXR | Unity parity | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Base color / main texture | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Property names and main UV transform preserved |
-| Main UV animation / tone correction | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Compiled in standard variants |
-| Main2nd / Main3rd / decal | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Main2nd/Main3rd blend masks and independent texture transforms are included in layered profiles; advanced dissolve/decal combinations remain budget-dependent |
-| Main toon shadow, 2nd, 3rd | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | lilToon bands retained; lighting ABI differs from Unity |
-| Normal map / normal map 2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Independent `_BumpMap_ST` / `_Bump2ndMap_ST`; missing glTF/VRM tangents are reconstructed with MikkTSpace |
-| MatCap / MatCap2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Both blend masks and custom normal maps select WebGL2-safe shader profiles |
-| Rim / directional rim | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Exercised in smoke example |
-| Rim shade / backlight | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | One-light approximation |
-| Emission / emission2nd | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Both RGBA blend masks, independent UV transforms/animation, and emission maps supported in the emission-mask profile; gradations omitted |
-| Reflection / specular | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Metallic, smoothness, and reflection-color textures supported; no Unity probe blending |
-| Distance fade / dissolve | ✅ | 🧪 | 🧪 | ✅ | ❌ | 🧪 | Core dissolve textures included |
-| Cutout / alpha mask | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | Forward and shadow-caster cutoff supported |
-| Transparent blending | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | Single ordinary Three transparent pass; no Unity prepass variants |
-| Bone-texture skinning | ✅ | — | ✅ | ✅ | ❌ | 🧪 | Three `SkinnedMesh`; four weights |
-| Morph targets | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Position/normal targets; maximum 64 |
-| Outline | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Back-face child follows skinning and morphs |
-| Directional shadow receive | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | One map, 2×2 PCF with depth and receiver normal bias; no cascades/VSM parity |
-| Directional/point shadow cast | ✅ | ✅ | ✅ | ✅ | ❌ | 🧪 | Uses Three depth/distance materials |
-| One directional + ambient light | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | First visible directional light; simple SH ambient |
-| Environment cubemap | ✅ | 🟡 | 🟡 | ✅ | ❌ | 🧪 | `THREE.CubeTexture`; PMREM/equirect internals not accessed |
-| glTF custom extension | — | 🧪 | 🧪 | 🧪 | ❌ | 🧪 | `MOCHIYA_materials_liltoon`; non-extension materials preserved |
-| Instancing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Compatibility macros are neutral no-ops |
-| Stereo / WebXR | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Stereo macros are neutral no-ops in this alpha |
-| Multiple Unity light modes / probes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Additional lights and probe blending are not reproduced |
-| Advanced masks, gradations, glitter, anisotropy, parallax/POM | ⏳ | ⏳ | ⏳ | ⏳ | ❌ | ❌ | Main2nd/Main3rd, MatCap, and emission blend masks are supported in dedicated profiles; other advanced masks remain unsupported |
-| AudioLink / VRC Light Volumes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | VRC Light Volumes warn and fall back to Three lighting |
-| Refraction | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Requires scene-color capture; constructor diagnoses |
-| Gem | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Independent future pass |
-| Fur | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Independent future shell/pass system |
-| Hardware tessellation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Unavailable in WebGL2; use pre-subdivided geometry |
+| Feature                                                       | Shader | Static | Skinned | Browser | WebXR | Unity parity | Notes                                                                                                                                                         |
+| ------------------------------------------------------------- | ------ | ------ | ------- | ------- | ----- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base color / main texture                                     | ✅     | ✅     | ✅      | ✅      | ❌    | 🧪           | Property names and main UV transform preserved                                                                                                                |
+| Main UV animation / tone correction                           | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Compiled in standard variants                                                                                                                                 |
+| Main2nd / Main3rd / decal                                     | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Main2nd/Main3rd blend masks and independent texture transforms are included in layered profiles; advanced dissolve/decal combinations remain budget-dependent |
+| Main toon shadow, 2nd, 3rd                                    | ✅     | 🟡     | 🟡      | ✅      | ❌    | 🧪           | lilToon bands retained; lighting ABI differs from Unity                                                                                                       |
+| Normal map / normal map 2nd                                   | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Independent `_BumpMap_ST` / `_Bump2ndMap_ST`; missing glTF/VRM tangents are reconstructed with MikkTSpace                                                     |
+| MatCap / MatCap2nd                                            | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Both blend masks and custom normal maps select WebGL2-safe shader profiles                                                                                    |
+| Rim / directional rim                                         | ✅     | ✅     | ✅      | ✅      | ❌    | 🧪           | Exercised in smoke example                                                                                                                                    |
+| Rim shade / backlight                                         | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | One-light approximation                                                                                                                                       |
+| Emission / emission2nd                                        | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Both RGBA blend masks, independent UV transforms/animation, and emission maps supported in the emission-mask profile; gradations omitted                      |
+| Reflection / specular                                         | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Metallic, smoothness, and reflection-color textures supported; no Unity probe blending                                                                        |
+| Distance fade / dissolve                                      | ✅     | 🧪     | 🧪      | ✅      | ❌    | 🧪           | Core dissolve textures included                                                                                                                               |
+| Cutout / alpha mask                                           | ✅     | 🟡     | 🟡      | ✅      | ❌    | 🧪           | Forward and shadow-caster cutoff supported                                                                                                                    |
+| Transparent blending                                          | ✅     | 🟡     | 🟡      | ✅      | ❌    | 🧪           | Single ordinary Three transparent pass; no Unity prepass variants                                                                                             |
+| Bone-texture skinning                                         | ✅     | —      | ✅      | ✅      | ❌    | 🧪           | Three `SkinnedMesh`; four weights                                                                                                                             |
+| Morph targets                                                 | ✅     | ✅     | ✅      | ✅      | ❌    | 🧪           | Position/normal targets; maximum 64                                                                                                                           |
+| Outline                                                       | ✅     | ✅     | ✅      | ✅      | ❌    | 🧪           | Back-face child follows skinning and morphs                                                                                                                   |
+| Directional shadow receive                                    | ✅     | 🟡     | 🟡      | ✅      | ❌    | 🧪           | One map, 2×2 PCF with depth and receiver normal bias; no cascades/VSM parity                                                                                  |
+| Directional/point shadow cast                                 | ✅     | ✅     | ✅      | ✅      | ❌    | 🧪           | Uses Three depth/distance materials                                                                                                                           |
+| One directional + ambient light                               | ✅     | 🟡     | 🟡      | ✅      | ❌    | 🧪           | First visible directional light; simple SH ambient                                                                                                            |
+| Environment cubemap                                           | ✅     | 🟡     | 🟡      | ✅      | ❌    | 🧪           | `THREE.CubeTexture`; PMREM/equirect internals not accessed                                                                                                    |
+| glTF custom extension                                         | —      | 🧪     | 🧪      | 🧪      | ❌    | 🧪           | `MOCHIYA_materials_liltoon`; non-extension materials preserved                                                                                                |
+| Instancing                                                    | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Compatibility macros are neutral no-ops                                                                                                                       |
+| Stereo / WebXR                                                | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Stereo macros are neutral no-ops in this alpha                                                                                                                |
+| Multiple Unity light modes / probes                           | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Additional lights and probe blending are not reproduced                                                                                                       |
+| Advanced masks, gradations, glitter, anisotropy, parallax/POM | ⏳     | ⏳     | ⏳      | ⏳      | ❌    | ❌           | Main2nd/Main3rd, MatCap, and emission blend masks are supported in dedicated profiles; other advanced masks remain unsupported                                |
+| AudioLink / VRC Light Volumes                                 | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | VRC Light Volumes warn and fall back to Three lighting                                                                                                        |
+| Refraction                                                    | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Requires scene-color capture; constructor diagnoses                                                                                                           |
+| Gem                                                           | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Independent future pass                                                                                                                                       |
+| Fur                                                           | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Independent future shell/pass system                                                                                                                          |
+| Hardware tessellation                                         | ❌     | ❌     | ❌      | ❌      | ❌    | ❌           | Unavailable in WebGL2; use pre-subdivided geometry                                                                                                            |
 
 The current browser smoke covers static rendering, live morph deformation, bone-texture skinning, outlines, lighting, and directional shadow maps in Chromium. Approved Unity reference images are not committed yet, so no appearance feature is represented as parity-tested.
 

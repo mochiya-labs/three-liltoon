@@ -8,15 +8,19 @@ const libraryDirectory = resolve(viewerDirectory, "../..");
 const packageDirectory = resolve(viewerDirectory, ".local-packages");
 const cacheDirectory = resolve(viewerDirectory, ".npm-cache");
 const npmCli = process.env.npm_execpath;
-const npm = npmCli ? process.execPath : process.platform === "win32" ? "npm.cmd" : "npm";
+const npm = npmCli
+	? process.execPath
+	: process.platform === "win32"
+		? "npm.cmd"
+		: "npm";
 const npmArgs = (args) => (npmCli ? [npmCli, ...args] : args);
 
 function run(args, options = {}) {
-  return execFileSync(npm, npmArgs(args), {
-    cwd: options.cwd ?? viewerDirectory,
-    encoding: "utf8",
-    stdio: options.capture ? ["inherit", "pipe", "inherit"] : "inherit",
-  });
+	return execFileSync(npm, npmArgs(args), {
+		cwd: options.cwd ?? viewerDirectory,
+		encoding: "utf8",
+		stdio: options.capture ? ["inherit", "pipe", "inherit"] : "inherit",
+	});
 }
 
 // The repository commits the package's runtime JS and declarations in dist/.
@@ -29,25 +33,33 @@ mkdirSync(packageDirectory, { recursive: true });
 mkdirSync(cacheDirectory, { recursive: true });
 
 const packResult = execFileSync(
-  npm,
-  npmArgs(["pack", "--json", "--cache", cacheDirectory, "--pack-destination", packageDirectory]),
-  {
-    cwd: libraryDirectory,
-    encoding: "utf8",
-    stdio: ["inherit", "pipe", "inherit"],
-  },
+	npm,
+	npmArgs([
+		"pack",
+		"--json",
+		"--cache",
+		cacheDirectory,
+		"--pack-destination",
+		packageDirectory,
+	]),
+	{
+		cwd: libraryDirectory,
+		encoding: "utf8",
+		stdio: ["inherit", "pipe", "inherit"],
+	},
 );
 const [packed] = JSON.parse(packResult);
-if (!packed?.filename) throw new Error("npm pack did not return an artifact filename.");
+if (!packed?.filename)
+	throw new Error("npm pack did not return an artifact filename.");
 
 run([
-  "install",
-  "--force",
-  "--no-save",
-  "--ignore-scripts",
-  "--no-audit",
-  "--no-fund",
-  "--cache",
-  cacheDirectory,
-  resolve(packageDirectory, packed.filename),
+	"install",
+	"--force",
+	"--no-save",
+	"--ignore-scripts",
+	"--no-audit",
+	"--no-fund",
+	"--cache",
+	cacheDirectory,
+	resolve(packageDirectory, packed.filename),
 ]);

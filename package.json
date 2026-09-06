@@ -1,72 +1,75 @@
 {
-  "name": "three-liltoon",
-  "version": "0.1.0",
-  "description": "Unofficial lilToon material and shader integration for Three.js WebGL2",
-  "license": "MIT",
-  "author": "Mochiya",
-  "type": "module",
-  "sideEffects": false,
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    "THIRD_PARTY_NOTICES.md"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./gltf": {
-      "types": "./dist/gltf.d.ts",
-      "import": "./dist/gltf.js"
-    }
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "scripts": {
-    "tools:setup": "tsx tools/shader-build/setup-toolchain.ts",
-    "tools:check": "tsx tools/shader-build/check-toolchain.ts",
-    "generate": "tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts && tsx tools/generators/generate-third-party-notices.ts",
-    "generate:all": "npm run generate && npm run shaders:build",
-    "shaders:build": "tsx tools/shader-build/build-all.ts",
-    "shaders:preprocess": "tsx tools/shader-build/preprocess.ts",
-    "shaders:clean": "rimraf shader/generated src/generated",
-    "shaders:rebuild": "npm run shaders:clean && npm run generate && npm run shaders:build",
-    "test": "npm run generate:all && vitest run",
-    "test:compiler": "npm run generate:all && vitest run test/compiler",
-    "test:browser": "npm run example:build && playwright test",
-    "test:parity": "tsx test/parity/run.ts",
-    "test:parity:required": "tsx test/parity/run.ts --require-fixtures",
-    "example:dev": "vite examples/basic-three",
-    "example:build": "npm run build:package && vite build examples/basic-three",
-    "example:viewer:dev": "npm --prefix examples/mochiya-liltoon-viewer run dev",
-    "example:viewer:build": "npm --prefix examples/mochiya-liltoon-viewer run build",
-    "typecheck": "npm run generate:all && tsc --noEmit",
-    "build:package": "npm run generate:all && tsup",
-    "build": "npm run generate:all && tsc --noEmit && tsup",
-    "prepublishOnly": "npm run build && npm test"
-  },
-  "peerDependencies": {
-    "three": ">=0.180.0 <0.190.0"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "@types/node": "^24.3.0",
-    "@types/pngjs": "^6.0.5",
-    "pixelmatch": "^7.2.0",
-    "pngjs": "^7.0.0",
-    "@types/three": "^0.185.4",
-    "rimraf": "^6.0.1",
-    "three": "^0.180.0",
-    "tsup": "^8.5.0",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.3",
-    "vitest": "^3.2.4"
-  }
+	"name": "three-liltoon",
+	"version": "0.1.0",
+	"description": "Unofficial lilToon material and shader integration for Three.js WebGL2",
+	"license": "MIT",
+	"author": "Mochiya",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE",
+		"THIRD_PARTY_NOTICES.md"
+	],
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./gltf": {
+			"types": "./dist/gltf.d.ts",
+			"import": "./dist/gltf.js"
+		}
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"scripts": {
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"tools:setup": "tsx tools/shader-build/setup-toolchain.ts",
+		"tools:check": "tsx tools/shader-build/check-toolchain.ts",
+		"generate": "tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts && tsx tools/generators/generate-third-party-notices.ts",
+		"generate:all": "npm run generate && npm run shaders:build",
+		"shaders:build": "tsx tools/shader-build/build-all.ts",
+		"shaders:preprocess": "tsx tools/shader-build/preprocess.ts",
+		"shaders:clean": "rimraf shader/generated src/generated",
+		"shaders:rebuild": "npm run shaders:clean && npm run generate && npm run shaders:build",
+		"test": "npm run generate:all && vitest run",
+		"test:compiler": "npm run generate:all && vitest run test/compiler",
+		"test:browser": "npm run example:build && playwright test",
+		"test:parity": "tsx test/parity/run.ts",
+		"test:parity:required": "tsx test/parity/run.ts --require-fixtures",
+		"example:dev": "vite examples/basic-three",
+		"example:build": "npm run build:package && vite build examples/basic-three",
+		"example:viewer:dev": "npm --prefix examples/mochiya-liltoon-viewer run dev",
+		"example:viewer:build": "npm --prefix examples/mochiya-liltoon-viewer run build",
+		"typecheck": "npm run generate:all && tsc --noEmit",
+		"build:package": "npm run generate:all && tsup",
+		"build": "npm run generate:all && tsc --noEmit && tsup",
+		"prepublishOnly": "npm run build && npm test"
+	},
+	"peerDependencies": {
+		"three": ">=0.180.0 <0.190.0"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1",
+		"@types/node": "^24.3.0",
+		"@types/pngjs": "^6.0.5",
+		"@types/three": "^0.185.4",
+		"pixelmatch": "^7.2.0",
+		"pngjs": "^7.0.0",
+		"prettier": "3.9.6",
+		"rimraf": "^6.0.1",
+		"three": "^0.180.0",
+		"tsup": "^8.5.0",
+		"tsx": "^4.20.5",
+		"typescript": "^5.9.2",
+		"vite": "^7.1.3",
+		"vitest": "^3.2.4"
+	}
 }

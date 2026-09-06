@@ -1,0 +1,25 @@
+# Dependencies, upstream sources and build outputs are managed by their tools.
+**/node_modules/
+vendor/
+tools/bin/
+**/dist/
+src/generated/
+shader/generated/
+THIRD_PARTY_NOTICES.md
+**/package-lock.json
+**/next-env.d.ts
+**/*.tsbuildinfo
+
+# Viewer caches, local packages and verification artifacts.
+**/.next/
+**/.vercel/
+**/.local-packages/
+**/.npm-cache/
+**/out/
+**/build/
+**/coverage/
+**/.tmp/
+**/playwright-report/
+**/test-results/
+test/parity/three-output/
+test/parity/diff/

@@ -8,40 +8,41 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const bodyFont = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-body-loaded",
+	subsets: ["latin"],
+	variable: "--font-body-loaded",
 });
 
 const headingFont = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-heading-loaded",
+	subsets: ["latin"],
+	variable: "--font-heading-loaded",
 });
 
 const monoFont = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono-loaded",
+	subsets: ["latin"],
+	variable: "--font-mono-loaded",
 });
 
 export const metadata: Metadata = {
-  title: "lilToon model viewer — Mochiya",
-  description: "Inspect and render Mochiya lilToon GLB and VRM files in Three.js.",
+	title: "lilToon model viewer — Mochiya",
+	description:
+		"Inspect and render Mochiya lilToon GLB and VRM files in Three.js.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={cn(
-        "h-full antialiased",
-        bodyFont.variable,
-        headingFont.variable,
-        monoFont.variable,
-      )}
-    >
-      <body className="min-h-full">
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
-    </html>
-  );
+	return (
+		<html
+			lang="en"
+			suppressHydrationWarning
+			className={cn(
+				"h-full antialiased",
+				bodyFont.variable,
+				headingFont.variable,
+				monoFont.variable,
+			)}
+		>
+			<body className="min-h-full">
+				<ThemeProvider>{children}</ThemeProvider>
+			</body>
+		</html>
+	);
 }

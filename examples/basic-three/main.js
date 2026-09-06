@@ -1,28 +1,28 @@
 import {
-  AmbientLight,
-  Bone,
-  Color,
-  DirectionalLight,
-  Float32BufferAttribute,
-  Mesh,
-  MeshStandardMaterial,
-  PCFShadowMap,
-  PerspectiveCamera,
-  PlaneGeometry,
-  Scene,
-  Skeleton,
-  SkinnedMesh,
-  SRGBColorSpace,
-  SphereGeometry,
-  CylinderGeometry,
-  Uint16BufferAttribute,
-  WebGLRenderer,
+	AmbientLight,
+	Bone,
+	Color,
+	DirectionalLight,
+	Float32BufferAttribute,
+	Mesh,
+	MeshStandardMaterial,
+	PCFShadowMap,
+	PerspectiveCamera,
+	PlaneGeometry,
+	Scene,
+	Skeleton,
+	SkinnedMesh,
+	SRGBColorSpace,
+	SphereGeometry,
+	CylinderGeometry,
+	Uint16BufferAttribute,
+	WebGLRenderer,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import {
-  LilToonMaterial,
-  LilToonRendererAdapter,
-  OutlinePass,
+	LilToonMaterial,
+	LilToonRendererAdapter,
+	OutlinePass,
 } from "three-liltoon";
 
 const canvas = document.querySelector("#scene");
@@ -57,22 +57,22 @@ sun.shadow.camera.bottom = -4;
 scene.add(sun, sun.target);
 
 const material = new LilToonMaterial({
-  name: "Mochiya example",
-  renderMode: "opaque",
-  properties: {
-    _Color: [0.91, 0.35, 0.48, 1],
-    _UseShadow: 1,
-    _ShadowColor: [0.54, 0.2, 0.33, 1],
-    _Shadow2ndColor: [0.77, 0.28, 0.42, 1],
-    _ShadowBorder: 0.52,
-    _ShadowBlur: 0.08,
-    _UseRim: 1,
-    _RimColor: [1, 0.75, 0.82, 0.42],
-    _RimBorder: 0.45,
-    _RimBlur: 0.55,
-    _OutlineWidth: 0.055,
-    _OutlineColor: [0.16, 0.06, 0.1, 1],
-  },
+	name: "Mochiya example",
+	renderMode: "opaque",
+	properties: {
+		_Color: [0.91, 0.35, 0.48, 1],
+		_UseShadow: 1,
+		_ShadowColor: [0.54, 0.2, 0.33, 1],
+		_Shadow2ndColor: [0.77, 0.28, 0.42, 1],
+		_ShadowBorder: 0.52,
+		_ShadowBlur: 0.08,
+		_UseRim: 1,
+		_RimColor: [1, 0.75, 0.82, 0.42],
+		_RimBorder: 0.45,
+		_RimBlur: 0.55,
+		_OutlineWidth: 0.055,
+		_OutlineColor: [0.16, 0.06, 0.1, 1],
+	},
 });
 const adapter = new LilToonRendererAdapter(renderer);
 material.setRendererAdapter(adapter);
@@ -82,12 +82,15 @@ hero.position.y = 1.3;
 hero.castShadow = true;
 hero.receiveShadow = true;
 const basePositions = hero.geometry.attributes.position;
-const morphPositions = new Float32BufferAttribute(basePositions.array.slice(), 3);
+const morphPositions = new Float32BufferAttribute(
+	basePositions.array.slice(),
+	3,
+);
 for (let index = 0; index < morphPositions.count; index += 1) {
-  const y = morphPositions.getY(index);
-  const factor = 1 + Math.max(0, y) * 0.12;
-  morphPositions.setX(index, morphPositions.getX(index) * factor);
-  morphPositions.setZ(index, morphPositions.getZ(index) * factor);
+	const y = morphPositions.getY(index);
+	const factor = 1 + Math.max(0, y) * 0.12;
+	morphPositions.setX(index, morphPositions.getX(index) * factor);
+	morphPositions.setZ(index, morphPositions.getZ(index) * factor);
 }
 hero.geometry.morphAttributes.position = [morphPositions];
 hero.updateMorphTargets();
@@ -100,71 +103,90 @@ floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
 scene.add(floor);
 function createSkinnedColumn() {
-  const segmentHeight = 0.75;
-  const segmentCount = 4;
-  const height = segmentHeight * segmentCount;
-  const halfHeight = height / 2;
-  const geometry = new CylinderGeometry(0.38, 0.52, height, 32, segmentCount * 3, true);
-  const position = geometry.attributes.position;
-  const skinIndices = [];
-  const skinWeights = [];
-  for (let index = 0; index < position.count; index += 1) {
-    const y = position.getY(index) + halfHeight;
-    const bone = Math.min(segmentCount - 1, Math.floor(y / segmentHeight));
-    const weight = Math.min(1, Math.max(0, (y - bone * segmentHeight) / segmentHeight));
-    skinIndices.push(bone, bone + 1, 0, 0);
-    skinWeights.push(1 - weight, weight, 0, 0);
-  }
-  geometry.setAttribute("skinIndex", new Uint16BufferAttribute(skinIndices, 4));
-  geometry.setAttribute("skinWeight", new Float32BufferAttribute(skinWeights, 4));
-  const bones = [];
-  for (let index = 0; index <= segmentCount; index += 1) {
-    const bone = new Bone();
-    bone.position.y = index === 0 ? -halfHeight : segmentHeight;
-    if (bones[index - 1]) bones[index - 1].add(bone);
-    bones.push(bone);
-  }
-  const skinMaterial = new LilToonMaterial({
-    name: "Skinned lilToon example",
-    properties: { ...material.lilToonProperties, _Color: [0.63, 0.72, 0.36, 1], _OutlineWidth: 0.04 },
-  }).setRendererAdapter(adapter);
-  const mesh = new SkinnedMesh(geometry, skinMaterial);
-  mesh.add(bones[0]);
-  mesh.bind(new Skeleton(bones));
-  mesh.position.set(-2.2, halfHeight, 0.5);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  new OutlinePass().attach(mesh, skinMaterial);
-  return { mesh, bones };
+	const segmentHeight = 0.75;
+	const segmentCount = 4;
+	const height = segmentHeight * segmentCount;
+	const halfHeight = height / 2;
+	const geometry = new CylinderGeometry(
+		0.38,
+		0.52,
+		height,
+		32,
+		segmentCount * 3,
+		true,
+	);
+	const position = geometry.attributes.position;
+	const skinIndices = [];
+	const skinWeights = [];
+	for (let index = 0; index < position.count; index += 1) {
+		const y = position.getY(index) + halfHeight;
+		const bone = Math.min(segmentCount - 1, Math.floor(y / segmentHeight));
+		const weight = Math.min(
+			1,
+			Math.max(0, (y - bone * segmentHeight) / segmentHeight),
+		);
+		skinIndices.push(bone, bone + 1, 0, 0);
+		skinWeights.push(1 - weight, weight, 0, 0);
+	}
+	geometry.setAttribute("skinIndex", new Uint16BufferAttribute(skinIndices, 4));
+	geometry.setAttribute(
+		"skinWeight",
+		new Float32BufferAttribute(skinWeights, 4),
+	);
+	const bones = [];
+	for (let index = 0; index <= segmentCount; index += 1) {
+		const bone = new Bone();
+		bone.position.y = index === 0 ? -halfHeight : segmentHeight;
+		if (bones[index - 1]) bones[index - 1].add(bone);
+		bones.push(bone);
+	}
+	const skinMaterial = new LilToonMaterial({
+		name: "Skinned lilToon example",
+		properties: {
+			...material.lilToonProperties,
+			_Color: [0.63, 0.72, 0.36, 1],
+			_OutlineWidth: 0.04,
+		},
+	}).setRendererAdapter(adapter);
+	const mesh = new SkinnedMesh(geometry, skinMaterial);
+	mesh.add(bones[0]);
+	mesh.bind(new Skeleton(bones));
+	mesh.position.set(-2.2, halfHeight, 0.5);
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	new OutlinePass().attach(mesh, skinMaterial);
+	return { mesh, bones };
 }
 const skinnedColumn = createSkinnedColumn();
 scene.add(skinnedColumn.mesh);
 
 let reported = false;
 function resize() {
-  renderer.setSize(innerWidth, innerHeight, false);
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth, innerHeight, false);
+	camera.aspect = innerWidth / innerHeight;
+	camera.updateProjectionMatrix();
 }
 addEventListener("resize", resize);
 resize();
 
 function frame(time) {
-  controls.update();
-  hero.rotation.y = time * 0.00022;
-  hero.morphTargetInfluences[0] = Math.sin(time * 0.0013) * 0.5 + 0.5;
-  skinnedColumn.bones[2].rotation.z = Math.sin(time * 0.0015) * 0.42;
-  skinnedColumn.bones[3].rotation.z = Math.cos(time * 0.0012) * 0.22;
-  adapter.render(scene, camera);
-  if (!reported && renderer.info.programs?.length) {
-    const error = context.getError();
-    reported = true;
-    const ok = error === context.NO_ERROR;
-    document.documentElement.dataset.renderStatus = ok ? "ok" : `gl-error-${error}`;
-    status.textContent = ok
-      ? `WebGL2 OK · static + morph + skin + outline · ${renderer.info.programs.length} programs`
-      : `WebGL error ${error}`;
-  }
-  requestAnimationFrame(frame);
+	controls.update();
+	hero.rotation.y = time * 0.00022;
+	hero.morphTargetInfluences[0] = Math.sin(time * 0.0013) * 0.5 + 0.5;
+	skinnedColumn.bones[2].rotation.z = Math.sin(time * 0.0015) * 0.42;
+	skinnedColumn.bones[3].rotation.z = Math.cos(time * 0.0012) * 0.22;
+	adapter.render(scene, camera);
+	if (!reported && renderer.info.programs?.length) {
+		const error = context.getError();
+		reported = true;
+		const ok = error === context.NO_ERROR;
+		document.documentElement.dataset.renderStatus = ok
+			? "ok"
+			: `gl-error-${error}`;
+		status.textContent = ok
+			? `WebGL2 OK · static + morph + skin + outline · ${renderer.info.programs.length} programs`
+			: `WebGL error ${error}`;
+	}
+	requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

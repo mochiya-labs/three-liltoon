@@ -26,9 +26,9 @@ npm install three https://github.com/zekailin00/three-liltoon.git
 ```ts
 import * as THREE from "three";
 import {
-  LilToonMaterial,
-  LilToonRendererAdapter,
-  OutlinePass,
+	LilToonMaterial,
+	LilToonRendererAdapter,
+	OutlinePass,
 } from "three-liltoon";
 
 const renderer = new THREE.WebGLRenderer();
@@ -36,16 +36,16 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 
 const material = new LilToonMaterial({
-  renderMode: "opaque", // opaque | cutout | transparent
-  properties: {
-    _Color: [0.91, 0.35, 0.48, 1],
-    _UseShadow: 1,
-    _UseRim: 1,
-    _OutlineWidth: 0.05,
-  },
-  textures: {
-    _MainTex: mainTexture,
-  },
+	renderMode: "opaque", // opaque | cutout | transparent
+	properties: {
+		_Color: [0.91, 0.35, 0.48, 1],
+		_UseShadow: 1,
+		_UseRim: 1,
+		_OutlineWidth: 0.05,
+	},
+	textures: {
+		_MainTex: mainTexture,
+	},
 });
 
 const mesh = new THREE.Mesh(geometry, material);
@@ -58,8 +58,8 @@ material.setRendererAdapter(adapter);
 new OutlinePass().attach(mesh, material);
 
 function frame() {
-  adapter.render(scene, camera);
-  requestAnimationFrame(frame);
+	adapter.render(scene, camera);
+	requestAnimationFrame(frame);
 }
 frame();
 ```
@@ -78,12 +78,15 @@ import { GLTFLilToonExtension, type LilToonWarning } from "three-liltoon/gltf";
 const adapter = new LilToonRendererAdapter(renderer);
 const loader = new GLTFLoader();
 const renderingWarnings: LilToonWarning[] = [];
-loader.register((parser) => new GLTFLilToonExtension(parser, {
-  rendererAdapter: adapter,
-  addOutlines: true,
-  configureShadowCasters: true,
-  onWarning: (warning) => renderingWarnings.push(warning), // optional frontend collection
-}));
+loader.register(
+	(parser) =>
+		new GLTFLilToonExtension(parser, {
+			rendererAdapter: adapter,
+			addOutlines: true,
+			configureShadowCasters: true,
+			onWarning: (warning) => renderingWarnings.push(warning), // optional frontend collection
+		}),
+);
 
 const gltf = await loader.loadAsync("/avatar.glb");
 scene.add(gltf.scene);
@@ -104,6 +107,8 @@ Direct material users can call `material.getWarnings()` and inspect `material.sh
 Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.liltoon-exporter`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
 ## Develop and verify
+
+Run `npm run format` after code changes and `npm run format:check` before submitting them. The checked-in Prettier settings also enable VS Code format-on-save; generated files and upstream sources are excluded.
 
 Initialize the pinned upstream source and ensure `dxc`, `spirv-cross`, `spirv-val`, and optionally `glslangValidator` are on `PATH` (or set their `*_PATH` environment variables).
 

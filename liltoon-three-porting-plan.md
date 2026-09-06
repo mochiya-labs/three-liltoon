@@ -1,4 +1,5 @@
 # lilToon → Three.js Porting Plan
+
 ## Untouched lilToon Submodule + DXC → SPIR-V → GLSL ES
 
 > **Purpose:** Technical implementation and maintenance guide for contributors building a Three.js port of lilToon while keeping the upstream lilToon source tree unmodified.
@@ -56,6 +57,8 @@ Build a reusable package that:
 
 All contributions must follow these rules.
 
+Formatting uses the repository's pinned Prettier and `.prettierrc`: tabs, double quotes, semicolons, trailing commas and automatic line-ending preservation. Run `npm run format` after editing code and `npm run format:check` before submitting it. The root configuration covers maintained source, tools, tests, documentation and examples; `.prettierignore` protects upstream sources, generated artifacts, lockfiles and local caches. VS Code uses the same configuration with format-on-save and four-column tab display. Generator output remains owned by its existing build tools.
+
 ## 2.1 Never modify the lilToon submodule
 
 Everything under:
@@ -67,6 +70,7 @@ vendor/liltoon/
 is read-only.
 
 Do not:
+
 - patch HLSL files in place
 - copy modified HLSL files back into the submodule
 - commit changes inside the submodule
@@ -93,6 +97,7 @@ docs/PORTING_EXCEPTIONS.md
 ```
 
 with:
+
 - original file/function
 - reason it cannot be compiled
 - replacement implementation
@@ -142,6 +147,7 @@ npm install @your-scope/liltoon-three
 and receive precompiled JavaScript/TypeScript declarations + generated GLSL.
 
 Consumers must **not** need:
+
 - DXC
 - Vulkan SDK
 - SPIRV-Cross
@@ -198,9 +204,9 @@ Example:
 
 ```json
 {
-  "peerDependencies": {
-    "three": ">=0.1xx"
-  }
+	"peerDependencies": {
+		"three": ">=0.1xx"
+	}
 }
 ```
 
@@ -401,8 +407,8 @@ and preferably:
 
 ```json
 {
-  "liltoonCommit": "...",
-  "liltoonVersion": "..."
+	"liltoonCommit": "...",
+	"liltoonVersion": "..."
 }
 ```
 
@@ -431,10 +437,12 @@ npm run test:parity
 ### Node.js
 
 Use:
+
 - Node.js 20+ or newer LTS
 - npm, pnpm, or yarn; pick one and commit the lockfile
 
 Recommended:
+
 - TypeScript
 - `tsx` for development scripts
 - `vitest` for unit/compiler tests
@@ -575,6 +583,7 @@ The build scripts should execute these commands rather than requiring developers
 ### SPIRV-Tools — recommended
 
 Use for:
+
 - validation
 - disassembly
 - debugging generated SPIR-V
@@ -614,17 +623,17 @@ Expose at least:
 
 ```json
 {
-  "scripts": {
-    "generate": "tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts",
-    "shaders:build": "tsx tools/shader-build/build-all.ts",
-    "shaders:clean": "rimraf shader/generated",
-    "shaders:rebuild": "npm run shaders:clean && npm run generate && npm run shaders:build",
-    "test": "vitest run",
-    "test:compiler": "vitest run test/compiler",
-    "test:parity": "tsx test/parity/run.ts",
-    "build": "npm run generate && npm run shaders:build && tsup",
-    "prepublishOnly": "npm run build && npm test"
-  }
+	"scripts": {
+		"generate": "tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts",
+		"shaders:build": "tsx tools/shader-build/build-all.ts",
+		"shaders:clean": "rimraf shader/generated",
+		"shaders:rebuild": "npm run shaders:clean && npm run generate && npm run shaders:build",
+		"test": "vitest run",
+		"test:compiler": "vitest run test/compiler",
+		"test:parity": "tsx test/parity/run.ts",
+		"build": "npm run generate && npm run shaders:build && tsup",
+		"prepublishOnly": "npm run build && npm test"
+	}
 }
 ```
 
@@ -660,6 +669,7 @@ ltspass_opaque.shader
 These are Unity ShaderLab containers.
 
 They mix:
+
 - `Properties`
 - `SubShader`
 - `Pass`
@@ -689,26 +699,26 @@ Extract:
 
 ```ts
 interface ShaderLabShader {
-  name: string;
-  properties: ShaderProperty[];
-  subShaders: ShaderLabSubShader[];
+	name: string;
+	properties: ShaderProperty[];
+	subShaders: ShaderLabSubShader[];
 }
 
 interface ShaderProperty {
-  name: string;
-  displayName?: string;
-  type: "Float" | "Int" | "Range" | "Color" | "Vector" | "2D" | "Cube" | string;
-  defaultValue: unknown;
-  attributes: string[];
+	name: string;
+	displayName?: string;
+	type: "Float" | "Int" | "Range" | "Color" | "Vector" | "2D" | "Cube" | string;
+	defaultValue: unknown;
+	attributes: string[];
 }
 
 interface ShaderLabPass {
-  name?: string;
-  tags: Record<string, string>;
-  renderState: ShaderRenderState;
-  defines: Record<string, string | boolean>;
-  pragmas: string[];
-  includes: string[];
+	name?: string;
+	tags: Record<string, string>;
+	renderState: ShaderRenderState;
+	defines: Record<string, string | boolean>;
+	pragmas: string[];
+	includes: string[];
 }
 ```
 
@@ -748,6 +758,7 @@ The public `LilToonMaterial` API should accept those names.
 These are especially important.
 
 They contain:
+
 - actual pass configuration
 - `LIL_FEATURE_*` defines
 - forward / forward-add / outline / shadowcaster pass definitions
@@ -757,6 +768,7 @@ They contain:
 Treat hidden pass shader files as **build recipes**.
 
 Extract:
+
 - pass name
 - pass type
 - compile-time defines
@@ -768,22 +780,22 @@ Generate a manifest such as:
 
 ```json
 {
-  "opaque": {
-    "passes": {
-      "forward": {
-        "defines": [
-          "LIL_PASS_FORWARD",
-          "LIL_FEATURE_SHADOW",
-          "LIL_FEATURE_NORMAL_1ST"
-        ],
-        "renderState": {
-          "cull": "_Cull",
-          "zWrite": "_ZWrite",
-          "zTest": "_ZTest"
-        }
-      }
-    }
-  }
+	"opaque": {
+		"passes": {
+			"forward": {
+				"defines": [
+					"LIL_PASS_FORWARD",
+					"LIL_FEATURE_SHADOW",
+					"LIL_FEATURE_NORMAL_1ST"
+				],
+				"renderState": {
+					"cull": "_Cull",
+					"zWrite": "_ZWrite",
+					"zTest": "_ZTest"
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -819,6 +831,7 @@ It must define/implement enough of the expected API for the unchanged common/pas
 Study BRP first because it is conceptually closest to traditional forward Three.js rendering.
 
 `lil_pipeline_brp.hlsl` includes Unity-specific headers such as:
+
 - `UnityCG.cginc`
 - `AutoLight.cginc`
 - `Lighting.cginc`
@@ -831,6 +844,7 @@ Those cannot be available on the web.
 Replace **renderer abstraction**, not lilToon shading.
 
 `lil_pipeline_web.hlsl` should provide:
+
 - matrix conventions
 - object/world/view/clip transforms
 - camera access
@@ -884,6 +898,7 @@ This is the high-value shader core.
 Do not translate manually.
 
 Responsibilities include:
+
 - material inputs
 - feature macros
 - texture inputs
@@ -968,6 +983,7 @@ LIL_PASS_FORWARD
 opaque material.
 
 Then:
+
 - cutout
 - transparency
 - outline
@@ -989,6 +1005,7 @@ First release option:
 - make lilToon alpha/cutout masks available to a custom depth material where required
 
 Later:
+
 - compile upstream shadowcaster HLSL
 - integrate via `customDepthMaterial` / `customDistanceMaterial`
 - support lilToon-specific alpha/discard/dissolve behavior
@@ -1022,6 +1039,7 @@ src/passes/OutlinePass.ts
 Do not merge outline into one fragment shader.
 
 The outline pass needs its own:
+
 - culling
 - depth state
 - stencil state
@@ -1143,6 +1161,7 @@ Separate variant/pass.
 Port after standard forward features.
 
 Determine all required:
+
 - view vectors
 - environment/reflection data
 - special texture inputs
@@ -1167,6 +1186,7 @@ and related defines.
 Not part of baseline Three.js port.
 
 Feature flags should be parsed but either:
+
 - disabled
 - mapped to a neutral fallback
 - explicitly reported unsupported
@@ -1184,6 +1204,7 @@ Attempt to compile unchanged.
 This is a likely renderer-integration hotspot.
 
 If it references Unity lighting macros/types:
+
 - provide those through `lil_pipeline_web.hlsl`
 - implement web light data structures
 - adapt Three lights to those structures
@@ -1214,6 +1235,7 @@ lilRenderPipelineReader.cs
 ```
 
 Use these to understand:
+
 - property semantics
 - feature toggles
 - variant generation
@@ -1225,6 +1247,7 @@ Use these to understand:
 ### Do not port Unity editor UI
 
 Do not reimplement:
+
 - inspector GUI
 - Unity asset database
 - Unity importer code
@@ -1241,6 +1264,7 @@ If feature compilation logic is encoded only in C#, implement an equivalent **bu
 ### Treatment
 
 Inspect for:
+
 - generated shader templates
 - source fragments
 - shader container templates
@@ -1261,6 +1285,7 @@ If they are only used by Unity-side shader generation, treat them as build/refer
 Do not package all textures blindly.
 
 Identify lilToon default/runtime-required textures, for example:
+
 - noise
 - tangent helpers
 - default gradients
@@ -1268,6 +1293,7 @@ Identify lilToon default/runtime-required textures, for example:
 - shape textures
 
 For each:
+
 1. determine whether it is actually required at runtime
 2. determine licensing from upstream notices
 3. either bundle it under `dist/assets/` or replace it with programmatically generated neutral textures where semantically safe
@@ -1294,6 +1320,7 @@ tools/shader-build/
 ### A. Unity type/macro compatibility
 
 Implement aliases for symbols such as:
+
 - transform helpers
 - saturate/lerp/etc. only if required
 - texture/sampler declaration macros
@@ -1329,6 +1356,7 @@ The TypeScript runtime populates the ABI.
 ### C. Vertex attributes
 
 Define stable locations/semantics for:
+
 - POSITION
 - NORMAL
 - TANGENT
@@ -1359,6 +1387,7 @@ Generate runtime uniform metadata from reflection.
 Generated ESSL must compile under WebGL2.
 
 Validate:
+
 - vertex shader precision
 - fragment shader precision
 - integer precision
@@ -1367,6 +1396,7 @@ Validate:
 Insert required precision declarations in a deterministic post-generation step if SPIRV-Cross does not emit suitable ones.
 
 Generated-source postprocessing is allowed if it is:
+
 - deterministic
 - isolated in `tools/shader-build`
 - tested
@@ -1390,6 +1420,7 @@ shader/compat/lil_web_*.hlsl
 ## 10.1 Camera
 
 Expose:
+
 - camera position
 - view matrix
 - projection matrix
@@ -1404,6 +1435,7 @@ Update per camera/render.
 ## 10.2 Object transforms
 
 Expose:
+
 - model matrix
 - model-view matrix
 - normal transform
@@ -1420,7 +1452,7 @@ Start with one supported main directional light.
 Map Three:
 
 ```ts
-THREE.DirectionalLight
+THREE.DirectionalLight;
 ```
 
 to a web lilToon light ABI:
@@ -1461,6 +1493,7 @@ Map Three scene/environment data to the closest lilToon/OpenLit inputs.
 Start with explicit uniform ambient color.
 
 Later support:
+
 - hemisphere approximation
 - spherical harmonics
 - environment map contribution
@@ -1492,6 +1525,7 @@ shader/compat/lil_web_shadow.hlsl
 The runtime obtains shadow camera/matrix/texture data from Three.
 
 First target:
+
 - directional shadow map
 - one cascade or non-cascaded shadow
 
@@ -1506,6 +1540,7 @@ Avoid coupling generated shader code to undocumented Three internal variable nam
 ## 10.7 Fog
 
 Map:
+
 - `THREE.Fog`
 - `THREE.FogExp2`
 
@@ -1518,6 +1553,7 @@ No fog support in first compiler milestone is acceptable, but shader compile mus
 ## 10.8 Reflection/environment
 
 Map:
+
 - `scene.environment`
 - cubemap/equirectangular environment after Three preprocessing
 
@@ -1538,6 +1574,7 @@ uTime
 ```
 
 for:
+
 - UV animation
 - emission animation
 - blink
@@ -1554,6 +1591,7 @@ Do not make stereo assumptions in the shader core.
 Three will render per eye.
 
 Ensure:
+
 - camera matrices update per eye
 - view-dependent effects (MatCap/rim/parallax) use the active eye camera
 - no single global camera position is cached across both eyes
@@ -1589,9 +1627,9 @@ Cull Back
 Three:
 
 ```ts
-THREE.DoubleSide
-THREE.BackSide
-THREE.FrontSide
+THREE.DoubleSide;
+THREE.BackSide;
+THREE.FrontSide;
 ```
 
 Verify orientation carefully because naming semantics differ by which faces are rendered vs culled.
@@ -1611,7 +1649,7 @@ ZWrite On/Off
 Three:
 
 ```ts
-material.depthWrite
+material.depthWrite;
 ```
 
 ---
@@ -1623,6 +1661,7 @@ Map Unity compare functions to Three depth functions.
 Implement full enum table rather than hardcoding `LEqual`.
 
 Example Three constants include:
+
 - `NeverDepth`
 - `AlwaysDepth`
 - `LessDepth`
@@ -1642,12 +1681,12 @@ Set:
 
 ```ts
 material.blending = THREE.CustomBlending;
-material.blendSrc
-material.blendDst
-material.blendEquation
-material.blendSrcAlpha
-material.blendDstAlpha
-material.blendEquationAlpha
+material.blendSrc;
+material.blendDst;
+material.blendEquation;
+material.blendSrcAlpha;
+material.blendDstAlpha;
+material.blendEquationAlpha;
 ```
 
 Create explicit Unity → Three enum maps.
@@ -1661,6 +1700,7 @@ Use lilToon's ShaderLab defaults and Unity enum definitions as specification.
 ## 11.5 Stencil
 
 Map:
+
 - reference
 - read mask
 - write mask
@@ -1686,9 +1726,9 @@ Offset factor, units
 Three:
 
 ```ts
-polygonOffset = true
-polygonOffsetFactor
-polygonOffsetUnits
+polygonOffset = true;
+polygonOffsetFactor;
+polygonOffsetUnits;
 ```
 
 ---
@@ -1700,6 +1740,7 @@ Three does not expose every Unity-style per-channel color mask at the ordinary M
 Investigate WebGLRenderer capabilities.
 
 If exact mapping is unavailable:
+
 - either add controlled renderer-state integration
 - or mark uncommon masks partially supported
 
@@ -1722,6 +1763,7 @@ Otherwise expose a diagnostic.
 Unity queue cannot map one-to-one to Three.
 
 Map approximately through:
+
 - `transparent`
 - `renderOrder`
 - object sorting
@@ -1748,17 +1790,17 @@ Example generated structure:
 
 ```ts
 export interface LilToonPropertySchema {
-  _Color: {
-    type: "Color";
-    default: [1, 1, 1, 1];
-  };
-  _MainTex: {
-    type: "Texture2D";
-  };
-  _UseShadow: {
-    type: "Int";
-    default: 0;
-  };
+	_Color: {
+		type: "Color";
+		default: [1, 1, 1, 1];
+	};
+	_MainTex: {
+		type: "Texture2D";
+	};
+	_UseShadow: {
+		type: "Int";
+		default: 0;
+	};
 }
 ```
 
@@ -1766,10 +1808,10 @@ Runtime public API can expose:
 
 ```ts
 const material = new LilToonMaterial({
-  _Color: new THREE.Color(1, 1, 1),
-  _MainTex: texture,
-  _UseShadow: 1,
-  _ShadowBorder: 0.5,
+	_Color: new THREE.Color(1, 1, 1),
+	_MainTex: texture,
+	_UseShadow: 1,
+	_ShadowBorder: 0.5,
 });
 ```
 
@@ -1793,22 +1835,22 @@ Given material properties, derive compile-time feature set:
 
 ```ts
 interface LilToonFeatureSet {
-  main2nd: boolean;
-  main3rd: boolean;
-  shadow: boolean;
-  shadow3rd: boolean;
-  normal1st: boolean;
-  normal2nd: boolean;
-  matcap: boolean;
-  matcap2nd: boolean;
-  rim: boolean;
-  emission1st: boolean;
-  emission2nd: boolean;
-  reflection: boolean;
-  glitter: boolean;
-  backlight: boolean;
-  outline: boolean;
-  // ...
+	main2nd: boolean;
+	main3rd: boolean;
+	shadow: boolean;
+	shadow3rd: boolean;
+	normal1st: boolean;
+	normal2nd: boolean;
+	matcap: boolean;
+	matcap2nd: boolean;
+	rim: boolean;
+	emission1st: boolean;
+	emission2nd: boolean;
+	reflection: boolean;
+	glitter: boolean;
+	backlight: boolean;
+	outline: boolean;
+	// ...
 }
 ```
 
@@ -1852,11 +1894,11 @@ Manifest example:
 
 ```json
 {
-  "variantKey": "forward:opaque:0x000128af",
-  "vertexShader": "forward-91f04a.vert.glsl",
-  "fragmentShader": "forward-91f04a.frag.glsl",
-  "requiredUniforms": [],
-  "requiredTextures": []
+	"variantKey": "forward:opaque:0x000128af",
+	"vertexShader": "forward-91f04a.vert.glsl",
+	"fragmentShader": "forward-91f04a.frag.glsl",
+	"requiredUniforms": [],
+	"requiredTextures": []
 }
 ```
 
@@ -1913,15 +1955,15 @@ For every generated shader keep metadata:
 
 ```json
 {
-  "pass": "forward",
-  "renderMode": "opaque",
-  "variant": "...",
-  "sourceLilToonCommit": "...",
-  "dxcVersion": "...",
-  "spirvCrossVersion": "...",
-  "sourceIncludes": [],
-  "defines": [],
-  "reflection": {}
+	"pass": "forward",
+	"renderMode": "opaque",
+	"variant": "...",
+	"sourceLilToonCommit": "...",
+	"dxcVersion": "...",
+	"spirvCrossVersion": "...",
+	"sourceIncludes": [],
+	"defines": [],
+	"reflection": {}
 }
 ```
 
@@ -1940,7 +1982,7 @@ src/material/LilToonMaterial.ts
 For WebGLRenderer it should use or wrap:
 
 ```ts
-THREE.RawShaderMaterial
+THREE.RawShaderMaterial;
 ```
 
 `RawShaderMaterial` is preferred because Three does not automatically prepend the normal ShaderMaterial built-ins.
@@ -1952,6 +1994,7 @@ Do not make generated shaders depend on Three's private GLSL chunks.
 ## 15.1 Material responsibilities
 
 `LilToonMaterial` should own:
+
 - lilToon property values
 - texture assignments
 - render mode
@@ -1962,6 +2005,7 @@ Do not make generated shaders depend on Three's private GLSL chunks.
 - dirty flags
 
 It should not own:
+
 - global renderer lighting
 - global shadow render targets
 - scene framebuffer capture
@@ -1975,14 +2019,14 @@ Those belong in renderer/pass adapters.
 
 ```ts
 const material = new LilToonMaterial({
-  properties: {
-    _Color: [1, 1, 1, 1],
-    _UseShadow: 1,
-    _ShadowBorder: 0.5,
-  },
-  textures: {
-    _MainTex: mainTexture,
-  },
+	properties: {
+		_Color: [1, 1, 1, 1],
+		_UseShadow: 1,
+		_ShadowBorder: 0.5,
+	},
+	textures: {
+		_MainTex: mainTexture,
+	},
 });
 ```
 
@@ -2037,18 +2081,21 @@ Because this port uses raw generated shaders, implement the required vertex defo
 ## Phase 1
 
 Support:
+
 - static mesh
 - skinned mesh
 
 ## Phase 2
 
 Support:
+
 - morph targets
 - morph normals if needed
 
 ## Approach
 
 Prefer a web compatibility implementation matching Three's CPU-provided data:
+
 - bone texture or bone matrices
 - skin indices
 - skin weights
@@ -2083,6 +2130,7 @@ Create a material-loader normalization layer.
 ## Color space
 
 At minimum classify:
+
 - color textures: sRGB
 - data/mask/normal textures: linear/non-color
 
@@ -2101,6 +2149,7 @@ Do not initially attempt every Unity lighting feature.
 Define controlled reference conditions.
 
 Baseline reference scene:
+
 - one directional light
 - fixed ambient light
 - fixed camera
@@ -2124,6 +2173,7 @@ Cross-engine visual differences should be isolated feature by feature.
 ## Phase 0 — repository and toolchain
 
 Deliver:
+
 - repo scaffold
 - lilToon submodule
 - Node build scripts
@@ -2133,6 +2183,7 @@ Deliver:
 - CI setup
 
 Acceptance:
+
 - `npm run shaders:build` can compile a trivial local HLSL vertex/fragment shader through DXC → SPIR-V → GLSL ES
 - generated GLSL compiles in a headless/browser WebGL2 test
 
@@ -2141,10 +2192,12 @@ Acceptance:
 ## Phase 1 — ShaderLab parser
 
 Support constructs present in:
+
 - `lts.shader`
 - `ltspass_opaque.shader`
 
 Parse:
+
 - properties
 - defaults
 - attributes
@@ -2158,6 +2211,7 @@ Parse:
 - `UsePass`
 
 Acceptance:
+
 - snapshot tests of extracted material schema
 - snapshot tests of opaque pass recipe
 - no Unity runtime required
@@ -2169,11 +2223,13 @@ Acceptance:
 Goal:
 
 Compile an upstream standard forward shader using:
+
 - original `lil_common*.hlsl`
 - original `lil_pass_forward*.hlsl`
 - local web pipeline compatibility layer
 
 Start with:
+
 - static mesh
 - opaque
 - one directional light
@@ -2183,6 +2239,7 @@ Start with:
 Create minimal neutral definitions for unsupported Unity systems.
 
 Acceptance:
+
 - DXC produces valid SPIR-V
 - `spirv-val` passes
 - SPIRV-Cross emits GLSL ES 300
@@ -2194,6 +2251,7 @@ Acceptance:
 ## Phase 3 — main texture + base color
 
 Enable:
+
 - `_MainTex`
 - `_Color`
 - UV0
@@ -2201,6 +2259,7 @@ Enable:
 - alpha result for opaque path
 
 Acceptance:
+
 - Unity and Three base-color reference scenes visually agree within chosen diff threshold
 
 ---
@@ -2229,6 +2288,7 @@ Do not enable the next feature before the previous one has a stable test.
 ## Phase 5 — appearance effects
 
 Enable:
+
 - reflection/specular
 - MatCap
 - MatCap2nd
@@ -2249,12 +2309,14 @@ Update `FEATURE_MATRIX.md`.
 ## Phase 6 — skinned avatars and morphs
 
 Implement:
+
 - `THREE.SkinnedMesh`
 - bone matrices/bone texture
 - skinning
 - morph targets
 
 Acceptance:
+
 - animated skinned reference avatar
 - no frame-to-frame shader artifacts
 - outline follows deformation
@@ -2265,6 +2327,7 @@ Acceptance:
 ## Phase 7 — cutout and transparency
 
 Implement:
+
 - alpha cutoff
 - alpha masks
 - transparent blend state
@@ -2273,6 +2336,7 @@ Implement:
 - optional prepass if required
 
 Parity-test:
+
 - hair
 - eyelashes
 - semitransparent clothing
@@ -2283,6 +2347,7 @@ Parity-test:
 ## Phase 8 — shadows
 
 Implement:
+
 - receive directional shadow
 - cast shadow with lilToon alpha/cutout behavior
 - bias/normal-bias mappings
@@ -2295,6 +2360,7 @@ Do not require exact Unity shadow filtering; require stable comparable appearanc
 ## Phase 9 — outline
 
 Implement:
+
 - second draw/pass
 - upstream outline vertex HLSL where possible
 - outline color
@@ -2305,6 +2371,7 @@ Implement:
 - cull/depth/stencil states
 
 Test on:
+
 - smooth mesh
 - hard-edge mesh
 - skinned avatar
@@ -2329,21 +2396,21 @@ Example:
 
 ```json
 {
-  "extensions": {
-    "MOCHIYA_materials_liltoon": {
-      "lilToonVersion": 45,
-      "shaderVariant": "lilToon",
-      "properties": {
-        "_UseShadow": 1,
-        "_ShadowBorder": 0.5
-      },
-      "textures": {
-        "_MainTex": {
-          "index": 3
-        }
-      }
-    }
-  }
+	"extensions": {
+		"MOCHIYA_materials_liltoon": {
+			"lilToonVersion": 45,
+			"shaderVariant": "lilToon",
+			"properties": {
+				"_UseShadow": 1,
+				"_ShadowBorder": 0.5
+			},
+			"textures": {
+				"_MainTex": {
+					"index": 3
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -2356,6 +2423,7 @@ src/loaders/GLTFLilToonExtension.ts
 Register using `GLTFLoader.register(...)`.
 
 The loader:
+
 1. reads extension data
 2. loads referenced textures
 3. creates `LilToonMaterial`
@@ -2372,18 +2440,23 @@ VRM can carry the extension alongside standard VRM/glTF data.
 Implement independently:
 
 ### Refraction
+
 Requires scene color texture/pass manager.
 
 ### Gem
+
 Requires dedicated shader/pass integration.
 
 ### Fur
+
 Requires shell/layer rendering strategy.
 
 ### FakeShadow
+
 Implement only if valuable.
 
 ### Tessellation
+
 Remain unsupported in WebGL2 unless a geometry preprocessing fallback is implemented.
 
 ---
@@ -2401,6 +2474,7 @@ unity-exporter/
 ```
 
 Responsibilities:
+
 - inspect Unity `Material`
 - verify shader is lilToon
 - read all serialized properties/textures
@@ -2428,25 +2502,25 @@ Basic conceptual usage:
 ```ts
 import * as THREE from "three";
 import {
-  LilToonMaterial,
-  LilToonRendererAdapter,
+	LilToonMaterial,
+	LilToonRendererAdapter,
 } from "@your-scope/liltoon-three";
 
 const renderer = new THREE.WebGLRenderer({
-  antialias: true,
+	antialias: true,
 });
 
 const adapter = new LilToonRendererAdapter(renderer);
 
 const material = new LilToonMaterial({
-  properties: {
-    _Color: [1, 1, 1, 1],
-    _UseShadow: 1,
-    _ShadowBorder: 0.5,
-  },
-  textures: {
-    _MainTex: mainTexture,
-  },
+	properties: {
+		_Color: [1, 1, 1, 1],
+		_UseShadow: 1,
+		_ShadowBorder: 0.5,
+	},
+	textures: {
+		_MainTex: mainTexture,
+	},
 });
 
 const mesh = new THREE.Mesh(geometry, material);
@@ -2455,6 +2529,7 @@ adapter.attach(scene);
 ```
 
 The final API may differ, but consumer code must not know:
+
 - DXC
 - SPIR-V
 - SPIRV-Cross
@@ -2473,9 +2548,9 @@ Recommended consumer flow:
 const loader = new GLTFLoader();
 
 loader.register((parser) => {
-  return new GLTFLilToonExtension(parser, {
-    rendererAdapter,
-  });
+	return new GLTFLilToonExtension(parser, {
+		rendererAdapter,
+	});
 });
 
 const gltf = await loader.loadAsync("/avatar.vrm");
@@ -2483,6 +2558,7 @@ scene.add(gltf.scene);
 ```
 
 The extension should degrade gracefully:
+
 - if custom lilToon extension exists: use `LilToonMaterial`
 - if absent: leave normal glTF material untouched
 
@@ -2534,11 +2610,13 @@ export const forwardVertex = `...`;
 ```
 
 Pros:
+
 - simplest consumer setup
 - no asset URL resolution
 - works with Vite/Next.js/Webpack
 
 Cons:
+
 - increases JS bundle size
 
 ### Option B — shader files as package assets
@@ -2557,13 +2635,13 @@ If the full shader library becomes large, publish subpath exports:
 
 ```json
 {
-  "exports": {
-    ".": "./dist/index.js",
-    "./core": "./dist/core.js",
-    "./outline": "./dist/outline.js",
-    "./fur": "./dist/fur.js",
-    "./gltf": "./dist/gltf.js"
-  }
+	"exports": {
+		".": "./dist/index.js",
+		"./core": "./dist/core.js",
+		"./outline": "./dist/outline.js",
+		"./fur": "./dist/fur.js",
+		"./gltf": "./dist/gltf.js"
+	}
 }
 ```
 
@@ -2590,6 +2668,7 @@ README wording should say:
 > An unofficial Three.js/WebGL port/integration that cross-compiles portions of the upstream lilToon shader.
 
 Include:
+
 - supported lilToon version/commit
 - supported Three.js versions
 - feature matrix
@@ -2616,11 +2695,11 @@ Generated metadata:
 
 ```ts
 export const compatibility = {
-  packageVersion: "0.3.0",
-  lilToonCommit: "...",
-  lilToonVersion: "...",
-  threeMin: "...",
-  threeMaxTested: "...",
+	packageVersion: "0.3.0",
+	lilToonCommit: "...",
+	lilToonVersion: "...",
+	threeMin: "...",
+	threeMaxTested: "...",
 };
 ```
 
@@ -2635,12 +2714,14 @@ Upstream lilToon is MIT licensed.
 The MIT notice must remain with copies/substantial portions of upstream software.
 
 The repository/package must include:
+
 - lilToon MIT license notice
 - required notices from `Assets/lilToon/Third Party Notices.md`
 - Three.js license if Three code is copied rather than merely peer-depended on
 - SPIRV-Cross/DXC notices if binaries/source are redistributed
 
 Preferred model:
+
 - do NOT publish DXC/SPIRV-Cross binaries in the npm runtime package
 - use them only in CI/development
 - do NOT vendor Three runtime source
@@ -2679,6 +2760,7 @@ Fail if generated output differs from committed/generated expected output, depen
 ## Unit tests
 
 Test:
+
 - ShaderLab properties
 - default parsing
 - blend mapping
@@ -2697,6 +2779,7 @@ Test:
 Use Playwright or similar.
 
 Create WebGL2 canvas and:
+
 - compile all shipped GLSL programs
 - link all programs
 - render basic fixtures
@@ -2704,6 +2787,7 @@ Create WebGL2 canvas and:
 - check shader error logs
 
 Test at least:
+
 - Chromium
 - Firefox
 
@@ -2720,6 +2804,7 @@ Compilation success does not mean visual correctness.
 ## Reference process
 
 For each feature:
+
 1. create a Unity scene using upstream lilToon
 2. fixed mesh
 3. fixed textures
@@ -2732,6 +2817,7 @@ For each feature:
 Three test renders the same fixture.
 
 Compare:
+
 - RMS error
 - SSIM/perceptual metric if useful
 - diff image
@@ -2882,6 +2968,7 @@ Three.js internals evolve.
 Minimize dependence on private classes/fields.
 
 Prefer:
+
 - public `RawShaderMaterial`
 - public material render-state properties
 - public camera/object matrices
@@ -2895,6 +2982,7 @@ src/renderer/three-internals/
 ```
 
 with:
+
 - exact Three version tests
 - comments
 - compatibility adapter
@@ -2916,6 +3004,7 @@ Lower code volume, potentially more brittle.
 More code, more stable shader ABI.
 
 Preferred:
+
 - normal opaque/cutout rendering: ordinary Three rendering
 - outline: package-owned second pass/material
 - refraction: package-owned scene-color pass
@@ -2931,6 +3020,7 @@ Do not attempt to feed a whole `.shader` file to DXC.
 Each generated shader stage gets an entry wrapper.
 
 The wrapper must:
+
 1. set pass defines
 2. set render-mode defines
 3. set supported feature defines
@@ -2964,6 +3054,7 @@ Output:
 These are debugging artifacts only.
 
 This makes it possible to determine whether errors originate from:
+
 - feature defines
 - include order
 - Unity symbols
@@ -2986,6 +3077,7 @@ unknown lighting helper
 ```
 
 Action:
+
 - implement compatibility definition in `shader/compat`
 - add unit/compiler test
 - do NOT modify vendor
@@ -2993,11 +3085,13 @@ Action:
 ## Category 2 — unsupported Unity resource
 
 Examples:
+
 - reflection probe array
 - light probe volume
 - grab pass texture
 
 Action:
+
 - add explicit web ABI
 - implement TypeScript renderer binding
 - provide neutral fallback until feature phase
@@ -3005,6 +3099,7 @@ Action:
 ## Category 3 — language feature unsupported by target SPIR-V/ESSL
 
 Action:
+
 - investigate DXC flag/target
 - determine whether feature is actually necessary
 - isolate a generated compatibility transform
@@ -3013,16 +3108,19 @@ Action:
 ## Category 4 — unsupported graphics pipeline stage
 
 Examples:
+
 - tessellation
 - geometry shader
 
 Action:
+
 - mark unsupported or implement alternative rendering architecture
 - do not fake cross-compilation
 
 ## Category 5 — SPIRV-Cross generated GLSL rejected by WebGL2
 
 Action:
+
 - minimize reproduction
 - inspect SPIR-V
 - adjust HLSL compatibility/input layout
@@ -3072,6 +3170,7 @@ CHANGELOG.md
 ```
 
 Optional:
+
 - prebuilt demo site
 - example VRM/glTF asset with redistribution permission
 
@@ -3093,17 +3192,17 @@ Example:
 
 ```json
 {
-  "dxc": {
-    "version": "<pinned release>",
-    "sha256": {
-      "linux-x64": "...",
-      "macos-arm64": "...",
-      "windows-x64": "..."
-    }
-  },
-  "spirvCross": {
-    "version": "<pinned commit/release>"
-  }
+	"dxc": {
+		"version": "<pinned release>",
+		"sha256": {
+			"linux-x64": "...",
+			"macos-arm64": "...",
+			"windows-x64": "..."
+		}
+	},
+	"spirvCross": {
+		"version": "<pinned commit/release>"
+	}
 }
 ```
 
@@ -3122,6 +3221,7 @@ npm run tools:setup
 ```
 
 The script:
+
 1. detects OS/arch
 2. downloads or locates pinned DXC
 3. downloads/builds or locates pinned SPIRV-Cross
@@ -3322,6 +3422,7 @@ WebGPU integration
 ```
 
 The WebGPU renderer adapter should implement the same conceptual:
+
 - material schema
 - light ABI
 - camera ABI
@@ -3340,6 +3441,7 @@ The point of this architecture is that lilToon stays the source dependency.
 ## Risk: lilToon common HLSL has more Unity coupling than expected
 
 Mitigation:
+
 - compatibility headers
 - neutral stubs for unsupported systems
 - compile one feature set at a time
@@ -3348,6 +3450,7 @@ Mitigation:
 ## Risk: shader variant explosion
 
 Mitigation:
+
 - broad super-variants first
 - feature-specialized variants only after profiling
 - manifest + hash-based program cache
@@ -3355,18 +3458,21 @@ Mitigation:
 ## Risk: Three shadow internals are difficult to reuse
 
 Mitigation:
+
 - own shadow inputs/pass where needed
 - maintain stable package shader ABI
 
 ## Risk: raw shader skinning integration
 
 Mitigation:
+
 - explicit bone/morph ABI
 - dedicated animated avatar tests
 
 ## Risk: generated GLSL varies by compiler version
 
 Mitigation:
+
 - pin DXC and SPIRV-Cross
 - reproducible builds
 - snapshot generated metadata
@@ -3374,6 +3480,7 @@ Mitigation:
 ## Risk: Unity and Three lighting cannot be pixel identical
 
 Mitigation:
+
 - controlled parity scenes
 - semantic/visual parity target
 - document renderer-specific differences
@@ -3419,6 +3526,7 @@ A complete implementation includes:
 ## `docs/ARCHITECTURE.md`
 
 Explain:
+
 - compiler flow
 - compatibility ABI
 - renderer integration

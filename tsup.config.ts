@@ -1,17 +1,17 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: {
-    index: "src/index.ts",
-    gltf: "src/gltf.ts",
-  },
-  format: ["esm"],
-  dts: true,
-  clean: true,
-  // Keep the checked-in runtime package minimal for the deployable viewer.
-  sourcemap: false,
-  splitting: true,
-  // Three.js is a peer dependency, including its examples/addons entrypoints.
-  external: ["three", /^three\//],
-  treeshake: true,
+	entry: {
+		index: "src/index.ts",
+		gltf: "src/gltf.ts",
+	},
+	format: ["esm"],
+	dts: true,
+	clean: true,
+	// Keep the checked-in runtime package minimal for the deployable viewer.
+	sourcemap: false,
+	splitting: true,
+	// Three.js is a peer dependency, including its examples/addons entrypoints.
+	external: ["three", /^three\//],
+	treeshake: true,
 });

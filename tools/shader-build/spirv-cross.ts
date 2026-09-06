@@ -3,76 +3,101 @@ import { readFileSync, writeFileSync } from "node:fs";
 import type { ShaderStage } from "./types.js";
 
 function postprocessGlsl(source: string, stage: ShaderStage): string {
-  let output = source;
-  if (!/precision\s+(?:lowp|mediump|highp)\s+float/.test(output)) {
-    output = output.replace("#version 300 es", "#version 300 es\nprecision highp float;\nprecision highp int;");
-  }
-  output = output.replace(
-    /SPIRV_Cross_Combined_(_[A-Za-z0-9_]+)sampler\1/g,
-    "$1",
-  );
-  if (stage === "vertex") {
-    const attributes: Record<string, string> = {
-      in_var_POSITION: "position",
-      in_var_NORMAL: "normal",
-      in_var_TANGENT: "tangent",
-      in_var_COLOR: "color",
-      in_var_TEXCOORD0: "uv",
-      in_var_TEXCOORD1: "uv1",
-      in_var_TEXCOORD2: "uv2",
-      in_var_TEXCOORD3: "uv3",
-      in_var_BLENDINDICES: "skinIndex",
-      in_var_BLENDWEIGHT: "skinWeight",
-    };
-    for (const [generated, three] of Object.entries(attributes)) {
-      output = output.replace(new RegExp(`\\b${generated}\\b`, "g"), three);
-    }
-  } else {
-    // SPIRV-Cross names stage outputs and inputs independently. WebGL2 links
-    // varyings by name (location qualifiers are not available until later
-    // ESSL versions), so make fragment inputs use the vertex-stage names.
-    output = output.replace(/\bin_var_/g, "out_var_");
-  }
+	let output = source;
+	if (!/precision\s+(?:lowp|mediump|highp)\s+float/.test(output)) {
+		output = output.replace(
+			"#version 300 es",
+			"#version 300 es\nprecision highp float;\nprecision highp int;",
+		);
+	}
+	output = output.replace(
+		/SPIRV_Cross_Combined_(_[A-Za-z0-9_]+)sampler\1/g,
+		"$1",
+	);
+	if (stage === "vertex") {
+		const attributes: Record<string, string> = {
+			in_var_POSITION: "position",
+			in_var_NORMAL: "normal",
+			in_var_TANGENT: "tangent",
+			in_var_COLOR: "color",
+			in_var_TEXCOORD0: "uv",
+			in_var_TEXCOORD1: "uv1",
+			in_var_TEXCOORD2: "uv2",
+			in_var_TEXCOORD3: "uv3",
+			in_var_BLENDINDICES: "skinIndex",
+			in_var_BLENDWEIGHT: "skinWeight",
+		};
+		for (const [generated, three] of Object.entries(attributes)) {
+			output = output.replace(new RegExp(`\\b${generated}\\b`, "g"), three);
+		}
+	} else {
+		// SPIRV-Cross names stage outputs and inputs independently. WebGL2 links
+		// varyings by name (location qualifiers are not available until later
+		// ESSL versions), so make fragment inputs use the vertex-stage names.
+		output = output.replace(/\bin_var_/g, "out_var_");
+	}
 
-  // DXC emits a dummy combined sampler for texture-size queries even when the
-  // same texture is already sampled through a real sampler. WebGL counts both
-  // uniforms against the per-stage texture-unit limit. Reuse the real combined
-  // sampler for that texture; textureSize works with it and no sampling state
-  // changes. Keep a dummy binding when no real sampler exists (bone/morph data).
-  const samplerUniformPattern = /uniform\s+(?:lowp\s+|mediump\s+|highp\s+)?sampler(?:2D|2DArray|Cube|2DShadow)\s+(SPIRV_Cross_Combined[A-Za-z0-9_]+)\s*;/g;
-  const samplerUniforms = [...output.matchAll(samplerUniformPattern)].map((match) => match[1]!);
-  for (const dummy of samplerUniforms.filter((name) => name.endsWith("SPIRV_Cross_DummySampler"))) {
-    const texturePrefix = dummy.slice(0, -"SPIRV_Cross_DummySampler".length);
-    const real = samplerUniforms.find((name) => name !== dummy && name.startsWith(texturePrefix));
-    if (real) output = output.replace(new RegExp(`\\b${dummy}\\b`, "g"), real);
-  }
-  const seenSamplerUniforms = new Set<string>();
-  output = output
-    .split("\n")
-    .filter((line) => {
-      if (!/^uniform\s+(?:lowp\s+|mediump\s+|highp\s+)?sampler/.test(line)) return true;
-      if (seenSamplerUniforms.has(line)) return false;
-      seenSamplerUniforms.add(line);
-      return true;
-    })
-    .join("\n");
-  return `${output.trim()}\n`;
+	// DXC emits a dummy combined sampler for texture-size queries even when the
+	// same texture is already sampled through a real sampler. WebGL counts both
+	// uniforms against the per-stage texture-unit limit. Reuse the real combined
+	// sampler for that texture; textureSize works with it and no sampling state
+	// changes. Keep a dummy binding when no real sampler exists (bone/morph data).
+	const samplerUniformPattern =
+		/uniform\s+(?:lowp\s+|mediump\s+|highp\s+)?sampler(?:2D|2DArray|Cube|2DShadow)\s+(SPIRV_Cross_Combined[A-Za-z0-9_]+)\s*;/g;
+	const samplerUniforms = [...output.matchAll(samplerUniformPattern)].map(
+		(match) => match[1]!,
+	);
+	for (const dummy of samplerUniforms.filter((name) =>
+		name.endsWith("SPIRV_Cross_DummySampler"),
+	)) {
+		const texturePrefix = dummy.slice(0, -"SPIRV_Cross_DummySampler".length);
+		const real = samplerUniforms.find(
+			(name) => name !== dummy && name.startsWith(texturePrefix),
+		);
+		if (real) output = output.replace(new RegExp(`\\b${dummy}\\b`, "g"), real);
+	}
+	const seenSamplerUniforms = new Set<string>();
+	output = output
+		.split("\n")
+		.filter((line) => {
+			if (!/^uniform\s+(?:lowp\s+|mediump\s+|highp\s+)?sampler/.test(line))
+				return true;
+			if (seenSamplerUniforms.has(line)) return false;
+			seenSamplerUniforms.add(line);
+			return true;
+		})
+		.join("\n");
+	return `${output.trim()}\n`;
 }
 
 export function crossCompileGlsl(
-  executable: string,
-  input: string,
-  output: string,
-  stage: ShaderStage,
+	executable: string,
+	input: string,
+	output: string,
+	stage: ShaderStage,
 ): void {
-  execFileSync(
-    executable,
-    [input, "--es", "--version", "300", "--glsl-emit-ubo-as-plain-uniforms", "--output", output],
-    { stdio: "inherit" },
-  );
-  writeFileSync(output, postprocessGlsl(readFileSync(output, "utf8"), stage));
+	execFileSync(
+		executable,
+		[
+			input,
+			"--es",
+			"--version",
+			"300",
+			"--glsl-emit-ubo-as-plain-uniforms",
+			"--output",
+			output,
+		],
+		{ stdio: "inherit" },
+	);
+	writeFileSync(output, postprocessGlsl(readFileSync(output, "utf8"), stage));
 }
 
-export function writeReflection(executable: string, input: string, output: string): void {
-  execFileSync(executable, [input, "--reflect", "--output", output], { stdio: "inherit" });
+export function writeReflection(
+	executable: string,
+	input: string,
+	output: string,
+): void {
+	execFileSync(executable, [input, "--reflect", "--output", output], {
+		stdio: "inherit",
+	});
 }

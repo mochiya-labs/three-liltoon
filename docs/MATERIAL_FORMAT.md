@@ -6,18 +6,18 @@
 
 ```json
 {
-  "specVersion": "1.0",
-  "lilToonVersion": "2.3.4-3-g72fc096",
-  "renderMode": "opaque",
-  "properties": {
-    "_Color": [0.91, 0.35, 0.48, 1],
-    "_UseShadow": 1,
-    "_ShadowBorder": 0.5,
-    "_UseRim": 1
-  },
-  "textures": {
-    "_MainTex": "textures/body.png"
-  }
+	"specVersion": "1.0",
+	"lilToonVersion": "2.3.4-3-g72fc096",
+	"renderMode": "opaque",
+	"properties": {
+		"_Color": [0.91, 0.35, 0.48, 1],
+		"_UseShadow": 1,
+		"_ShadowBorder": 0.5,
+		"_UseRim": 1
+	},
+	"textures": {
+		"_MainTex": "textures/body.png"
+	}
 }
 ```
 
@@ -29,29 +29,29 @@ Extension name: `MOCHIYA_materials_liltoon`.
 
 ```json
 {
-  "materials": [
-    {
-      "name": "Body",
-      "extensions": {
-        "MOCHIYA_materials_liltoon": {
-          "specVersion": "1.0",
-          "lilToonVersion": "2.3.4-3-g72fc096",
-          "shaderVariant": "lilToon",
-          "renderMode": "opaque",
-          "properties": {
-            "_Color": [1, 1, 1, 1],
-            "_UseShadow": 1,
-            "_OutlineWidth": 0.04
-          },
-          "textures": {
-            "_MainTex": { "index": 0 },
-            "_BumpMap": { "index": 1, "texCoord": 0 }
-          }
-        }
-      }
-    }
-  ],
-  "extensionsUsed": ["MOCHIYA_materials_liltoon"]
+	"materials": [
+		{
+			"name": "Body",
+			"extensions": {
+				"MOCHIYA_materials_liltoon": {
+					"specVersion": "1.0",
+					"lilToonVersion": "2.3.4-3-g72fc096",
+					"shaderVariant": "lilToon",
+					"renderMode": "opaque",
+					"properties": {
+						"_Color": [1, 1, 1, 1],
+						"_UseShadow": 1,
+						"_OutlineWidth": 0.04
+					},
+					"textures": {
+						"_MainTex": { "index": 0 },
+						"_BumpMap": { "index": 1, "texCoord": 0 }
+					}
+				}
+			}
+		}
+	],
+	"extensionsUsed": ["MOCHIYA_materials_liltoon"]
 }
 ```
 

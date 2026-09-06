@@ -5,13 +5,18 @@ import { discoverToolchain, getVersion } from "./toolchain.js";
 
 const tools = discoverToolchain();
 const state = {
-  tools,
-  versions: {
-    dxc: getVersion(tools.dxc, ["--version"]),
-    spirvVal: getVersion(tools.spirvVal, ["--version"]),
-  },
+	tools,
+	versions: {
+		dxc: getVersion(tools.dxc, ["--version"]),
+		spirvVal: getVersion(tools.spirvVal, ["--version"]),
+	},
 };
 const outputDirectory = resolve(PROJECT_ROOT, ".tmp");
 mkdirSync(outputDirectory, { recursive: true });
-writeFileSync(resolve(outputDirectory, "toolchain-paths.json"), `${JSON.stringify(state, null, 2)}\n`);
-process.stdout.write(`Located the pinned shader toolchain and wrote .tmp/toolchain-paths.json.\n`);
+writeFileSync(
+	resolve(outputDirectory, "toolchain-paths.json"),
+	`${JSON.stringify(state, null, 2)}\n`,
+);
+process.stdout.write(
+	`Located the pinned shader toolchain and wrote .tmp/toolchain-paths.json.\n`,
+);

@@ -6,9 +6,9 @@ Use identical mesh, textures, material values, camera, light, resolution, and co
 
 ```json
 {
-  "maxDiffRatio": 0.05,
-  "maxRms": 0.08,
-  "pixelThreshold": 0.1
+	"maxDiffRatio": 0.05,
+	"maxRms": 0.08,
+	"pixelThreshold": 0.1
 }
 ```
 
