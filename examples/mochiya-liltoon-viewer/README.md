@@ -4,6 +4,8 @@ A small, read-only Next.js example for loading one local `.glb` model or `.vrm` 
 
 The file never leaves the browser. It is exposed to `GLTFLoader` through a temporary object URL and disposed when it is replaced or the page closes.
 
+The viewer uses the Mochiya application layout and olive theme: the viewport and inspector meet at one square panel boundary without workspace gutters. English and Japanese labels, light and dark themes, the Mochiya icon, and the Space Grotesk brand face are available from the header.
+
 ## Included runtime packages
 
 - Next.js 16 and React 19
@@ -50,7 +52,7 @@ For lilToon materials, the Properties tab shows the full effective `lilToonPrope
 
 The loader collects structured `three-liltoon` compatibility warnings without marking the load as failed. The viewport shows **Ready · N warnings**; expand **rendering warnings** in the inspector for affected materials, parameters, and shader profiles. Click a material name to select it. Each material's Details tab includes its actual runtime shader profile and warnings. Replacing the model clears the previous inspection/warnings. Diagnostics identify unsupported active features or texture bindings, not every possible visual mismatch; disabled feature slots are ignored.
 
-The directional light stays at a fixed world position, aimed at the origin. Its position, intensity, ambient/hemisphere fill, and shadow options can be tuned in `viewer-lighting.tsx`; orbiting, panning, and zooming do not move the light or its target. Disabling `castShadow` or renderer shadows removes shadow-map occlusion without disabling authored lilToon toon shading. Authored MatCaps and specular highlights remain view-dependent material effects. Rendering goes directly to the canvas without post-processing; lilToon's required sRGB output conversion remains enabled for sRGB output.
+The canvas is present before and after loading a model. Its empty scene matches the avatar asset runtime viewer: light/dark olive backgrounds, a 0.25-unit grid, shadow receiver, hemisphere fill, fixed world-space directional light, neutral tone mapping, sRGB output, and CameraControls. Orbiting, panning, and zooming do not move the light or its target. Rendering stays direct to the canvas without post-processing.
 
 ## Source layout
 

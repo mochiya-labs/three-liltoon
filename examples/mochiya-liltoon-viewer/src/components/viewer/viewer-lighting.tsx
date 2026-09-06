@@ -3,20 +3,19 @@
 export function ViewerLighting() {
 	return (
 		<>
-			{/*
-        Keep indirect light deliberately below the main light. lilToon uses it
-        with each material's _ShadowEnvStrength; a full-strength ambient rig
-        fills the authored toon shadow colors back toward the base color.
-      */}
-			<ambientLight intensity={0.18} color="#ffffff" />
-			<hemisphereLight
-				intensity={1}
-				color="#ffffff"
-				groundColor="#ffffff"
-				position={[0, 6, 0]}
-			/>
+			<hemisphereLight args={["#e0faff", "#fff0db", 0.5]} />
 			{/* Fixed world-space light; Three's default target stays at the origin. */}
-			<directionalLight color="#ffffff" intensity={0.4} position={[0, 3, 3]} />
+			<directionalLight
+				position={[-0.5, 3, 2]}
+				intensity={1.75}
+				castShadow
+				shadow-mapSize={[2048, 2048]}
+				shadow-camera-left={-3}
+				shadow-camera-right={3}
+				shadow-camera-top={3}
+				shadow-camera-bottom={-3}
+				shadow-bias={-0.0001}
+			/>
 		</>
 	);
 }

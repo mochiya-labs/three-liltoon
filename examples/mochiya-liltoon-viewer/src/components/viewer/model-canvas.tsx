@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bounds, Grid, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { AnimationMixer } from "three";
+import { AnimationMixer, NeutralToneMapping, SRGBColorSpace } from "three";
 import { enableLilToon } from "three-liltoon";
 
 import { disposeModel } from "@/lib/model/dispose-model";
@@ -17,7 +17,9 @@ import type {
 import { ViewerLighting } from "./viewer-lighting";
 
 type ModelCanvasProps = {
-	source: ModelSource;
+	source: ModelSource | null;
+	dark: boolean;
+	loadFailureMessage: string;
 	onInspectionChange: (inspection: ModelInspection | null) => void;
 	onStatusChange: (status: LoadStatus) => void;
 };
@@ -52,11 +54,16 @@ function AnimatedModel({ model }: { model: LoadedModel }) {
 	);
 }
 
+type ModelLoaderProps = Omit<ModelCanvasProps, "source" | "dark"> & {
+	source: ModelSource;
+};
+
 function ModelLoader({
 	source,
+	loadFailureMessage,
 	onInspectionChange,
 	onStatusChange,
-}: ModelCanvasProps) {
+}: ModelLoaderProps) {
 	const renderer = useThree((state) => state.gl);
 	useEffect(() => enableLilToon(renderer), [renderer]);
 	const [model, setModel] = useState<LoadedModel | null>(null);
@@ -83,9 +90,7 @@ function ModelLoader({
 			.catch((error: unknown) => {
 				if (!active) return;
 				const message =
-					error instanceof Error
-						? error.message
-						: "The model could not be loaded.";
+					error instanceof Error ? error.message : loadFailureMessage;
 				onStatusChange({ phase: "error", message });
 			});
 
@@ -93,7 +98,7 @@ function ModelLoader({
 			active = false;
 			if (loadedModel) disposeModel(loadedModel);
 		};
-	}, [onInspectionChange, onStatusChange, renderer, source.url]);
+	}, [loadFailureMessage, onInspectionChange, onStatusChange, source]);
 
 	return model ? <AnimatedModel model={model} /> : null;
 }
@@ -101,38 +106,45 @@ function ModelLoader({
 export function ModelCanvas(props: ModelCanvasProps) {
 	return (
 		<Canvas
-			shadows="percentage"
+			shadows
 			dpr={[1, 2]}
-			camera={{ position: [2.8, 1.8, 4.6], fov: 34, near: 0.01, far: 500 }}
+			camera={{ position: [0, 1.4, 5.5], fov: 26, near: 0.01, far: 300 }}
 			gl={{
 				antialias: true,
-				alpha: false,
-				powerPreference: "high-performance",
+				toneMapping: NeutralToneMapping,
+				outputColorSpace: SRGBColorSpace,
 			}}
 		>
-			<color attach="background" args={["#20221b"]} />
+			<color attach="background" args={[props.dark ? "#23251f" : "#f3f4ed"]} />
 			<ViewerLighting />
-			<ModelLoader key={props.source.url} {...props} />
+			{props.source ? (
+				<ModelLoader
+					key={props.source.url}
+					source={props.source}
+					loadFailureMessage={props.loadFailureMessage}
+					onInspectionChange={props.onInspectionChange}
+					onStatusChange={props.onStatusChange}
+				/>
+			) : null}
+			<mesh
+				rotation={[-Math.PI / 2, 0, 0]}
+				position={[0, -0.005, 0]}
+				receiveShadow
+			>
+				<planeGeometry args={[200, 200]} />
+				<shadowMaterial opacity={0.12} />
+			</mesh>
 			<Grid
-				position={[0, -0.01, 0]}
-				args={[20, 20]}
-				cellSize={0.5}
-				cellThickness={0.6}
-				cellColor="#5f6254"
-				sectionSize={2}
-				sectionThickness={1}
-				sectionColor="#858a72"
-				fadeDistance={18}
-				fadeStrength={1.5}
+				args={[30, 30]}
+				position={[0, -0.004, 0]}
+				cellSize={0.25}
+				sectionSize={1}
+				cellColor={props.dark ? "#42463a" : "#d6dbcd"}
+				sectionColor={props.dark ? "#5b604f" : "#b8c1aa"}
+				fadeDistance={15}
 				infiniteGrid
 			/>
-			<OrbitControls
-				makeDefault
-				enableDamping
-				minDistance={0.2}
-				maxDistance={30}
-				target={[0, 0.9, 0]}
-			/>
+			<OrbitControls makeDefault minDistance={0.4} maxDistance={20} />
 		</Canvas>
 	);
 }

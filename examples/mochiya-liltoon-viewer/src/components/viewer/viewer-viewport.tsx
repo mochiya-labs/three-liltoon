@@ -11,8 +11,8 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import type { Labels } from "@/lib/i18n";
 import type {
 	LoadStatus,
 	ModelInspection,
@@ -27,6 +27,8 @@ type ViewerViewportProps = {
 	inspection: ModelInspection | null;
 	status: LoadStatus;
 	uploadError: string | null;
+	dark: boolean;
+	t: Labels;
 	onChooseFile: () => void;
 	onFile: (file: File) => void;
 	onInspectionChange: (inspection: ModelInspection | null) => void;
@@ -44,6 +46,8 @@ export function ViewerViewport({
 	inspection,
 	status,
 	uploadError,
+	dark,
+	t,
 	onChooseFile,
 	onFile,
 	onInspectionChange,
@@ -53,7 +57,7 @@ export function ViewerViewport({
 	const error =
 		uploadError ?? (status.phase === "error" ? status.message : null);
 
-	function handleDrop(event: DragEvent<HTMLDivElement>) {
+	function handleDrop(event: DragEvent<HTMLElement>) {
 		event.preventDefault();
 		setDragging(false);
 		const file = event.dataTransfer.files[0];
@@ -61,11 +65,12 @@ export function ViewerViewport({
 	}
 
 	return (
-		<Card
+		<section
 			className={cn(
-				"relative min-h-[32rem] overflow-hidden bg-[#20221b] lg:h-[calc(100svh-4.5rem)] lg:min-h-0",
-				dragging && "ring-2 ring-primary",
+				"viewer-main relative flex min-h-0 min-w-0 flex-col bg-background",
+				dragging && "ring-2 ring-inset ring-primary",
 			)}
+			aria-label={t.preview}
 			onDragEnter={(event) => {
 				event.preventDefault();
 				setDragging(true);
@@ -77,142 +82,135 @@ export function ViewerViewport({
 			}}
 			onDrop={handleDrop}
 		>
-			{source ? (
-				<ModelCanvas
-					key={source.id}
-					source={source}
-					onInspectionChange={onInspectionChange}
-					onStatusChange={onStatusChange}
-				/>
-			) : (
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,#34372c_0%,#20221b_62%)]" />
-			)}
-
-			<div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3">
-				<div className="flex min-w-0 flex-wrap gap-1.5">
-					{inspection ? (
-						<>
-							<Badge>{inspection.format}</Badge>
-							<Badge
-								variant={inspection.hasMochiyaLilToon ? "default" : "outline"}
-							>
-								{inspection.hasMochiyaLilToon
-									? "Mochiya lilToon"
-									: "Standard materials"}
-							</Badge>
-							<Badge
-								variant="outline"
-								className="border-white/15 bg-black/25 text-white"
-							>
-								{inspection.meshCount} meshes
-							</Badge>
-						</>
-					) : source ? (
-						<Badge
-							variant="outline"
-							className="border-white/15 bg-black/25 text-white"
-						>
-							{source.fileName}
-						</Badge>
-					) : null}
+			<header className="flex h-12 shrink-0 items-center justify-between border-b px-3">
+				<div className="flex items-center gap-2 text-xs font-medium">
+					<span className="inline-block size-1.5 rounded-full bg-primary" />
+					{t.preview}
 				</div>
-				{status.phase === "ready" && (
+				{status.phase === "ready" ? (
 					<Badge className="shrink-0" role="status">
 						{inspection?.warnings.length ? (
 							<WarningCircleIcon />
 						) : (
 							<CheckCircleIcon />
 						)}
-						Ready
+						{t.ready}
 						{inspection?.warnings.length
-							? ` · ${inspection.warnings.length} warnings`
+							? ` · ${inspection.warnings.length} ${t.warnings}`
 							: ""}
 					</Badge>
-				)}
-			</div>
+				) : null}
+			</header>
 
-			{!source && (
-				<div className="absolute inset-0 grid place-items-center p-6 text-center text-white">
-					<div className="max-w-sm">
-						<div className="mx-auto grid size-12 place-items-center rounded-xl bg-white/8 ring-1 ring-white/12">
-							<CubeIcon className="size-6 text-[#d0f56d]" />
-						</div>
-						<h2 className="mt-4 font-heading text-base font-medium">
-							Open a model
-						</h2>
-						<p className="mt-1 text-xs/relaxed text-white/55">
-							Drop a Mochiya-exported VRM or binary glTF here. One model is
-							shown at a time.
-						</p>
-						<Button
-							className="pointer-events-auto mt-4"
-							size="lg"
-							onClick={onChooseFile}
-						>
-							<FileArrowUpIcon /> Choose GLB or VRM
-						</Button>
+			<div className="relative min-h-64 flex-1">
+				<ModelCanvas
+					source={source}
+					dark={dark}
+					loadFailureMessage={t.loadError}
+					onInspectionChange={onInspectionChange}
+					onStatusChange={onStatusChange}
+				/>
+
+				<div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3">
+					<div className="flex min-w-0 flex-wrap gap-1.5">
+						{inspection ? (
+							<>
+								<Badge>{inspection.format}</Badge>
+								<Badge
+									variant={inspection.hasMochiyaLilToon ? "default" : "outline"}
+								>
+									{inspection.hasMochiyaLilToon
+										? t.mochiyaLilToon
+										: t.standardMaterials}
+								</Badge>
+								<Badge variant="outline">
+									{inspection.meshCount} {t.meshes}
+								</Badge>
+							</>
+						) : source ? (
+							<Badge variant="outline">{source.fileName}</Badge>
+						) : null}
 					</div>
 				</div>
-			)}
 
-			{source && status.phase === "loading" && (
-				<div className="absolute inset-0 grid place-items-center bg-black/25 p-6 backdrop-blur-[2px]">
-					<div className="w-full max-w-xs rounded-lg bg-card p-4 text-card-foreground shadow-xl ring-1 ring-white/10">
-						<div className="flex items-center gap-2 font-heading text-sm font-medium">
-							<CircleNotchIcon className="size-4 animate-spin text-primary" />{" "}
-							Loading model
-						</div>
-						<p className="mt-1 truncate text-xs text-muted-foreground">
-							{source.fileName}
-						</p>
-						<Progress className="mt-3" value={status.progress ?? 12} />
-					</div>
-				</div>
-			)}
-
-			{error && (
-				<div className="absolute inset-x-3 bottom-3 rounded-lg bg-card p-3 text-card-foreground shadow-xl ring-1 ring-destructive/30">
-					<div className="flex items-start gap-2">
-						<WarningCircleIcon className="mt-0.5 size-4 shrink-0 text-destructive" />
-						<div className="min-w-0 flex-1">
-							<div className="font-heading text-xs font-medium">
-								Could not open this model
+				{!source ? (
+					<div className="pointer-events-none absolute inset-0 grid place-items-center p-6 text-center">
+						<div className="pointer-events-auto max-w-sm border bg-background/95 p-6 shadow-sm">
+							<div className="mx-auto grid size-12 place-items-center border bg-primary/15 text-primary-foreground">
+								<CubeIcon className="size-6" />
 							</div>
-							<p className="mt-0.5 break-words text-xs text-muted-foreground">
-								{error}
+							<h2 className="mt-4 font-heading text-base font-medium">
+								{t.openPrompt}
+							</h2>
+							<p className="mt-1 text-xs/relaxed text-muted-foreground">
+								{t.emptyHint}
 							</p>
+							<Button className="mt-4" size="lg" onClick={onChooseFile}>
+								<FileArrowUpIcon /> {t.chooseFile}
+							</Button>
 						</div>
-						<Button variant="outline" size="sm" onClick={onChooseFile}>
-							Replace
-						</Button>
 					</div>
-				</div>
-			)}
+				) : null}
 
-			{source && status.phase === "ready" && (
-				<div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/45 to-transparent p-3 pt-12 text-white">
-					<div className="min-w-0">
-						<div className="truncate text-xs font-medium">
-							{source.fileName}
-						</div>
-						<div className="text-[0.6875rem] text-white/55">
-							{formatBytes(source.fileSize)}
+				{source && status.phase === "loading" ? (
+					<div className="absolute inset-0 grid place-items-center bg-black/25 p-6 backdrop-blur-[2px]">
+						<div className="w-full max-w-xs border bg-card p-4 text-card-foreground shadow-xl">
+							<div className="flex items-center gap-2 font-heading text-sm font-medium">
+								<CircleNotchIcon className="size-4 animate-spin text-primary" />
+								{t.loadingModel}
+							</div>
+							<p className="mt-1 truncate text-xs text-muted-foreground">
+								{source.fileName}
+							</p>
+							<Progress className="mt-3" value={status.progress ?? 12} />
 						</div>
 					</div>
-					<div className="text-right text-[0.6875rem] text-white/55">
-						Drag to orbit · Scroll to zoom
-					</div>
-				</div>
-			)}
+				) : null}
 
-			{dragging && (
-				<div className="pointer-events-none absolute inset-3 grid place-items-center rounded-lg border border-dashed border-primary bg-primary/10 text-center text-white backdrop-blur-sm">
-					<div>
-						<FileArrowUpIcon className="mx-auto mb-2 size-6 text-[#d0f56d]" />
-						Drop to replace the model
+				{error ? (
+					<div className="absolute inset-x-3 bottom-3 border border-destructive/30 bg-card p-3 text-card-foreground shadow-xl">
+						<div className="flex items-start gap-2">
+							<WarningCircleIcon className="mt-0.5 size-4 shrink-0 text-destructive" />
+							<div className="min-w-0 flex-1">
+								<div className="font-heading text-xs font-medium">
+									{t.loadError}
+								</div>
+								<p className="mt-0.5 break-words text-xs text-muted-foreground">
+									{error}
+								</p>
+							</div>
+							<Button variant="outline" size="sm" onClick={onChooseFile}>
+								{t.replace}
+							</Button>
+						</div>
 					</div>
-				</div>
-			)}
-		</Card>
+				) : null}
+
+				{source && status.phase === "ready" ? (
+					<div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/45 to-transparent p-3 pt-12 text-white">
+						<div className="min-w-0">
+							<div className="truncate text-xs font-medium">
+								{source.fileName}
+							</div>
+							<div className="text-[0.6875rem] text-white/55">
+								{formatBytes(source.fileSize)}
+							</div>
+						</div>
+						<div className="text-right text-[0.6875rem] text-white/55">
+							{t.orbitHint}
+						</div>
+					</div>
+				) : null}
+
+				{dragging ? (
+					<div className="pointer-events-none absolute inset-3 grid place-items-center border border-dashed border-primary bg-primary/10 text-center backdrop-blur-sm">
+						<div>
+							<FileArrowUpIcon className="mx-auto mb-2 size-6 text-primary" />
+							{t.dropToReplace}
+						</div>
+					</div>
+				) : null}
+			</div>
+		</section>
 	);
 }

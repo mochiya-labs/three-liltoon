@@ -3825,3 +3825,19 @@ The authoring contract describes version 1.0, optional fields, JSON scalar/boole
 Run schema generation in the normal generation/build chain and expose an independent command requiring neither upstream shader sources nor compiler binaries. Check the generated file into the repository and include it in packed installs. Validate representative exporter-shaped payloads, malformed references/values, documented examples and generation consistency; rebuild declarations and verify the packed schema export. No shader, Unity exporter or attachment-runtime behavior changes are required.
 
 Implemented and verified: 31 schema checks and 89 existing runtime unit tests pass, along with library TypeScript checking and tsup bundling. The generated Draft 7 file compiles with Ajv, matches fresh generation, and validates the format guide's example. A packed isolated consumer imports the exact schema through `three-liltoon/schema` and typechecks the root/glTF entries without VRM, attachment runtime or schema tooling installed. Prettier and whitespace checks pass. The generator is pinned to 2.4.0 to retain Node 20 development compatibility; Ajv is test-only. Shader generation, browser rendering and Unity export were not rerun for this contract/tooling change.
+
+## 56. Diagnostic viewer application alignment
+
+Keep the diagnostic viewer focused on one model and one material inspector while aligning its application shell with Mochiya's other creator tools.
+
+| Area        | Baseline                                                                                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace   | Full-height viewport and inspector with no gutter, square panel boundaries, and a stacked mobile layout                                                     |
+| Brand       | The Mochiya site icon and Space Grotesk heading face                                                                                                        |
+| Language    | One typed English/Japanese dictionary for all fixed viewer and inspector labels; changing language updates the document language                            |
+| Theme       | Header control for the existing olive light/dark token sets                                                                                                 |
+| Empty scene | Always-mounted Three.js canvas using the avatar asset viewer's background colors, grid, ground shadow, lights, camera, tone mapping, and output color space |
+
+Preserve local-file loading, lilToon/VRM setup, animation playback, model framing, material inspection, warnings, and GPU cleanup. The scene remains a diagnostic baseline rather than a Unity lighting-parity promise. Verify dictionary key parity, exact declarative scene constants, TypeScript, ESLint, production build, both themes, both languages, responsive panel stacking, and an empty-scene browser render.
+
+The model frame uses Drei `Bounds` with `OrbitControls` as the default controls. `Bounds` reads and updates the default control's public `target` vector while fitting a model; controls without that contract must not be registered as its default controls. A real exported VRM browser regression must complete its initial fit and subsequent frames without uncaught errors.

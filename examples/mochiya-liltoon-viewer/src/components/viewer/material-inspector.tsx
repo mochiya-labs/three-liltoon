@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Labels } from "@/lib/i18n";
 import type {
 	InspectorEntry,
 	MaterialInspection,
@@ -41,9 +42,11 @@ import type {
 function PropertyRows({
 	entries,
 	query,
+	t,
 }: {
 	entries: InspectorEntry[];
 	query: string;
+	t: Labels;
 }) {
 	const filtered = useMemo(() => {
 		const normalized = query.trim().toLowerCase();
@@ -56,7 +59,7 @@ function PropertyRows({
 	if (filtered.length === 0) {
 		return (
 			<div className="grid h-32 place-items-center px-6 text-center text-xs text-muted-foreground">
-				No properties match this search.
+				{t.noMatchingProperties}
 			</div>
 		);
 	}
@@ -86,15 +89,19 @@ function PropertyRows({
 	);
 }
 
-function TextureRows({ textures }: { textures: TextureInspection[] }) {
+function TextureRows({
+	textures,
+	t,
+}: {
+	textures: TextureInspection[];
+	t: Labels;
+}) {
 	if (textures.length === 0) {
 		return (
 			<div className="grid h-40 place-items-center px-6 text-center">
 				<div>
 					<ImageIcon className="mx-auto mb-2 size-5 text-muted-foreground" />
-					<p className="text-xs text-muted-foreground">
-						No textures are assigned to this material.
-					</p>
+					<p className="text-xs text-muted-foreground">{t.noTextures}</p>
 				</div>
 			</div>
 		);
@@ -107,11 +114,11 @@ function TextureRows({ textures }: { textures: TextureInspection[] }) {
 					key={texture.id}
 					className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 px-3 py-3"
 				>
-					<div className="relative aspect-square overflow-hidden rounded-md border bg-muted">
+					<div className="relative aspect-square overflow-hidden border bg-muted">
 						{texture.previewUrl ? (
 							<NextImage
 								src={texture.previewUrl}
-								alt={`${texture.name} texture preview`}
+								alt={`${texture.name} ${t.texturePreview}`}
 								fill
 								sizes="80px"
 								className="object-contain"
@@ -120,7 +127,7 @@ function TextureRows({ textures }: { textures: TextureInspection[] }) {
 						) : (
 							<div className="grid size-full place-items-center text-muted-foreground">
 								<ImageIcon className="size-5" />
-								<span className="sr-only">Preview unavailable</span>
+								<span className="sr-only">{t.previewUnavailable}</span>
 							</div>
 						)}
 					</div>
@@ -139,11 +146,11 @@ function TextureRows({ textures }: { textures: TextureInspection[] }) {
 						</div>
 						<dl className="mt-2 space-y-1 text-[0.6875rem]">
 							{[
-								["Size", texture.size],
-								["Color space", texture.colorSpace],
-								["Flip Y", texture.flipY],
-								["Wrap S / T", texture.wrap],
-								["Min / mag", texture.filter],
+								[t.size, texture.size],
+								[t.colorSpace, texture.colorSpace],
+								[t.flipY, texture.flipY],
+								[t.wrap, texture.wrap],
+								[t.filter, texture.filter],
 							].map(([label, value]) => (
 								<div
 									key={label}
@@ -166,20 +173,26 @@ function TextureRows({ textures }: { textures: TextureInspection[] }) {
 	);
 }
 
-function InspectorBody({ material }: { material: MaterialInspection }) {
+function InspectorBody({
+	material,
+	t,
+}: {
+	material: MaterialInspection;
+	t: Labels;
+}) {
 	const [query, setQuery] = useState("");
 
 	return (
 		<Tabs defaultValue="properties" className="min-h-0 flex-1">
 			<TabsList className="mx-4 grid w-[calc(100%-2rem)] grid-cols-3">
 				<TabsTrigger value="properties">
-					<SlidersHorizontalIcon /> Properties
+					<SlidersHorizontalIcon /> {t.properties}
 				</TabsTrigger>
 				<TabsTrigger value="textures">
-					<ImageIcon /> Textures
+					<ImageIcon /> {t.textures}
 				</TabsTrigger>
 				<TabsTrigger value="details">
-					<InfoIcon /> Details
+					<InfoIcon /> {t.details}
 				</TabsTrigger>
 			</TabsList>
 
@@ -189,19 +202,19 @@ function InspectorBody({ material }: { material: MaterialInspection }) {
 					<Input
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
-						placeholder={`Search ${material.properties.length} properties`}
+						placeholder={`${t.searchProperties} (${material.properties.length})`}
 						className="pl-7"
-						aria-label="Search material properties"
+						aria-label={t.searchProperties}
 					/>
 				</div>
 				<ScrollArea className="min-h-0 flex-1 border-t">
-					<PropertyRows entries={material.properties} query={query} />
+					<PropertyRows entries={material.properties} query={query} t={t} />
 				</ScrollArea>
 			</TabsContent>
 
 			<TabsContent value="textures" className="min-h-0">
 				<ScrollArea className="h-full border-t">
-					<TextureRows textures={material.textures} />
+					<TextureRows textures={material.textures} t={t} />
 				</ScrollArea>
 			</TabsContent>
 
@@ -210,9 +223,9 @@ function InspectorBody({ material }: { material: MaterialInspection }) {
 					{material.warnings.length > 0 && (
 						<div
 							className="space-y-2 border-b p-3 text-xs"
-							aria-label="Selected material warnings"
+							aria-label={t.selectedMaterialWarnings}
 						>
-							<p className="font-medium">Rendering warnings</p>
+							<p className="font-medium">{t.renderingWarnings}</p>
 							{material.warnings.map((warning) => (
 								<p
 									key={`${warning.code}:${warning.property}`}
@@ -223,7 +236,7 @@ function InspectorBody({ material }: { material: MaterialInspection }) {
 							))}
 						</div>
 					)}
-					<PropertyRows entries={material.details} query="" />
+					<PropertyRows entries={material.details} query="" t={t} />
 				</ScrollArea>
 			</TabsContent>
 		</Tabs>
@@ -232,8 +245,10 @@ function InspectorBody({ material }: { material: MaterialInspection }) {
 
 export function MaterialInspector({
 	inspection,
+	t,
 }: {
 	inspection: ModelInspection | null;
+	t: Labels;
 }) {
 	const [requestedMaterialId, setRequestedMaterialId] = useState<string | null>(
 		null,
@@ -244,61 +259,58 @@ export function MaterialInspector({
 		materials[0];
 
 	return (
-		<Card className="min-h-[36rem] lg:h-[calc(100svh-4.5rem)] lg:min-h-0">
-			<CardHeader className="shrink-0">
-				<div className="flex items-start justify-between gap-3">
-					<div>
-						<CardTitle>Material inspector</CardTitle>
-						<CardDescription>
-							Read-only runtime properties from the loaded model.
-						</CardDescription>
-					</div>
+		<Card className="inspector-sidebar min-h-[36rem] rounded-none border-0 border-l bg-background shadow-none ring-0 max-[880px]:border-t max-[880px]:border-l-0 lg:min-h-0">
+			<CardHeader className="shrink-0 gap-0 border-b px-0 pt-0">
+				<div className="flex h-12 items-center justify-between gap-3 px-4">
+					<CardTitle>{t.materialInspector}</CardTitle>
 					{materials.length > 0 && (
 						<Badge variant="outline">{materials.length}</Badge>
 					)}
 				</div>
-				{inspection && inspection.warnings.length > 0 && (
-					<details className="min-w-0 rounded-md border bg-muted/40 p-2 text-xs">
-						<summary className="cursor-pointer font-medium">
-							<WarningCircleIcon className="mr-1 inline size-3.5" />
-							{inspection.warnings.length} rendering warnings
-						</summary>
-						<p className="mt-2 text-muted-foreground">
-							Model loaded. Some material settings cannot be reproduced by the
-							selected shader profiles.
-						</p>
-						<ul
-							className="mt-2 max-h-48 space-y-3 overflow-y-auto"
-							aria-label="Rendering warnings"
-						>
-							{inspection.warnings.map((warning) => (
-								<li
-									key={`${warning.materialIndex}:${warning.code}:${warning.property}`}
-									className="min-w-0 break-words"
-								>
-									<Button
-										variant="ghost"
-										size="sm"
-										className="h-auto max-w-full justify-start whitespace-normal p-0 text-left text-xs underline underline-offset-2"
-										onClick={() =>
-											setRequestedMaterialId(
-												`material-${warning.materialIndex}`,
-											)
-										}
+				<div className="space-y-3 border-t px-4 py-3">
+					<CardDescription>{t.readOnlyDescription}</CardDescription>
+					{inspection && inspection.warnings.length > 0 && (
+						<details className="min-w-0 border bg-muted/40 p-2 text-xs">
+							<summary className="cursor-pointer font-medium">
+								<WarningCircleIcon className="mr-1 inline size-3.5" />
+								{inspection.warnings.length} {t.renderingWarnings}
+							</summary>
+							<p className="mt-2 text-muted-foreground">
+								{t.warningDescription}
+							</p>
+							<ul
+								className="mt-2 max-h-48 space-y-3 overflow-y-auto"
+								aria-label={t.renderingWarnings}
+							>
+								{inspection.warnings.map((warning) => (
+									<li
+										key={`${warning.materialIndex}:${warning.code}:${warning.property}`}
+										className="min-w-0 break-words"
 									>
-										{warning.materialName}
-									</Button>
-									<p className="mt-0.5 text-muted-foreground">
-										{warning.message}
-									</p>
-									<p className="mt-1 break-all font-mono text-[0.625rem] text-muted-foreground">
-										{warning.shaderKey} · {warning.code}
-									</p>
-								</li>
-							))}
-						</ul>
-					</details>
-				)}
+										<Button
+											variant="ghost"
+											size="sm"
+											className="h-auto max-w-full justify-start whitespace-normal p-0 text-left text-xs underline underline-offset-2"
+											onClick={() =>
+												setRequestedMaterialId(
+													`material-${warning.materialIndex}`,
+												)
+											}
+										>
+											{warning.materialName}
+										</Button>
+										<p className="mt-0.5 text-muted-foreground">
+											{warning.message}
+										</p>
+										<p className="mt-1 break-all font-mono text-[0.625rem] text-muted-foreground">
+											{warning.shaderKey} · {warning.code}
+										</p>
+									</li>
+								))}
+							</ul>
+						</details>
+					)}
+				</div>
 			</CardHeader>
 
 			{!selected ? (
@@ -306,18 +318,18 @@ export function MaterialInspector({
 					<div>
 						<CubeIcon className="mx-auto mb-3 size-6 text-muted-foreground" />
 						<div className="font-heading text-sm font-medium">
-							No material to inspect
+							{t.noMaterial}
 						</div>
 						<p className="mt-1 max-w-64 text-xs text-muted-foreground">
-							Load a GLB or VRM file to see every available material property.
+							{t.noMaterialHint}
 						</p>
 					</div>
 				</CardContent>
 			) : (
 				<div className="flex min-h-0 flex-1 flex-col">
-					<div className="space-y-3 px-4 pb-3">
+					<div className="space-y-3 px-4 py-3">
 						<Select value={selected.id} onValueChange={setRequestedMaterialId}>
-							<SelectTrigger aria-label="Select a material">
+							<SelectTrigger aria-label={t.selectMaterial}>
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -325,7 +337,7 @@ export function MaterialInspector({
 									<SelectItem key={material.id} value={material.id}>
 										{material.name}
 										{material.warnings.length > 0 &&
-											` (${material.warnings.length} warnings)`}
+											` (${material.warnings.length} ${t.warnings})`}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -335,21 +347,21 @@ export function MaterialInspector({
 								{selected.type}
 							</Badge>
 							<Badge variant="outline">
-								{selected.properties.length} properties
+								{selected.properties.length} {t.propertiesCount}
 							</Badge>
 							<Badge variant="outline">
-								{selected.textures.length} textures
+								{selected.textures.length} {t.texturesCount}
 							</Badge>
 							{selected.warnings.length > 0 && (
 								<Badge variant="outline">
 									<WarningCircleIcon />
-									{selected.warnings.length} warnings
+									{selected.warnings.length} {t.warnings}
 								</Badge>
 							)}
 						</div>
 					</div>
 					<Separator />
-					<InspectorBody key={selected.id} material={selected} />
+					<InspectorBody key={selected.id} material={selected} t={t} />
 				</div>
 			)}
 		</Card>

@@ -127,11 +127,61 @@
 
 	body {
 		@apply bg-background text-foreground;
+		min-height: 100dvh;
+		overflow: hidden;
 	}
 
 	button,
 	[role="button"] {
 		@apply cursor-pointer;
+	}
+}
+
+@layer components {
+	.viewer-shell {
+		display: flex;
+		height: 100dvh;
+		min-height: 0;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.viewer-workspace {
+		display: grid;
+		min-height: 0;
+		flex: 1;
+		grid-template-columns: minmax(0, 1fr) 23rem;
+		overflow: hidden;
+	}
+
+	.inspector-sidebar {
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	@media (max-width: 880px) {
+		body {
+			overflow: auto;
+		}
+
+		.viewer-shell {
+			height: auto;
+			min-height: 100dvh;
+			overflow: visible;
+		}
+
+		.viewer-workspace {
+			grid-template-columns: minmax(0, 1fr);
+			overflow: visible;
+		}
+
+		.viewer-main {
+			min-height: 34rem;
+		}
+
+		.inspector-sidebar {
+			min-height: 38rem;
+		}
 	}
 }
 
