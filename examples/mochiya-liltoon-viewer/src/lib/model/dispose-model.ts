@@ -1,5 +1,5 @@
-import { LilToonMaterial } from "three-liltoon";
-import { uninstallLilToonExpressionBindings } from "three-liltoon/vrm";
+import { LilToonMaterial } from "@mochiya/three-liltoon";
+import { uninstallLilToonExpressionBindings } from "@mochiya/three-liltoon/vrm";
 import {
 	BufferGeometry,
 	Material,

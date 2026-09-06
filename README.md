@@ -15,13 +15,15 @@ Maintained by [Mochiya](https://mochiya.org).
 
 Compiler binaries are development dependencies only. The npm package embeds generated GLSL strings and does not compile shaders in the browser.
 
-The runtime JavaScript and TypeScript declarations under `dist/` are committed so deployable examples can consume the package without initializing the lilToon submodule or installing the shader toolchain. Source maps and compiler intermediates remain untracked. After changing package or shader source, run `npm run build:package` and commit the updated `dist/` files with the source change.
+The runtime JavaScript, TypeScript declarations, extension schema and third-party notice under `dist/` are committed so deployable examples can consume the package without initializing the lilToon submodule or installing the shader toolchain. Source maps and compiler intermediates remain untracked. After changing package or shader source, run `npm run build:package` and commit the updated `dist/` files with the source change.
 
-## Install from Git
+## Install
 
 ```bash
 npm install three https://github.com/zekailin00/three-liltoon.git
 ```
+
+The Git installation exposes the package as `@mochiya/three-liltoon`. After the first npm release, install it with `npm install @mochiya/three-liltoon three`.
 
 ## Choose your setup
 
@@ -37,7 +39,7 @@ Enable the renderer once, then choose either loader setup below. Manually create
 
 ```ts
 import { Mesh, WebGLRenderer } from "three";
-import { LilToonMaterial, enableLilToon } from "three-liltoon";
+import { LilToonMaterial, enableLilToon } from "@mochiya/three-liltoon";
 
 const renderer = new WebGLRenderer({ antialias: true });
 const releaseRendering = enableLilToon(renderer);
@@ -72,7 +74,7 @@ The package defines `MOCHIYA_materials_liltoon`; it only replaces materials that
 
 ```ts
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { GLTFLilToonExtension } from "three-liltoon/gltf";
+import { GLTFLilToonExtension } from "@mochiya/three-liltoon/gltf";
 
 const loader = new GLTFLoader();
 loader.register((parser) => new GLTFLilToonExtension(parser));
@@ -81,18 +83,18 @@ const gltf = await loader.loadAsync("/avatar.glb");
 scene.add(gltf.scene);
 ```
 
-Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. See the [format guide](docs/MATERIAL_FORMAT.md) and [JSON Schema](schema/MOCHIYA_materials_liltoon.schema.json), also available as `three-liltoon/schema`. The schema validates each material's extension payload, not an entire glTF document or rendered feature support.
+Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. See the [format guide](https://github.com/zekailin00/three-liltoon/blob/main/docs/MATERIAL_FORMAT.md) and [JSON Schema](dist/schema/MOCHIYA_materials_liltoon.schema.json), also available as `@mochiya/three-liltoon/schema`. The schema validates each material's extension payload, not an entire glTF document or rendered feature support.
 
 ## Load VRM and glTF/GLB
 
-Install `@pixiv/three-vrm` 3.4 or newer within major version 3 when loading VRM avatars. It is an optional peer; `three-liltoon` and `three-liltoon/gltf` work without it.
+Install `@pixiv/three-vrm` 3.4 or newer within major version 3 when loading VRM avatars. It is an optional peer; `@mochiya/three-liltoon` and `@mochiya/three-liltoon/gltf` work without it.
 
 Use this loader setup when your app supports VRM:
 
 ```ts
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRMLoaderPlugin } from "@pixiv/three-vrm";
-import { enableLilToonVRM } from "three-liltoon/vrm";
+import { enableLilToonVRM } from "@mochiya/three-liltoon/vrm";
 
 const loader = new GLTFLoader();
 loader.register((parser) => enableLilToonVRM(new VRMLoaderPlugin(parser)));
@@ -115,7 +117,7 @@ The helper enhances and returns the same plugin instance. Pass standard VRM opti
 | Texture scale / offset                    | `_MainTex_ST` only; other texture slots keep their own transforms              |
 | Morph targets and other materials         | Handled unchanged by three-vrm                                                 |
 
-Generated outlines follow animated colors and main UVs. Shader feature/profile limits still apply. This mapping requires neither attachment data nor `avatar-asset-runtime`.
+Generated outlines follow animated colors and main UVs. Shader feature/profile limits still apply. This mapping requires neither attachment data nor `@mochiya/avatar-composition`.
 
 For custom loading, `/vrm` also exports `installLilToonExpressionBindings(vrm)`, which returns an undo function, and `uninstallLilToonExpressionBindings(vrm)`. Repeated installation is safe. Install before the first expression update; undo and reinstall after changing the expression bindings themselves. Uninstall restores the original bindings and values without disposing materials or textures. The loader installs automatically, so ordinary loading needs no manual setup call.
 
@@ -132,13 +134,13 @@ enableLilToonVRM(new VRMLoaderPlugin(parser, vrmOptions), { onWarning });
 
 Use one setup per loader; the first enhancement's warning options apply. The renderer setup is independent of these loading options.
 
-`LilToonWarning` is exported from both `three-liltoon` and `three-liltoon/gltf`. Warnings contain `severity: "warning"`, a stable `code`, `materialName`, glTF `materialIndex`, `property`, `shaderKey`, and a readable `message`. They do not reject loading or change authored settings. With no callback they are logged to the console; the completed load also exposes them as `gltf.userData.lilToonWarnings`. Use a fresh collection per load if reusing a loader.
+`LilToonWarning` is exported from both `@mochiya/three-liltoon` and `@mochiya/three-liltoon/gltf`. Warnings contain `severity: "warning"`, a stable `code`, `materialName`, glTF `materialIndex`, `property`, `shaderKey`, and a readable `message`. They do not reject loading or change authored settings. With no callback they are logged to the console; the completed load also exposes them as `gltf.userData.lilToonWarnings`. Use a fresh collection per load if reusing a loader.
 
 Checks cover known enabled forward features missing from the selected program, active assigned textures without samplers, incompatible 2D/cube textures, extension-version differences, and unsupported Unity shader families. Dormant texture slots and supported shared MatCap normals do not produce warnings. For example, enabling reflection and assigning a MatCap mask alongside an emission mask reports what the emission-mask profile cannot reproduce. A lack of warnings is not a guarantee of Unity visual parity or GPU/geometry correctness.
 
 Direct material users can call `material.getWarnings()` and inspect `material.shaderKey`; this check is side-effect-free. Recheck after `setProperty` / `setTexture`: texture edits automatically reselect the shader profile; unsupported combinations still warn. `LilToonMaterialLoader.onWarning` provides the same feature diagnostics for standalone JSON loads (that loader does not resolve serialized texture references). Outline, shadow, and other passes are outside the forward-profile check. Real file/parse failures still reject; explicit unsupported pass constructors still throw.
 
-Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.liltoon-exporter`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
+Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.avatar-tools`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
 ## Develop and verify
 
@@ -180,13 +182,13 @@ npm run dev
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Feature matrix](docs/FEATURE_MATRIX.md)
-- [Porting exceptions](docs/PORTING_EXCEPTIONS.md)
-- [Material/glTF format](docs/MATERIAL_FORMAT.md)
-- [Upgrading lilToon](docs/UPGRADING_LILTOON.md)
-- [Publishing](docs/PUBLISHING.md)
+- [Architecture](https://github.com/zekailin00/three-liltoon/blob/main/docs/ARCHITECTURE.md)
+- [Feature matrix](https://github.com/zekailin00/three-liltoon/blob/main/docs/FEATURE_MATRIX.md)
+- [Porting exceptions](https://github.com/zekailin00/three-liltoon/blob/main/docs/PORTING_EXCEPTIONS.md)
+- [Material/glTF format](https://github.com/zekailin00/three-liltoon/blob/main/docs/MATERIAL_FORMAT.md)
+- [Upgrading lilToon](https://github.com/zekailin00/three-liltoon/blob/main/docs/UPGRADING_LILTOON.md)
+- [Publishing](https://github.com/zekailin00/three-liltoon/blob/main/docs/PUBLISHING.md)
 
 ## License
 
-Package code is MIT. Upstream and carried notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). DXC, SPIRV-Cross, SPIRV-Tools, glslang, Playwright, and Three.js are not redistributed in the runtime package.
+Package code is MIT. Upstream and carried notices are in [THIRD_PARTY_NOTICES.md](dist/THIRD_PARTY_NOTICES.md). DXC, SPIRV-Cross, SPIRV-Tools, glslang, Playwright, and Three.js are not redistributed in the runtime package.

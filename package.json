@@ -1,5 +1,5 @@
 {
-	"name": "three-liltoon",
+	"name": "@mochiya/three-liltoon",
 	"version": "0.1.0",
 	"description": "Unofficial lilToon material and shader integration for Three.js WebGL2",
 	"license": "MIT",
@@ -8,15 +8,28 @@
 		"url": "https://mochiya.org"
 	},
 	"homepage": "https://mochiya.org",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zekailin00/three-liltoon.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zekailin00/three-liltoon/issues"
+	},
+	"keywords": [
+		"three.js",
+		"liltoon",
+		"gltf",
+		"vrm",
+		"webgl2"
+	],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
 	"type": "module",
 	"sideEffects": false,
 	"files": [
-		"dist",
-		"schema",
-		"docs/MATERIAL_FORMAT.md",
-		"README.md",
-		"LICENSE",
-		"THIRD_PARTY_NOTICES.md"
+		"dist"
 	],
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -34,7 +47,7 @@
 			"types": "./dist/vrm.d.ts",
 			"import": "./dist/vrm.js"
 		},
-		"./schema": "./schema/MOCHIYA_materials_liltoon.schema.json"
+		"./schema": "./dist/schema/MOCHIYA_materials_liltoon.schema.json"
 	},
 	"engines": {
 		"node": ">=20"
@@ -46,6 +59,7 @@
 		"tools:check": "tsx tools/shader-build/check-toolchain.ts",
 		"generate": "npm run generate:gltf-schema && tsx tools/generators/generate-material-schema.ts && tsx tools/generators/generate-render-states.ts && tsx tools/generators/generate-third-party-notices.ts",
 		"generate:gltf-schema": "tsx tools/generators/generate-gltf-schema.ts",
+		"package:stage": "node scripts/stage-package.mjs",
 		"generate:all": "npm run generate && npm run shaders:build",
 		"shaders:build": "tsx tools/shader-build/build-all.ts",
 		"shaders:preprocess": "tsx tools/shader-build/preprocess.ts",
@@ -61,8 +75,8 @@
 		"example:viewer:dev": "npm --prefix examples/mochiya-liltoon-viewer run dev",
 		"example:viewer:build": "npm --prefix examples/mochiya-liltoon-viewer run build",
 		"typecheck": "npm run generate:all && tsc --noEmit",
-		"build:package": "npm run generate:all && tsup",
-		"build": "npm run generate:all && tsc --noEmit && tsup",
+		"build:package": "npm run generate:all && tsup && npm run package:stage",
+		"build": "npm run generate:all && tsc --noEmit && tsup && npm run package:stage",
 		"prepublishOnly": "npm run build && npm test"
 	},
 	"peerDependencies": {

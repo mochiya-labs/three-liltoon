@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	transpilePackages: ["three-liltoon"],
+	transpilePackages: ["@mochiya/three-liltoon"],
 	turbopack: {
 		root: process.cwd(),
 	},

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Bounds, Grid, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { AnimationMixer, NeutralToneMapping, SRGBColorSpace } from "three";
-import { enableLilToon } from "three-liltoon";
+import { enableLilToon } from "@mochiya/three-liltoon";
 
 import { disposeModel } from "@/lib/model/dispose-model";
 import { loadModel } from "@/lib/model/load-model";

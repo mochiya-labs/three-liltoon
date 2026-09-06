@@ -1,4 +1,4 @@
-import { LilToonMaterial, GLTFLilToonExtension } from './chunk-QFSBPSQT.js';
+import { LilToonMaterial, GLTFLilToonExtension } from './chunk-LEOYQ4DX.js';
 import { VRMExpressionMaterialColorBind, VRMExpressionTextureTransformBind } from '@pixiv/three-vrm';
 
 var colorProperties = {

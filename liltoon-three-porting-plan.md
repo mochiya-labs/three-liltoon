@@ -3690,7 +3690,7 @@ The most important maintenance property is:
 
 ## 54.1 Goal and boundary
 
-**Pre-release API cleanup, 2026-09-06:** Remove deprecated functions/classes rather than retaining compatibility exports. Keep `enableLilToon`, `enableLilToonVRM` and `GLTFLilToonExtension` as the supported setup API. Remove the renderer/VRM subclasses, manual adapter/pass manager, outline/caster wrappers and material adapter assignment. Preserve automatic lighting, outlines and casters through private renderer context and scheduling code. Migrate tests to the supported helpers, regenerate public bundles/declarations, and verify consumers. Avatar asset runtime has no remaining deprecated functions/classes; its core remains independent of materials.
+**Pre-release API cleanup, 2026-09-06:** Remove deprecated functions/classes rather than retaining compatibility exports. Keep `enableLilToon`, `enableLilToonVRM` and `GLTFLilToonExtension` as the supported setup API. Remove the renderer/VRM subclasses, manual adapter/pass manager, outline/caster wrappers and material adapter assignment. Preserve automatic lighting, outlines and casters through private renderer context and scheduling code. Migrate tests to the supported helpers, regenerate public bundles/declarations, and verify consumers. Avatar Composition has no remaining deprecated functions/classes; its core remains independent of materials.
 
 **API refinement, 2026-09-06:** Use standard `WebGLRenderer` with `enableLilToon(renderer)`. For VRM-capable loading, register `enableLilToonVRM(new VRMLoaderPlugin(parser, options))` from `three-liltoon/vrm`. The helper returns the same plugin instance, composes lilToon material loading and tangent preparation, then adapts expressions after the original VRM hook completes. It also loads ordinary glTF/GLB without requiring VRM data. Keep `GLTFLilToonExtension` as the independent glTF-only entry without a three-vrm dependency. Renderer/plugin subclasses and deprecated manual APIs are removed before the first release. Migrate maintained examples and public usage guidance; verify same-instance/options preservation, repeated enhancement, material fallback, asynchronous ordering, glTF/VRM loading, warnings and package entry isolation.
 
@@ -3720,7 +3720,7 @@ The following APIs are implemented:
 
 ```ts
 import { Mesh, MeshBasicMaterial, Scene, WebGLRenderer } from "three";
-import { LilToonMaterial, enableLilToon } from "three-liltoon";
+import { LilToonMaterial, enableLilToon } from "@mochiya/three-liltoon";
 
 const renderer = new WebGLRenderer({ antialias: true });
 const releaseRendering = enableLilToon(renderer);
@@ -3812,32 +3812,50 @@ Validation: 90 unit tests, nine Chrome viewer tests, library typecheck/bundle, b
 
 ## 54.9 Pre-release API cleanup
 
-All deprecated setup classes, exports and material adapter assignment are removed. `enableLilToon.ts` owns scheduling and `rendererContext.ts` owns private per-renderer inputs. The public setup remains `enableLilToon(renderer)`, `enableLilToonVRM(new VRMLoaderPlugin(parser, options))`, or the independent `GLTFLilToonExtension` for glTF-only loading. No compatibility aliases are retained. Avatar asset runtime has no deprecated functions/classes.
+All deprecated setup classes, exports and material adapter assignment are removed. `enableLilToon.ts` owns scheduling and `rendererContext.ts` owns private per-renderer inputs. The public setup remains `enableLilToon(renderer)`, `enableLilToonVRM(new VRMLoaderPlugin(parser, options))`, or the independent `GLTFLilToonExtension` for glTF-only loading. No compatibility aliases are retained. Avatar Composition has no deprecated functions/classes.
 
 Verification: 89 unit tests, two standalone Chrome tests, nine attachment-viewer Chrome tests, library typechecking/bundling and both viewer production builds pass. The rebuilt tarball and declarations exclude removed APIs; an isolated root/glTF consumer runs and typechecks without VRM. Shader and Unity behavior are unchanged.
 
 ## 55. Generated material-extension schema
 
-Publish `schema/MOCHIYA_materials_liltoon.schema.json` and the `three-liltoon/schema` package export. Generate Draft 7 JSON Schema from the annotated public wire types in `src/loaders/types.ts` using development-only tooling. `docs/MATERIAL_FORMAT.md` defines placement, meaning and defaults; the generated schema supplies structural constraints. Keep this separate from the ShaderLab property/default generator.
+Generate `schema/MOCHIYA_materials_liltoon.schema.json` as the reviewed source artifact and stage it at `dist/schema/MOCHIYA_materials_liltoon.schema.json` for the `@mochiya/three-liltoon/schema` package export. Generate Draft 7 JSON Schema from the annotated public wire types in `src/loaders/types.ts` using development-only tooling. `docs/MATERIAL_FORMAT.md` defines placement, meaning and defaults; the generated schema supplies structural constraints. Keep this separate from the ShaderLab property/default generator.
 
 The authoring contract describes version 1.0, optional fields, JSON scalar/boolean/numeric-array properties and nonnegative integer texture indices. Original property/texture names stay open dictionaries; do not enumerate only rendered shader features. Three.js Color/Vector instances belong to material constructors, not glTF payloads. Unknown top-level fields are authoring errors; the existing loader remains permissive and warns on version differences without a new validation gate.
 
 Run schema generation in the normal generation/build chain and expose an independent command requiring neither upstream shader sources nor compiler binaries. Check the generated file into the repository and include it in packed installs. Validate representative exporter-shaped payloads, malformed references/values, documented examples and generation consistency; rebuild declarations and verify the packed schema export. No shader, Unity exporter or attachment-runtime behavior changes are required.
 
-Implemented and verified: 31 schema checks and 89 existing runtime unit tests pass, along with library TypeScript checking and tsup bundling. The generated Draft 7 file compiles with Ajv, matches fresh generation, and validates the format guide's example. A packed isolated consumer imports the exact schema through `three-liltoon/schema` and typechecks the root/glTF entries without VRM, attachment runtime or schema tooling installed. Prettier and whitespace checks pass. The generator is pinned to 2.4.0 to retain Node 20 development compatibility; Ajv is test-only. Shader generation, browser rendering and Unity export were not rerun for this contract/tooling change.
+Implemented and verified: 31 schema checks and 89 existing runtime unit tests pass, along with library TypeScript checking and tsup bundling. The generated Draft 7 file compiles with Ajv, matches fresh generation, and validates the format guide's example. A packed isolated consumer imports the exact schema through `@mochiya/three-liltoon/schema` and typechecks the root/glTF entries without VRM, attachment runtime or schema tooling installed. Prettier and whitespace checks pass. The generator is pinned to 2.4.0 to retain Node 20 development compatibility; Ajv is test-only. Shader generation, browser rendering and Unity export were not rerun for this contract/tooling change.
 
 ## 56. Diagnostic viewer application alignment
 
 Keep the diagnostic viewer focused on one model and one material inspector while aligning its application shell with Mochiya's other creator tools.
 
-| Area        | Baseline                                                                                                                                                    |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Workspace   | Full-height viewport and inspector with no gutter, square panel boundaries, and a stacked mobile layout                                                     |
-| Brand       | The Mochiya site icon and Space Grotesk heading face                                                                                                        |
-| Language    | One typed English/Japanese dictionary for all fixed viewer and inspector labels; changing language updates the document language                            |
-| Theme       | Header control for the existing olive light/dark token sets                                                                                                 |
-| Empty scene | Always-mounted Three.js canvas using the avatar asset viewer's background colors, grid, ground shadow, lights, camera, tone mapping, and output color space |
+| Area        | Baseline                                                                                                                                                          |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace   | Full-height viewport and inspector with no gutter, square panel boundaries, and a stacked mobile layout                                                           |
+| Brand       | The Mochiya site icon and Space Grotesk heading face                                                                                                              |
+| Language    | One typed English/Japanese dictionary for all fixed viewer and inspector labels; changing language updates the document language                                  |
+| Theme       | Header control for the existing olive light/dark token sets                                                                                                       |
+| Empty scene | Always-mounted Three.js canvas using the Avatar Composition viewer's background colors, grid, ground shadow, lights, camera, tone mapping, and output color space |
 
 Preserve local-file loading, lilToon/VRM setup, animation playback, model framing, material inspection, warnings, and GPU cleanup. The scene remains a diagnostic baseline rather than a Unity lighting-parity promise. Verify dictionary key parity, exact declarative scene constants, TypeScript, ESLint, production build, both themes, both languages, responsive panel stacking, and an empty-scene browser render.
 
 The model frame uses Drei `Bounds` with `OrbitControls` as the default controls. `Bounds` reads and updates the default control's public `target` vector while fitting a model; controls without that contract must not be registered as its default controls. A real exported VRM browser regression must complete its initial fit and subsequent frames without uncaught errors.
+
+## 57. Avatar Composition package identity
+
+The independent attachment package is publicly named **Mochiya Avatar Composition**, published as `@mochiya/avatar-composition`, and owns `MOCHIYA_avatar_composition`. `three-liltoon` remains independent: it owns only `MOCHIYA_materials_liltoon`, and its VRM helper requires neither the composition package nor its extension. References in public documentation and the diagnostic viewer use the new package name while the sibling checkout remains at `../avatar-asset-runtime` for local workspace compatibility.
+
+## 58. npm publication boundary
+
+Publish the material library as the public scoped package `@mochiya/three-liltoon`. The repository and product name remain three-liltoon. Package imports use the scoped root, `/gltf`, `/vrm` and `/schema` exports; no unscoped compatibility package is published before the first release.
+
+The npm allowlist contains only `dist`. The normal build stages the generated JSON Schema and third-party notice into `dist` after tsup, so consumers receive runtime JavaScript, declarations, schema and licensing notices without source, tools, tests, examples, vendor files, compiler binaries or lockfiles. npm also includes `package.json`, README and LICENSE as required package metadata. `publishConfig` fixes the public npm registry and public access for the organization scope. Direct publication retains the full build and test gate in `prepublishOnly`; local `npm pack --json` remains free of lifecycle output so the diagnostic viewer can parse and install the checked-in artifact.
+
+Release preparation is documented in `docs/PUBLISHING.md`: authenticate the npm account, run the toolchain/build/test/parity checks, inspect `npm pack --dry-run`, test the tarball in an isolated consumer, publish the first version with public access, and verify the registry version/dist-tags. Automated publication should use npm trusted publishing rather than committed credentials.
+
+## 59. Windows shader-tool discovery
+
+Shader-tool discovery follows the operating system's executable rules. On Windows, each `PATH` entry is searched with `PATHEXT`, allowing ordinary commands such as `dxc`, `spirv-cross`, and `spirv-val` to resolve their `.exe` files exactly as they do in PowerShell and Command Prompt. Empty entries and directories with a matching name are ignored. Explicit tool environment variables retain precedence.
+
+The checked toolchain baseline is DXC 1.9.0.5399 and SPIRV-Tools 2026.3 from Vulkan SDK 1.4.357.0. Rebuilding all 33 shader variants with this baseline produces no tracked generated-shader changes from the previous artifacts. Unit coverage simulates Windows `.exe` discovery through `PATHEXT` and ordinary multi-entry PATH lookup. The full build and all 209 tests pass, and the 15-file npm payload remains limited to `dist/**`, README, LICENSE, and package metadata.

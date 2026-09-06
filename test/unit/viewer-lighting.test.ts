@@ -20,7 +20,7 @@ const canvasSource = readFileSync(
 const lightElement = source.match(/<directionalLight\b[\s\S]*?\/>/)?.[0] ?? "";
 
 describe("viewer fixed lighting", () => {
-	it("matches the avatar asset viewer scene baseline", () => {
+	it("matches the Avatar Composition viewer scene baseline", () => {
 		expect(source).toContain(
 			'<hemisphereLight args={["#e0faff", "#fff0db", 0.5]} />',
 		);

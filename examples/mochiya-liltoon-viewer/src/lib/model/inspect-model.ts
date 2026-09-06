@@ -2,7 +2,7 @@ import {
 	LilToonMaterial,
 	LILTOON_GLTF_EXTENSION,
 	type LilToonWarning,
-} from "three-liltoon";
+} from "@mochiya/three-liltoon";
 import {
 	Color,
 	Material,

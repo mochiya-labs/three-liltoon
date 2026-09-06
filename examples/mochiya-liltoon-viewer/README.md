@@ -52,7 +52,7 @@ For lilToon materials, the Properties tab shows the full effective `lilToonPrope
 
 The loader collects structured `three-liltoon` compatibility warnings without marking the load as failed. The viewport shows **Ready · N warnings**; expand **rendering warnings** in the inspector for affected materials, parameters, and shader profiles. Click a material name to select it. Each material's Details tab includes its actual runtime shader profile and warnings. Replacing the model clears the previous inspection/warnings. Diagnostics identify unsupported active features or texture bindings, not every possible visual mismatch; disabled feature slots are ignored.
 
-The canvas is present before and after loading a model. Its empty scene matches the avatar asset runtime viewer: light/dark olive backgrounds, a 0.25-unit grid, shadow receiver, hemisphere fill, fixed world-space directional light, neutral tone mapping, sRGB output, and CameraControls. Orbiting, panning, and zooming do not move the light or its target. Rendering stays direct to the canvas without post-processing.
+The canvas is present before and after loading a model. Its empty scene matches the Avatar Composition viewer: light/dark olive backgrounds, a 0.25-unit grid, shadow receiver, hemisphere fill, fixed world-space directional light, neutral tone mapping, sRGB output, and OrbitControls. Orbiting, panning, and zooming do not move the light or its target. Rendering stays direct to the canvas without post-processing.
 
 ## Source layout
 

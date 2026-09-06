@@ -19,7 +19,7 @@ import {
 	WebGLRenderer,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { LilToonMaterial, enableLilToon } from "three-liltoon";
+import { LilToonMaterial, enableLilToon } from "@mochiya/three-liltoon";
 
 const canvas = document.querySelector("#scene");
 const status = document.querySelector("#status");

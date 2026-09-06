@@ -78,11 +78,11 @@ Colors and vectors use arrays; Three.js `Color`/`Vector` instances are construct
 
 Property and texture names are open dictionaries, including names unsupported by the current renderer. Unknown fields outside those dictionaries are rejected by the authoring schema. The loader does not enforce this schema at runtime: version mismatches still warn and load on a best-effort basis. Structural validation cannot verify referenced textures exist, shader feature support, or visual parity. Keep standard glTF material fallback data and list the extension in `extensionsUsed` for unaware viewers.
 
-The package exports the schema as `three-liltoon/schema`. For example, with [Ajv](https://ajv.js.org/guide/getting-started.html) installed:
+The package exports the schema as `@mochiya/three-liltoon/schema`. For example, with [Ajv](https://ajv.js.org/guide/getting-started.html) installed:
 
 ```js
 import Ajv from "ajv";
-import schema from "three-liltoon/schema" with { type: "json" };
+import schema from "@mochiya/three-liltoon/schema" with { type: "json" };
 
 const validate = new Ajv({ allowUnionTypes: true }).compile(schema);
 const payload = gltf.materials[0].extensions.MOCHIYA_materials_liltoon;

@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { delimiter } from "node:path";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { delimiter, extname, join } from "node:path";
 
 export interface Toolchain {
 	dxc: string;
@@ -9,11 +9,37 @@ export interface Toolchain {
 	glslangValidator?: string;
 }
 
-function executableOnPath(name: string): string | undefined {
-	const candidates = (process.env.PATH ?? "")
-		.split(delimiter)
-		.map((directory) => `${directory}/${name}`);
-	return candidates.find(existsSync);
+export interface ExecutableSearchOptions {
+	path?: string;
+	pathExt?: string;
+	platform?: NodeJS.Platform;
+}
+
+export function executableOnPath(
+	name: string,
+	options: ExecutableSearchOptions = {},
+): string | undefined {
+	const platform = options.platform ?? process.platform;
+	const pathValue = options.path ?? process.env.PATH ?? "";
+	const pathExt =
+		options.pathExt ?? process.env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD";
+	const extensions =
+		platform === "win32" && extname(name) === ""
+			? ["", ...pathExt.split(";").filter(Boolean)]
+			: [""];
+
+	for (const pathEntry of pathValue.split(delimiter)) {
+		const directory = pathEntry.trim().replace(/^"|"$/g, "");
+		if (!directory) continue;
+
+		for (const extension of extensions) {
+			const candidate = join(directory, `${name}${extension}`);
+			if (existsSync(candidate) && statSync(candidate).isFile())
+				return candidate;
+		}
+	}
+
+	return undefined;
 }
 
 function resolveTool(

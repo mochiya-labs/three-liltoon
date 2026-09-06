@@ -1,0 +1,104 @@
+{
+  "$comment": "Generated from src/loaders/types.ts. Do not edit; run npm run generate:gltf-schema.",
+  "title": "MOCHIYA_materials_liltoon",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/GLTFLilToonMaterialDefinition",
+  "definitions": {
+    "GLTFLilToonMaterialDefinition": {
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "1.0",
+          "description": "Extension version. When omitted, the current version is assumed."
+        },
+        "lilToonVersion": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "description": "Source lilToon version, retained as metadata."
+        },
+        "shaderVariant": {
+          "type": "string",
+          "description": "Original Unity shader name; does not imply renderer support for that shader."
+        },
+        "renderMode": {
+          "$ref": "#/definitions/LilToonRenderMode",
+          "description": "When omitted, inferred from shaderVariant (cutout, trans, otherwise opaque)."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/GLTFLilToonPropertyValue"
+          },
+          "description": "Original property names and linear values, including per-texture <name>_ST transforms."
+        },
+        "textures": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/GLTFLilToonTextureInfo"
+              },
+              {
+                "type": "integer",
+                "description": "A zero-based glTF index.",
+                "minimum": 0
+              }
+            ]
+          },
+          "description": "Original texture property names mapped to glTF texture indices or texture-info objects."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Material extension payload at materials[i].extensions.MOCHIYA_materials_liltoon."
+    },
+    "LilToonRenderMode": {
+      "type": "string",
+      "enum": [
+        "opaque",
+        "cutout",
+        "transparent"
+      ]
+    },
+    "GLTFLilToonPropertyValue": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      ],
+      "description": "JSON property values. Colors and vectors use numeric arrays, not Three.js objects."
+    },
+    "GLTFLilToonTextureInfo": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Index into the glTF textures array.",
+          "minimum": 0
+        },
+        "texCoord": {
+          "type": "integer",
+          "description": "Texture coordinate set. The current renderer uses TEXCOORD_0 only.",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "required": [
+        "index"
+      ],
+      "additionalProperties": false,
+      "description": "A reference to a texture in the enclosing glTF document."
+    }
+  }
+}

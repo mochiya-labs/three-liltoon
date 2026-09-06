@@ -1,6 +1,6 @@
 import type { VRM } from "@pixiv/three-vrm";
 import type { AnimationClip, Group } from "three";
-import type { LilToonWarning } from "three-liltoon";
+import type { LilToonWarning } from "@mochiya/three-liltoon";
 
 export type ModelSource = {
 	id: string;

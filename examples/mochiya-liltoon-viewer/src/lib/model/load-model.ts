@@ -1,6 +1,6 @@
 import { VRMLoaderPlugin, VRMUtils, type VRM } from "@pixiv/three-vrm";
-import type { LilToonWarning } from "three-liltoon";
-import { enableLilToonVRM } from "three-liltoon/vrm";
+import type { LilToonWarning } from "@mochiya/three-liltoon";
+import { enableLilToonVRM } from "@mochiya/three-liltoon/vrm";
 import { Mesh } from "three";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 
