@@ -20,10 +20,10 @@ The runtime JavaScript, TypeScript declarations, extension schema and third-part
 ## Install
 
 ```bash
-npm install three https://github.com/zekailin00/three-liltoon.git
+npm install @mochiya/three-liltoon three
 ```
 
-The Git installation exposes the package as `@mochiya/three-liltoon`. After the first npm release, install it with `npm install @mochiya/three-liltoon three`.
+Add `@pixiv/three-vrm` when using the optional `/vrm` integration.
 
 ## Choose your setup
 
