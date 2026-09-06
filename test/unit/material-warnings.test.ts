@@ -83,19 +83,15 @@ describe("material profile warnings", () => {
 		expect(material.getWarnings()).toEqual([]);
 	});
 
-	it("rechecks edits against the existing program instead of silently reselecting it", () => {
+	it("reselects the supported program when texture requirements change", () => {
 		const material = new LilToonMaterial();
 		material.setTexture("_EmissionBlendMask", new DataTexture());
 		expect(material.getWarnings()).toEqual([]);
 		material.setProperty("_UseEmission", 1);
-		expect(material.shaderKey).toBe("standard-opaque");
-		expect(material.getWarnings()).toContainEqual(
-			expect.objectContaining({
-				property: "_EmissionBlendMask",
-				code: "unused-texture",
-			}),
-		);
+		expect(material.shaderKey).toBe("standard-opaque-emission-mask");
+		expect(material.getWarnings()).toEqual([]);
 		material.setTexture("_EmissionBlendMask", null);
+		expect(material.shaderKey).toBe("standard-opaque");
 		expect(material.getWarnings()).toEqual([]);
 	});
 
@@ -122,7 +118,7 @@ describe("material profile warnings", () => {
 		material.setTexture("_MatCapBumpMap", new DataTexture());
 		expect(material.getWarnings()).toContainEqual(
 			expect.objectContaining({
-				property: "_MatCapBumpMap",
+				property: "_ShadowBorderMask",
 				code: "unused-texture",
 			}),
 		);

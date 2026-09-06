@@ -1,3 +1,4 @@
-export { G as GLTFLilToonExtension, b as GLTFLilToonExtensionOptions, p as GLTFLilToonMaterialDefinition, q as GLTFLilToonTextureInfo, c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, h as LilToonMaterialLoader, m as LilToonWarning, n as LilToonWarningCode } from './gltf-HpUJqscG.js';
+export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-2SkJrHyN.js';
+export { G as GLTFLilToonMaterialDefinition, j as GLTFLilToonTextureInfo, b as LILTOON_GLTF_EXTENSION, c as LILTOON_GLTF_SPEC_VERSION, e as LilToonMaterialLoader } from './gltf-Cx5c6-T5.js';
 import 'three';
 import 'three/examples/jsm/loaders/GLTFLoader.js';

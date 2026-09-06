@@ -19,11 +19,7 @@ import {
 	WebGLRenderer,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import {
-	LilToonMaterial,
-	LilToonRendererAdapter,
-	OutlinePass,
-} from "three-liltoon";
+import { LilToonMaterial, enableLilToon } from "three-liltoon";
 
 const canvas = document.querySelector("#scene");
 const status = document.querySelector("#status");
@@ -31,6 +27,7 @@ const context = canvas.getContext("webgl2", { antialias: true, alpha: false });
 if (!context) throw new Error("This example requires WebGL2.");
 
 const renderer = new WebGLRenderer({ canvas, context, antialias: true });
+enableLilToon(renderer);
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFShadowMap;
@@ -71,11 +68,10 @@ const material = new LilToonMaterial({
 		_RimBorder: 0.45,
 		_RimBlur: 0.55,
 		_OutlineWidth: 0.055,
+		_UseOutline: 1,
 		_OutlineColor: [0.16, 0.06, 0.1, 1],
 	},
 });
-const adapter = new LilToonRendererAdapter(renderer);
-material.setRendererAdapter(adapter);
 
 const hero = new Mesh(new SphereGeometry(1.25, 96, 64), material);
 hero.position.y = 1.3;
@@ -95,7 +91,6 @@ for (let index = 0; index < morphPositions.count; index += 1) {
 hero.geometry.morphAttributes.position = [morphPositions];
 hero.updateMorphTargets();
 scene.add(hero);
-new OutlinePass().attach(hero, material);
 
 const neutral = new MeshStandardMaterial({ color: 0x858a72, roughness: 0.9 });
 const floor = new Mesh(new PlaneGeometry(20, 20), neutral);
@@ -147,14 +142,13 @@ function createSkinnedColumn() {
 			_Color: [0.63, 0.72, 0.36, 1],
 			_OutlineWidth: 0.04,
 		},
-	}).setRendererAdapter(adapter);
+	});
 	const mesh = new SkinnedMesh(geometry, skinMaterial);
 	mesh.add(bones[0]);
 	mesh.bind(new Skeleton(bones));
 	mesh.position.set(-2.2, halfHeight, 0.5);
 	mesh.castShadow = true;
 	mesh.receiveShadow = true;
-	new OutlinePass().attach(mesh, skinMaterial);
 	return { mesh, bones };
 }
 const skinnedColumn = createSkinnedColumn();
@@ -175,7 +169,7 @@ function frame(time) {
 	hero.morphTargetInfluences[0] = Math.sin(time * 0.0013) * 0.5 + 0.5;
 	skinnedColumn.bones[2].rotation.z = Math.sin(time * 0.0015) * 0.42;
 	skinnedColumn.bones[3].rotation.z = Math.cos(time * 0.0012) * 0.22;
-	adapter.render(scene, camera);
+	renderer.render(scene, camera);
 	if (!reported && renderer.info.programs?.length) {
 		const error = context.getError();
 		reported = true;

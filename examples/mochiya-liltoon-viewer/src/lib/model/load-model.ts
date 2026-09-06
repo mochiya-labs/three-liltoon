@@ -1,7 +1,7 @@
 import { VRMLoaderPlugin, VRMUtils, type VRM } from "@pixiv/three-vrm";
-import { LilToonRendererAdapter, type LilToonWarning } from "three-liltoon";
-import { GLTFLilToonExtension } from "three-liltoon/gltf";
-import { Mesh, type WebGLRenderer } from "three";
+import type { LilToonWarning } from "three-liltoon";
+import { enableLilToonVRM } from "three-liltoon/vrm";
+import { Mesh } from "three";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 
 import { inspectModel } from "./inspect-model";
@@ -17,22 +17,15 @@ function errorMessage(error: unknown) {
 
 export function loadModel(
 	url: string,
-	renderer: WebGLRenderer,
 	onProgress: (progress?: number) => void,
 ): Promise<LoadedModel> {
-	const adapter = new LilToonRendererAdapter(renderer);
 	const loader = new GLTFLoader();
 	const warnings: LilToonWarning[] = [];
-	loader.register(
-		(parser) =>
-			new GLTFLilToonExtension(parser, {
-				rendererAdapter: adapter,
-				addOutlines: true,
-				configureShadowCasters: true,
-				onWarning: (warning) => warnings.push(warning),
-			}),
+	loader.register((parser) =>
+		enableLilToonVRM(new VRMLoaderPlugin(parser), {
+			onWarning: (warning) => warnings.push(warning),
+		}),
 	);
-	loader.register((parser) => new VRMLoaderPlugin(parser));
 
 	return new Promise((resolve, reject) => {
 		loader.load(

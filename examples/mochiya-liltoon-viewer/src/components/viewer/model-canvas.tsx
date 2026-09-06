@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Bounds, Grid, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { AnimationMixer } from "three";
+import { enableLilToon } from "three-liltoon";
 
 import { disposeModel } from "@/lib/model/dispose-model";
 import { loadModel } from "@/lib/model/load-model";
@@ -57,6 +58,7 @@ function ModelLoader({
 	onStatusChange,
 }: ModelCanvasProps) {
 	const renderer = useThree((state) => state.gl);
+	useEffect(() => enableLilToon(renderer), [renderer]);
 	const [model, setModel] = useState<LoadedModel | null>(null);
 
 	useEffect(() => {
@@ -65,7 +67,7 @@ function ModelLoader({
 		onInspectionChange(null);
 		onStatusChange({ phase: "loading" });
 
-		loadModel(source.url, renderer, (progress) => {
+		loadModel(source.url, (progress) => {
 			if (active) onStatusChange({ phase: "loading", progress });
 		})
 			.then((nextModel) => {

@@ -1,172 +1,265 @@
-import { warnLilToon, getNeutralTexture, LilToonMaterial, UnsupportedFeatureError } from './chunk-RVQHELZP.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialLoader, OutlinePass, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-RVQHELZP.js';
-import { Vector3, CubeTexture, Vector4, Color, AmbientLight, HemisphereLight, Matrix4, DirectionalLight } from 'three';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-HWXASNFK.js';
+import { UnsupportedFeatureError, LilToonMaterial, setGlobalProperty } from './chunk-QFSBPSQT.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-QFSBPSQT.js';
+import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, BackSide, SkinnedMesh, Mesh } from 'three';
 
-var LilToonEnvironmentAdapter = class {
-  #warnedEquirectangular = false;
-  read(scene) {
-    if (!scene.environment) return null;
-    if (scene.environment instanceof CubeTexture) return scene.environment;
-    if (!this.#warnedEquirectangular) {
-      this.#warnedEquirectangular = true;
-      warnLilToon("Raw equirectangular/PMREM environment access is not public in WebGLRenderer; use a CubeTexture for lilToon reflection.");
-    }
-    return null;
+var helpers = /* @__PURE__ */ new WeakSet();
+var originalHooks = /* @__PURE__ */ new WeakMap();
+var AutomaticPasses = class {
+  recipes = /* @__PURE__ */ new Map();
+  proxies = /* @__PURE__ */ new WeakMap();
+  hidden = new MeshBasicMaterial({ visible: false });
+  active = /* @__PURE__ */ new Set();
+  depth = 0;
+  begin() {
+    this.depth++;
   }
-  bind(scene, globals) {
-    const texture = this.read(scene);
-    const hdr = globals.unity_SpecCube0_HDR;
-    if (hdr instanceof Vector4) {
-      hdr.set(texture ? 1 : 0, 1, 0, 0);
-    }
-    return texture;
+  end() {
+    if (--this.depth !== 0) return;
+    for (const [source, recipe] of this.recipes)
+      if (!this.active.has(source)) recipe.release();
+    this.active.clear();
   }
-};
-var lightPosition = new Vector3();
-var targetPosition = new Vector3();
-var LilToonLightAdapter = class {
-  read(scene) {
-    let main;
-    const ambient = new Color(0.05, 0.05, 0.05);
-    scene.traverseVisible((object) => {
-      if (!main && object instanceof DirectionalLight) main = object;
-      if (object instanceof AmbientLight) ambient.add(object.color.clone().multiplyScalar(object.intensity));
-      if (object instanceof HemisphereLight) {
-        ambient.add(object.color.clone().add(object.groundColor).multiplyScalar(object.intensity * 0.5));
-      }
+  recipe(source) {
+    this.active.add(source);
+    let recipe = this.recipes.get(source);
+    if (!recipe) {
+      const outline = new LilToonMaterial({
+        pass: "outline",
+        renderMode: source.renderMode,
+        properties: source.lilToonProperties,
+        textures: source.lilToonTextures
+      });
+      const depth = new MeshDepthMaterial({ depthPacking: RGBADepthPacking });
+      const distance = new MeshDistanceMaterial();
+      recipe = {
+        source,
+        outline,
+        depth,
+        distance,
+        input: null,
+        map: null,
+        release: () => {
+          source.removeEventListener("dispose", recipe.release);
+          outline.dispose();
+          depth.dispose();
+          distance.dispose();
+          recipe.map?.dispose();
+          this.recipes.delete(source);
+        }
+      };
+      this.recipes.set(source, recipe);
+      source.addEventListener("dispose", recipe.release);
+    }
+    source.getProperty("_Color");
+    for (const [name, value] of Object.entries(source.lilToonProperties)) {
+      recipe.outline.lilToonProperties[name] = value;
+      setGlobalProperty(recipe.outline.globalUniforms, name, value);
+    }
+    recipe.outline.setProperty("_Color", source.getProperty("_Color"));
+    for (const [name, texture] of Object.entries(source.lilToonTextures)) {
+      if (recipe.outline.lilToonTextures[name] !== texture)
+        recipe.outline.setTexture(name, texture);
+    }
+    recipe.outline.side = BackSide;
+    recipe.outline.visible = source.visible;
+    if (recipe.input !== source.map) {
+      recipe.map?.dispose();
+      recipe.input = source.map;
+      recipe.map = source.map?.clone() ?? null;
+      if (recipe.map) recipe.map.matrixAutoUpdate = false;
+    }
+    if (recipe.map) {
+      const st = source.getProperty("_MainTex_ST");
+      const v = Array.isArray(st) ? st : st && typeof st === "object" && "toArray" in st ? st.toArray() : [1, 1, 0, 0];
+      recipe.map.matrix.setUvTransform(
+        v[2] ?? 0,
+        v[3] ?? 0,
+        v[0] ?? 1,
+        v[1] ?? 1,
+        0,
+        0,
+        0
+      );
+    }
+    return recipe;
+  }
+  prepare(scene) {
+    const undo = [];
+    const meshes = [];
+    scene.traverse((node) => {
+      if (node.isMesh && !helpers.has(node))
+        meshes.push(node);
     });
-    const direction = new Vector3();
-    const color = new Color(0, 0, 0);
-    if (main) {
-      main.getWorldPosition(lightPosition);
-      main.target.getWorldPosition(targetPosition);
-      direction.subVectors(lightPosition, targetPosition).normalize();
-      color.copy(main.color).multiplyScalar(main.intensity);
-    }
-    return { main, direction, color, ambient };
-  }
-};
-var LilToonShadowAdapter = class {
-  bind(light, globals, shadowsEnabled = true) {
-    const shadow = shadowsEnabled && light?.castShadow && light.shadow.map?.texture ? light.shadow : void 0;
-    const targetMatrix = globals.uMainShadowMatrix;
-    if (targetMatrix instanceof Matrix4) {
-      if (shadow) targetMatrix.copy(shadow.matrix).transpose();
-      else targetMatrix.identity();
-    }
-    const targetSize = globals.uShadowMapSize;
-    if (targetSize instanceof Vector4) {
-      const width = shadow?.mapSize.x ?? 1;
-      const height = shadow?.mapSize.y ?? 1;
-      targetSize.set(width, height, 1 / Math.max(1, width), 1 / Math.max(1, height));
-    }
-    globals.uShadowBias = shadow?.bias ?? 0;
-    globals.uShadowNormalBias = shadow?.normalBias ?? 0;
-    return { texture: shadow?.map?.texture ?? getNeutralTexture("white") };
-  }
-};
-
-// src/renderer/LilToonRendererAdapter.ts
-var LilToonRendererAdapter = class {
-  constructor(renderer) {
-    this.renderer = renderer;
-  }
-  renderer;
-  lightAdapter = new LilToonLightAdapter();
-  shadowAdapter = new LilToonShadowAdapter();
-  environmentAdapter = new LilToonEnvironmentAdapter();
-  #sceneState = /* @__PURE__ */ new WeakMap();
-  attach(root) {
-    root.traverse((object) => {
-      const material = object.material;
-      const materials = Array.isArray(material) ? material : [material];
-      for (const candidate of materials) {
-        if (candidate instanceof LilToonMaterial) candidate.setRendererAdapter(this);
+    try {
+      for (const mesh of meshes) {
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        const recipes = materials.map(
+          (material) => material instanceof LilToonMaterial && material.pass === "forward" ? this.recipe(material) : void 0
+        );
+        const first = recipes.find((recipe) => recipe !== void 0);
+        if (!first) continue;
+        const outlines = recipes.map(
+          (recipe) => recipe && Number(recipe.source.lilToonProperties._UseOutline ?? 1) !== 0 && Number(recipe.source.lilToonProperties._OutlineWidth ?? 0) > 0 ? recipe.outline : this.hidden
+        );
+        const manualOutline = mesh.children.some(
+          (child) => !helpers.has(child) && child.isMesh && child.material?.pass === "outline"
+        );
+        if (!manualOutline && outlines.some((material) => material !== this.hidden)) {
+          let proxy = this.proxies.get(mesh);
+          if (!proxy) {
+            proxy = mesh.isSkinnedMesh ? new SkinnedMesh(mesh.geometry, first.outline) : new Mesh(mesh.geometry, first.outline);
+            proxy.name = `${mesh.name}:lilToon-outline`;
+            proxy.matrixAutoUpdate = false;
+            proxy.raycast = () => {
+            };
+            helpers.add(proxy);
+            this.proxies.set(mesh, proxy);
+          }
+          proxy.geometry = mesh.geometry;
+          proxy.material = Array.isArray(mesh.material) ? outlines : outlines[0];
+          proxy.visible = mesh.visible;
+          proxy.layers.mask = mesh.layers.mask;
+          proxy.frustumCulled = mesh.frustumCulled;
+          proxy.renderOrder = mesh.renderOrder - 1;
+          proxy.morphTargetDictionary = mesh.morphTargetDictionary;
+          proxy.morphTargetInfluences = mesh.morphTargetInfluences;
+          if (proxy.isSkinnedMesh) {
+            const skin = proxy, source = mesh;
+            skin.skeleton = source.skeleton;
+            skin.bindMode = source.bindMode;
+            skin.bindMatrix.copy(source.bindMatrix);
+            skin.bindMatrixInverse.copy(source.bindMatrixInverse);
+            skin.boundingBox = source.boundingBox;
+            skin.boundingSphere = source.boundingSphere;
+          }
+          const priorParent = proxy.parent;
+          mesh.add(proxy);
+          undo.push(() => {
+            proxy.removeFromParent();
+            priorParent?.add(proxy);
+          });
+        }
+        const depth = mesh.customDepthMaterial, distance = mesh.customDistanceMaterial;
+        if (!depth) mesh.customDepthMaterial = first.depth;
+        if (!distance) mesh.customDistanceMaterial = first.distance;
+        const before = mesh.onBeforeShadow;
+        const hook = (...args) => {
+          const material = args[5];
+          const recipe = recipes[args[6]?.materialIndex ?? 0];
+          if (recipe && (material === first.depth || material === first.distance)) {
+            if (!!material.map !== !!recipe.map) material.needsUpdate = true;
+            material.map = recipe.map;
+            material.alphaMap = null;
+            material.alphaTest = recipe.source.alphaTest;
+            material.opacity = recipe.source.opacity;
+          } else if (!recipe && (material === first.depth || material === first.distance)) {
+            material.opacity = materials[args[6]?.materialIndex ?? 0]?.opacity ?? 1;
+          }
+          before.apply(mesh, args);
+        };
+        mesh.onBeforeShadow = hook;
+        undo.push(() => {
+          if (mesh.customDepthMaterial === first.depth)
+            mesh.customDepthMaterial = depth;
+          if (mesh.customDistanceMaterial === first.distance)
+            mesh.customDistanceMaterial = distance;
+          if (mesh.onBeforeShadow === hook) mesh.onBeforeShadow = before;
+        });
       }
-    });
-    return this;
+      scene.updateMatrixWorld();
+    } catch (error) {
+      undo.reverse().forEach((restore) => restore());
+      throw error;
+    }
+    return () => undo.reverse().forEach((restore) => restore());
   }
-  prepareMaterial(material, renderer, scene, _camera, _object, _elapsedSeconds) {
-    const frame = renderer.info.render.frame;
-    let state = this.#sceneState.get(scene);
-    if (!state || state.frame !== frame) {
-      state = { frame, lighting: this.lightAdapter.read(scene) };
-      this.#sceneState.set(scene, state);
-    }
-    const { lighting } = state;
-    material.globalUniforms.uMainLightDirection?.set(
-      lighting.direction.x,
-      lighting.direction.y,
-      lighting.direction.z,
-      0
-    );
-    material.globalUniforms.uMainLightColor?.set(
-      lighting.color.r,
-      lighting.color.g,
-      lighting.color.b,
-      1
-    );
-    material.globalUniforms.uAmbientColor?.set(
-      lighting.ambient.r,
-      lighting.ambient.g,
-      lighting.ambient.b,
-      1
-    );
-    for (const [name, channel] of [["unity_SHAr", "r"], ["unity_SHAg", "g"], ["unity_SHAb", "b"]]) {
-      const value = material.globalUniforms[name];
-      if (value instanceof Vector4) value.set(0, 0, 0, lighting.ambient[channel]);
-    }
-    for (const name of ["unity_SHBr", "unity_SHBg", "unity_SHBb", "unity_SHC"]) {
-      const value = material.globalUniforms[name];
-      if (value instanceof Vector4) value.set(0, 0, 0, 0);
-    }
-    if (Number(material.lilToonProperties._UdonForceSceneLighting ?? 0) !== 0) {
-      material.globalUniforms._LightMinLimit = 0;
-      material.globalUniforms._LightMaxLimit = 1e5;
-      material.globalUniforms._MonochromeLighting = 0;
-      material.globalUniforms._AsUnlit = 0;
-    }
-    const shadow = this.shadowAdapter.bind(lighting.main, material.globalUniforms, renderer.shadowMap.enabled);
-    material.setSystemTexture("__shadow", shadow.texture);
-    material.setSystemTexture("__environment", this.environmentAdapter.bind(scene, material.globalUniforms));
-  }
-  render(scene, camera) {
-    this.attach(scene);
-    this.renderer.render(scene, camera);
+  dispose() {
+    for (const recipe of this.recipes.values()) recipe.release();
+    this.hidden.dispose();
   }
 };
-
-// src/renderer/LilToonPassManager.ts
-var LilToonPassManager = class {
-  constructor(renderer) {
-    this.renderer = renderer;
-    this.adapter = new LilToonRendererAdapter(renderer);
-  }
-  renderer;
-  adapter;
-  render(scene, camera) {
-    this.adapter.render(scene, camera);
-  }
-};
+var installations = /* @__PURE__ */ new WeakMap();
+function enableLilToon(renderer) {
+  const existing = installations.get(renderer);
+  if (existing) return existing.acquire();
+  const passes = new AutomaticPasses();
+  const render = renderer.render, dispose = renderer.dispose;
+  let users = 0, disposed = false;
+  const wrapped = function(scene, camera) {
+    passes.begin();
+    const previous = scene.onBeforeRender;
+    const original = originalHooks.get(previous) ?? previous;
+    let restore;
+    const hook = function(...args) {
+      original.apply(this, args);
+      restore ??= passes.prepare(scene);
+    };
+    originalHooks.set(hook, original);
+    scene.onBeforeRender = hook;
+    try {
+      if (!scene.isScene)
+        restore = passes.prepare(scene);
+      render.call(renderer, scene, camera);
+    } finally {
+      restore?.();
+      if (scene.onBeforeRender === hook) scene.onBeforeRender = previous;
+      passes.end();
+    }
+  };
+  const wrappedDispose = () => {
+    installation.release();
+    dispose.call(renderer);
+  };
+  const installation = {
+    release: () => {
+      if (disposed) return;
+      disposed = true;
+      if (renderer.render === wrapped) renderer.render = render;
+      if (renderer.dispose === wrappedDispose) renderer.dispose = dispose;
+      passes.dispose();
+      installations.delete(renderer);
+    },
+    acquire: () => {
+      users++;
+      let released = false;
+      return () => {
+        if (released || disposed) return;
+        released = true;
+        if (--users === 0) installation.release();
+      };
+    }
+  };
+  installations.set(renderer, installation);
+  renderer.render = wrapped;
+  renderer.dispose = wrappedDispose;
+  return installation.acquire();
+}
 
 // src/passes/RefractionPass.ts
 var RefractionPass = class {
   constructor() {
-    throw new UnsupportedFeatureError("Refraction requires scene-color capture and is not shipped in the WebGL2 alpha.");
+    throw new UnsupportedFeatureError(
+      "Refraction requires scene-color capture and is not shipped in the WebGL2 alpha."
+    );
   }
 };
 
 // src/passes/GemPass.ts
 var GemPass = class {
   constructor() {
-    throw new UnsupportedFeatureError("Gem rendering is not shipped in the WebGL2 alpha.");
+    throw new UnsupportedFeatureError(
+      "Gem rendering is not shipped in the WebGL2 alpha."
+    );
   }
 };
 
 // src/passes/FurPass.ts
 var FurPass = class {
   constructor() {
-    throw new UnsupportedFeatureError("Fur shell rendering is not shipped in the WebGL2 alpha.");
+    throw new UnsupportedFeatureError(
+      "Fur shell rendering is not shipped in the WebGL2 alpha."
+    );
   }
 };
 
@@ -9606,4 +9699,4 @@ var LILTOON_RENDER_RECIPES = {
   }
 };
 
-export { FurPass, GemPass, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonPassManager, LilToonRendererAdapter, LilToonShadowAdapter, RefractionPass };
+export { FurPass, GemPass, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, RefractionPass, enableLilToon };

@@ -167,10 +167,11 @@ describe("GLTFLilToonExtension", () => {
 			associations: new Map(),
 		} as unknown as GLTFParser;
 
-		await new GLTFLilToonExtension(parser, {
-			addOutlines: false,
-			configureShadowCasters: false,
-		}).afterRoot({ scene } as unknown as GLTF);
+		await new GLTFLilToonExtension(parser).afterRoot({
+			scene,
+		} as unknown as GLTF);
+		expect(scene.children).toHaveLength(1);
+		expect(scene.children[0]!.children).toHaveLength(0);
 
 		const tangent = geometry.getAttribute("tangent");
 		expect(tangent).toBeDefined();

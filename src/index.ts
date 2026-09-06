@@ -1,4 +1,5 @@
 export { LilToonMaterial } from "./material/LilToonMaterial.js";
+export { enableLilToon } from "./renderer/enableLilToon.js";
 export { LilToonMaterialFactory } from "./material/LilToonMaterialFactory.js";
 export type {
 	LilToonMaterialParameters,
@@ -8,13 +9,9 @@ export type {
 export type { SerializedLilToonMaterial } from "./material/LilToonMaterialState.js";
 export { detectLilToonFeatures } from "./material/LilToonFeatureSet.js";
 export type { LilToonFeatureSet } from "./material/LilToonFeatureSet.js";
-export { LilToonRendererAdapter } from "./renderer/LilToonRendererAdapter.js";
-export { LilToonPassManager } from "./renderer/LilToonPassManager.js";
 export { LilToonLightAdapter } from "./renderer/LilToonLightAdapter.js";
 export { LilToonShadowAdapter } from "./renderer/LilToonShadowAdapter.js";
 export { LilToonEnvironmentAdapter } from "./renderer/LilToonEnvironmentAdapter.js";
-export { OutlinePass } from "./passes/OutlinePass.js";
-export { ShadowCasterPass } from "./passes/ShadowCasterPass.js";
 export { RefractionPass } from "./passes/RefractionPass.js";
 export { GemPass } from "./passes/GemPass.js";
 export { FurPass } from "./passes/FurPass.js";

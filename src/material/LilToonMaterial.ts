@@ -26,7 +26,7 @@ import {
 	updateObjectCameraUniforms,
 	type LilToonGlobalUniforms,
 } from "../renderer/LilToonUniformBinder.js";
-import type { LilToonRendererAdapter } from "../renderer/LilToonRendererAdapter.js";
+import { rendererContext } from "../renderer/rendererContext.js";
 import { LilToonMorphAdapter } from "../renderer/LilToonMorphAdapter.js";
 import {
 	getLilToonShaderProgram,
@@ -163,6 +163,7 @@ function addOutputColorSpaceConversion(fragmentShader: string): string {
 const morphAdapter = new LilToonMorphAdapter();
 
 export class LilToonMaterial extends RawShaderMaterial {
+	color = new Color(1, 1, 1);
 	readonly isLilToonMaterial = true;
 	readonly lilToonProperties: Record<string, LilToonScalarOrVector>;
 	readonly lilToonTextures: Record<string, Texture | null> = {};
@@ -170,7 +171,6 @@ export class LilToonMaterial extends RawShaderMaterial {
 	renderMode: LilToonRenderMode;
 	pass: "forward" | "outline";
 	featureSet: LilToonFeatureSet;
-	rendererAdapter?: LilToonRendererAdapter;
 	readonly #samplerBindings: Map<string, string>;
 	readonly #cubeSamplers: Set<string>;
 	#shaderKey: string;
@@ -237,6 +237,38 @@ export class LilToonMaterial extends RawShaderMaterial {
 			program.fragmentShader,
 		);
 		this.lilToonProperties = propertyDefaults();
+		Object.defineProperty(this, "opacity", {
+			configurable: true,
+			enumerable: true,
+			get: () => {
+				const c = this.lilToonProperties._Color;
+				return Array.isArray(c) ? (c[3] ?? 1) : c instanceof Vector4 ? c.w : 1;
+			},
+			set: (alpha: number) => {
+				this.syncColor();
+				const c = this.lilToonProperties._Color as number[];
+				this.setProperty("_Color", [c[0]!, c[1]!, c[2]!, alpha]);
+			},
+		});
+		Object.defineProperty(this, "alphaTest", {
+			configurable: true,
+			enumerable: true,
+			get: () =>
+				this.renderMode === "cutout"
+					? Number(this.lilToonProperties._Cutoff ?? 0.5)
+					: 0,
+			set: (cutoff: number) => {
+				this.renderMode =
+					cutoff > 0
+						? "cutout"
+						: this.renderMode === "transparent" || this.transparent
+							? "transparent"
+							: "opaque";
+				this.transparent = this.renderMode === "transparent";
+				this.setProperty("_Cutoff", cutoff);
+				this.refreshProgram();
+			},
+		});
 		if (renderMode === "transparent") {
 			this.lilToonProperties._ZWrite = 0;
 			this.lilToonProperties._SrcBlend = 5;
@@ -250,8 +282,17 @@ export class LilToonMaterial extends RawShaderMaterial {
 		}
 		for (const [name, value] of Object.entries(parameters.textures ?? {}))
 			this.setTexture(name, value);
+		this.readColor();
+		if (parameters.color !== undefined) {
+			this.color.set(parameters.color);
+			this.syncColor();
+		}
+		if (parameters.opacity !== undefined) this.opacity = parameters.opacity;
+		if (parameters.map !== undefined) this.map = parameters.map;
+		if (parameters.alphaTest !== undefined)
+			this.alphaTest = parameters.alphaTest;
 		this.featureSet = detectLilToonFeatures(this.lilToonProperties);
-		applyLilToonRenderState(this, renderMode, this.lilToonProperties);
+		applyLilToonRenderState(this, this.renderMode, this.lilToonProperties);
 		if (pass === "outline") {
 			this.side = BackSide;
 			this.transparent = false;
@@ -282,14 +323,8 @@ export class LilToonMaterial extends RawShaderMaterial {
 				object,
 				elapsed,
 			);
-			this.rendererAdapter?.prepareMaterial(
-				this,
-				renderer,
-				scene,
-				camera,
-				object,
-				elapsed,
-			);
+			this.syncColor();
+			rendererContext(renderer).prepareMaterial(this, scene);
 			this.updateDeformationUniforms(object, renderer);
 			const outputColorSpace =
 				renderer.getRenderTarget()?.texture.colorSpace ??
@@ -307,7 +342,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		};
 	}
 
-	/** The actual compiled program; edits do not automatically reselect it. */
+	/** The actual compiled program, reselected when texture requirements change. */
 	get shaderKey(): string {
 		return this.#shaderKey;
 	}
@@ -329,6 +364,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 	setProperty(name: string, value: LilToonScalarOrVector): this {
 		this.lilToonProperties[name] = copyValue(value);
 		setGlobalProperty(this.globalUniforms, name, value);
+		if (name === "_Color") this.readColor();
 		this.featureSet = detectLilToonFeatures(this.lilToonProperties);
 		if (
 			/(_Cull|_ZWrite|_ZTest|_Blend|_Stencil|_Offset|_ColorMask|_AlphaToMask)/.test(
@@ -343,6 +379,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 	getProperty<T extends LilToonScalarOrVector = LilToonScalarOrVector>(
 		name: string,
 	): T | undefined {
+		if (name === "_Color") this.syncColor();
 		return this.lilToonProperties[name] as T | undefined;
 	}
 
@@ -352,6 +389,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 			property: string,
 		) => string | number | null = () => null,
 	): SerializedLilToonMaterial {
+		this.syncColor();
 		const properties = Object.fromEntries(
 			Object.entries(this.lilToonProperties).map(([name, value]) => [
 				name,
@@ -376,6 +414,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 	setTexture(name: string, texture: Texture | null): this {
 		const normalized = texture ? normalizeLilToonTexture(name, texture) : null;
 		this.lilToonTextures[name] = normalized;
+		this.refreshProgram();
 		for (const [uniformName, property] of this.#samplerBindings) {
 			if (property !== name) continue;
 			const isCube = Boolean(
@@ -394,12 +433,8 @@ export class LilToonMaterial extends RawShaderMaterial {
 		return this;
 	}
 
-	setRendererAdapter(adapter: LilToonRendererAdapter | undefined): this {
-		this.rendererAdapter = adapter;
-		return this;
-	}
-
 	override copy(source: LilToonMaterial): this {
+		source.syncColor();
 		super.copy(source);
 		this.renderMode = source.renderMode;
 		this.pass = source.pass;
@@ -432,8 +467,84 @@ export class LilToonMaterial extends RawShaderMaterial {
 			this.#cubeSamplers.add(uniformName);
 
 		this.featureSet = { ...source.featureSet };
-		this.rendererAdapter = source.rendererAdapter;
+		this.readColor();
 		return this;
+	}
+
+	get map(): Texture | null {
+		return this.lilToonTextures._MainTex ?? null;
+	}
+	set map(texture: Texture | null) {
+		this.setTexture("_MainTex", texture);
+	}
+
+	private readColor(): void {
+		const value = this.lilToonProperties._Color;
+		if (Array.isArray(value))
+			this.color.setRGB(value[0]!, value[1]!, value[2]!);
+		else if (value instanceof Color) this.color.copy(value);
+		else if (value instanceof Vector4)
+			this.color.setRGB(value.x, value.y, value.z);
+	}
+	private syncColor(): void {
+		const current = this.lilToonProperties._Color;
+		const alpha = Array.isArray(current)
+			? (current[3] ?? 1)
+			: current instanceof Vector4
+				? current.w
+				: 1;
+		const value = [this.color.r, this.color.g, this.color.b, alpha];
+		this.lilToonProperties._Color = value;
+		setGlobalProperty(this.globalUniforms, "_Color", value);
+	}
+	private refreshProgram(): void {
+		const program =
+			this.pass === "outline"
+				? getOutlineShaderProgram()
+				: getLilToonShaderProgram(
+						this.renderMode,
+						shaderProfile(this.lilToonTextures),
+					);
+		if (program.key === this.#shaderKey) return;
+		this.#shaderKey = program.key;
+		this.#usedProperties = shaderPropertyReferences(
+			program.vertexShader,
+			program.fragmentShader,
+		);
+		this.vertexShader = program.vertexShader.replace(/^#version 300 es\s*/, "");
+		this.fragmentShader = addOutputColorSpaceConversion(
+			program.fragmentShader,
+		).replace(/^#version 300 es\s*/, "");
+		this.globalUniforms = createGlobalUniforms(
+			program.vertexShader,
+			program.fragmentShader,
+		);
+		this.uniforms = {
+			_Globals: { value: this.globalUniforms },
+			[OUTPUT_SRGB_UNIFORM]: { value: 1 },
+		};
+		this.#samplerBindings.clear();
+		this.#cubeSamplers.clear();
+		for (const match of `${program.vertexShader}\n${program.fragmentShader}`.matchAll(
+			/uniform\s+(?:\w+\s+)?samplerCube\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/g,
+		))
+			this.#cubeSamplers.add(match[1]!);
+		for (const [uniform, property] of program.samplerBindings) {
+			this.#samplerBindings.set(uniform, property);
+			this.uniforms[uniform] = {
+				value:
+					property === "__shadow"
+						? getNeutralTexture("white")
+						: property.startsWith("__") || this.#cubeSamplers.has(uniform)
+							? null
+							: getNeutralTexture(textureDefault(property)),
+			};
+		}
+		for (const [key, value] of Object.entries(this.lilToonProperties))
+			setGlobalProperty(this.globalUniforms, key, value);
+		for (const [key, texture] of Object.entries(this.lilToonTextures))
+			this.setTexture(key, texture);
+		this.needsUpdate = true;
 	}
 
 	/** @internal Renderer ABI texture binding. */

@@ -2,8 +2,6 @@ import {
 	DataTexture,
 	DirectionalLight,
 	Matrix4,
-	Mesh,
-	PerspectiveCamera,
 	Scene,
 	Vector4,
 	WebGLRenderTarget,
@@ -12,7 +10,7 @@ import {
 } from "three";
 import { describe, expect, it } from "vitest";
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
-import { LilToonRendererAdapter } from "../../src/renderer/LilToonRendererAdapter.js";
+import { rendererContext } from "../../src/renderer/rendererContext.js";
 import { LilToonShadowAdapter } from "../../src/renderer/LilToonShadowAdapter.js";
 import type { LilToonGlobalUniforms } from "../../src/renderer/LilToonUniformBinder.js";
 
@@ -168,7 +166,7 @@ describe("directional shadow fallback", () => {
 			info: { render: { frame: 1 } },
 			shadowMap: { enabled: true },
 		} as WebGLRenderer;
-		const adapter = new LilToonRendererAdapter(renderer);
+		const context = rendererContext(renderer);
 		const material = new LilToonMaterial({
 			properties: { _UseShadow: 1, _ShadowBorder: 0.4 },
 		});
@@ -177,14 +175,7 @@ describe("directional shadow fallback", () => {
 		scene.add(light);
 		for (const enabled of [true, false, true]) {
 			renderer.shadowMap.enabled = enabled;
-			adapter.prepareMaterial(
-				material,
-				renderer,
-				scene,
-				new PerspectiveCamera(),
-				new Mesh(),
-				0,
-			);
+			context.prepareMaterial(material, scene);
 			if (enabled)
 				expect(shadowTextures(material)[0]).toBe(light.shadow.map!.texture);
 			else expectNeutral(shadowTextures(material)[0], material.globalUniforms);
@@ -192,14 +183,7 @@ describe("directional shadow fallback", () => {
 			expect(material.getProperty("_ShadowBorder")).toBe(0.4);
 		}
 		light.castShadow = false;
-		adapter.prepareMaterial(
-			material,
-			renderer,
-			scene,
-			new PerspectiveCamera(),
-			new Mesh(),
-			0,
-		);
+		context.prepareMaterial(material, scene);
 		expectNeutral(shadowTextures(material)[0], material.globalUniforms);
 		light.shadow.map!.dispose();
 		material.dispose();

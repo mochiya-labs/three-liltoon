@@ -313,16 +313,14 @@ liltoon-three/
 │   │   └── shaderManifest.ts
 │   │
 │   ├── renderer/
-│   │   ├── LilToonRendererAdapter.ts
+│   │   ├── rendererContext.ts
 │   │   ├── LilToonLightAdapter.ts
 │   │   ├── LilToonShadowAdapter.ts
 │   │   ├── LilToonEnvironmentAdapter.ts
-│   │   ├── LilToonPassManager.ts
+│   │   ├── enableLilToon.ts
 │   │   └── LilToonUniformBinder.ts
 │   │
 │   ├── passes/
-│   │   ├── OutlinePass.ts
-│   │   ├── ShadowCasterPass.ts
 │   │   ├── RefractionPass.ts
 │   │   ├── FurPass.ts
 │   │   └── GemPass.ts
@@ -1033,7 +1031,7 @@ mesh
 Implement:
 
 ```text
-src/passes/OutlinePass.ts
+src/renderer/enableLilToon.ts (private automatic outline scheduling)
 ```
 
 Do not merge outline into one fragment shader.
@@ -1411,7 +1409,7 @@ This is the main unavoidable manual integration work.
 Implement:
 
 ```text
-src/renderer/LilToonRendererAdapter.ts
+src/renderer/rendererContext.ts
 shader/compat/lil_web_*.hlsl
 ```
 
@@ -1531,7 +1529,7 @@ First target:
 
 Then extend.
 
-If exact access to Three internal shadow resources becomes brittle, own the required shadow render target/pass in `LilToonPassManager`.
+If exact access to Three internal shadow resources becomes brittle, own the required shadow render target/pass in the private renderer integration.
 
 Avoid coupling generated shader code to undocumented Three internal variable names.
 
@@ -2103,7 +2101,7 @@ Prefer a web compatibility implementation matching Three's CPU-provided data:
 
 Do not depend on private Three GLSL chunks unless they are copied under compatible license and explicitly versioned.
 
-If using Three's exposed skeleton/bone texture data, create explicit uniforms in `LilToonRendererAdapter`.
+If using Three's exposed skeleton/bone texture data, create explicit uniforms in the private renderer context.
 
 Skinned avatars are a release-blocking requirement if the package is intended for avatar rendering.
 
@@ -2501,16 +2499,13 @@ Basic conceptual usage:
 
 ```ts
 import * as THREE from "three";
-import {
-	LilToonMaterial,
-	LilToonRendererAdapter,
-} from "@your-scope/liltoon-three";
+import { LilToonMaterial, enableLilToon } from "@your-scope/liltoon-three";
 
 const renderer = new THREE.WebGLRenderer({
 	antialias: true,
 });
 
-const adapter = new LilToonRendererAdapter(renderer);
+const releaseRendering = enableLilToon(renderer);
 
 const material = new LilToonMaterial({
 	properties: {
@@ -2525,7 +2520,8 @@ const material = new LilToonMaterial({
 
 const mesh = new THREE.Mesh(geometry, material);
 
-adapter.attach(scene);
+scene.add(mesh);
+renderer.render(scene, camera);
 ```
 
 The final API may differ, but consumer code must not know:
@@ -2547,11 +2543,7 @@ Recommended consumer flow:
 ```ts
 const loader = new GLTFLoader();
 
-loader.register((parser) => {
-	return new GLTFLilToonExtension(parser, {
-		rendererAdapter,
-	});
-});
+loader.register((parser) => new GLTFLilToonExtension(parser));
 
 const gltf = await loader.loadAsync("/avatar.vrm");
 scene.add(gltf.scene);
@@ -2913,7 +2905,7 @@ Examples:
 [liltoon-three] Unsupported lilToon tessellation material.
 [liltoon-three] Material requests VRC Light Volumes, which are unavailable in WebGL backend.
 [liltoon-three] Shader variant not shipped: <key>.
-[liltoon-three] Refraction material requires LilToonPassManager scene-color capture.
+[liltoon-three] Refraction material requires a dedicated scene-color capture implementation.
 ```
 
 Do not silently ignore unsupported lilToon parameters that significantly affect appearance.
@@ -3689,3 +3681,137 @@ The repository should end up with this ownership boundary:
 The most important maintenance property is:
 
 > **A lilToon update should normally require updating the submodule, rebuilding shaders, fixing only compatibility-layer regressions, rerunning parity tests, and publishing a new package. It should not require re-porting lilToon's shader algorithms by hand.**
+
+---
+
+# 54. Part 1: standalone material refactor proposal
+
+**Status: P1.1-P1.3 implemented, 2026-09-05. P1.4 gem/refraction and P1.5 fur remain separate unimplemented shader milestones.** This section supersedes earlier adapter setup guidance. The migration design below is implemented for supported forward/outline/caster paths; section 54.7 records the verified baseline. [Part 2](../mochiya-vrm-outfit-export-plan.md#15-part-2-material-independent-avatar-runtime-proposal) is also implemented.
+
+## 54.1 Goal and boundary
+
+**Pre-release API cleanup, 2026-09-06:** Remove deprecated functions/classes rather than retaining compatibility exports. Keep `enableLilToon`, `enableLilToonVRM` and `GLTFLilToonExtension` as the supported setup API. Remove the renderer/VRM subclasses, manual adapter/pass manager, outline/caster wrappers and material adapter assignment. Preserve automatic lighting, outlines and casters through private renderer context and scheduling code. Migrate tests to the supported helpers, regenerate public bundles/declarations, and verify consumers. Avatar asset runtime has no remaining deprecated functions/classes; its core remains independent of materials.
+
+**API refinement, 2026-09-06:** Use standard `WebGLRenderer` with `enableLilToon(renderer)`. For VRM-capable loading, register `enableLilToonVRM(new VRMLoaderPlugin(parser, options))` from `three-liltoon/vrm`. The helper returns the same plugin instance, composes lilToon material loading and tangent preparation, then adapts expressions after the original VRM hook completes. It also loads ordinary glTF/GLB without requiring VRM data. Keep `GLTFLilToonExtension` as the independent glTF-only entry without a three-vrm dependency. Renderer/plugin subclasses and deprecated manual APIs are removed before the first release. Migrate maintained examples and public usage guidance; verify same-instance/options preservation, repeated enhancement, material fallback, asynchronous ordering, glTF/VRM loading, warnings and package entry isolation.
+
+The optional `three-liltoon/vrm` entry owns automatic VRM material expressions. Renderer/context/pass ownership is now independent of VRM and attachment loading. Only `/vrm` imports three-vrm.
+
+Make `three-liltoon` useful as a standalone Three.js material library. A user selects material appearance, assigns it to an ordinary `Mesh` or `SkinnedMesh`, and renders. The package determines renderer inputs, shader profiles and necessary passes. Applications use the enable helpers; renderer contexts and supported passes are managed internally.
+
+The material, renderer integration, shader compiler and `MOCHIYA_materials_liltoon` loader belong entirely to this package. They must work without VRM, Mochiya attachment data, React or a specific viewer. Loading glTF is optional and must not be the mechanism that makes manually created materials work.
+
+## 54.2 How close can this be to a built-in material?
+
+Built-in materials are convenient because Three's renderer already implements their rendering requirements. For example, `MeshPhysicalMaterial` transmission uses a renderer-owned capture pass. That does not give arbitrary `RawShaderMaterial` subclasses a general pass-registration API. The reviewed [r180](https://github.com/mrdoob/three.js/blob/r180/src/renderers/WebGLRenderer.js), [r185](https://github.com/mrdoob/three.js/blob/r185/src/renderers/WebGLRenderer.js) and current [development renderer](https://github.com/mrdoob/three.js/blob/dev/src/renderers/WebGLRenderer.js) all prepare render lists and shadows before the material's draw callback.
+
+| Experience                                                                                     | Feasibility and decision                                                                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create a material and use stock `WebGLRenderer` for its forward surface                        | Achievable through automatic per-draw binding. No explicit adapter.                                                                                                                                                         |
+| Create a material with automatic outlines, specialized casters and future gem/fur passes       | Achievable with a package-owned rendering integration installed once per renderer. No per-material or per-pass setup. Recommended full-feature path.                                                                        |
+| Every feature from only `new LilToonMaterial()`, on an unchanged renderer and arbitrary meshes | Not a supported general Three.js material contract. Do not promise it from the current public hooks.                                                                                                                        |
+| Automatically patch Three globals/prototypes on import or first material construction          | Reject. It changes unrelated renderers, obscures ownership and conflicts with the package's side-effect-free imports.                                                                                                       |
+| Issue extra draws through `renderBufferDirect` from a material callback                        | Research alternative only. It is absent from the current [public renderer reference](https://threejs.org/docs/pages/WebGLRenderer.html), and does not itself solve early shadow setup, geometry expansion or scene capture. |
+
+The recommended compromise is **one renderer enable call, then ordinary material usage**. This is closer to built-in material UX, but it is not literally zero additional integration with an existing stock renderer. Selecting lights, environment, shadow enablement and appearance remains ordinary application work; shader algorithms must not be replaced with PBR approximations to obtain a simpler constructor.
+
+## 54.3 Public API direction
+
+The following APIs are implemented:
+
+```ts
+import { Mesh, MeshBasicMaterial, Scene, WebGLRenderer } from "three";
+import { LilToonMaterial, enableLilToon } from "three-liltoon";
+
+const renderer = new WebGLRenderer({ antialias: true });
+const releaseRendering = enableLilToon(renderer);
+const scene = new Scene();
+const material = new LilToonMaterial({
+	properties: { _Color: [1, 1, 1, 1], _UseOutline: 1, _OutlineWidth: 0.02 },
+	textures: { _MainTex: texture },
+});
+const mesh = new Mesh(geometry, material);
+scene.add(mesh);
+renderer.render(scene, camera); // Includes the authored outline automatically.
+
+mesh.material = new MeshBasicMaterial({ color: "white" });
+renderer.render(scene, camera); // Old lilToon passes are no longer used.
+```
+
+`enableLilToon(renderer)` wraps only the supplied renderer instance's public render/disposal methods and returns an idempotent cleanup function. R3F installs it in a renderer-lifetime effect. Users keep standard renderer construction and the usual render loop. There is no package-specific renderer subclass or manual adapter/pass API. VRM loading uses `enableLilToonVRM(new VRMLoaderPlugin(parser, options))`; glTF-only applications keep `GLTFLilToonExtension` without importing three-vrm.
+
+Retain original property names as the canonical data model. Add familiar aliases such as `color`, `map`, `opacity` and `alphaTest` where semantics agree, with two-way synchronization and correct mutable `Color` behavior. Do not alias independent texture transforms onto a shared texture object. Material setters should re-evaluate shader/pass requirements when structural features change, while scalar edits remain uniform updates. Preserve working `clone`, `copy`, shared-material and `dispose` behavior. Constructor overloads and aliases need tests before documentation advertises standard-property compatibility.
+
+## 54.4 Internal refactor
+
+```mermaid
+flowchart LR
+  Input["Material constructor or lilToon glTF loader"] --> Material["LilToonMaterial: appearance and feature requirements"]
+  Material --> Context["Internal renderer context"]
+  Context --> Bind["Lights, environment, camera and deformation"]
+  Context --> Passes["Automatic pass scheduling and resource ownership"]
+  Bind --> Three["Three.js WebGLRenderer"]
+  Passes --> Three
+```
+
+| Work                         | Proposed implementation                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hide adapter setup           | Keep internal renderer contexts cached by renderer. `Material.onBeforeRender` obtains the active context automatically from its arguments. Keep per-object uniform uploads; a shared material must not retain one renderer's state.                                                                                                             |
+| Discover requirements early  | Before the underlying render begins, collect effective mesh/material/group state, resolve feature recipes and prepare resources. Include off-camera shadow casters. A renderer integration can do this on the first frame and after lilToon is replaced by a standard material.                                                                 |
+| Own passes centrally         | Replace loader-created permanent helpers with context-owned pass instances/proxies. Synchronize material properties, textures, geometry groups, visibility/layers, skeletons, morphs and render order. Preserve authored geometry groups and scene relationships outside the render operation; exclude proxies from picking and asset metadata. |
+| Track lifetime               | Cache resources by their actual owner: renderer, material or mesh/geometry. Restore borrowed custom shadow materials/callbacks and temporary render state in `finally`. Release owned resources on material/geometry/renderer disposal. Never dispose shared input textures merely because a material was replaced.                             |
+| Simplify loading             | `GLTFLilToonExtension(parser)` resolves material data/textures and source shader family, including unused action-only materials. It no longer accepts a renderer or owns passes. Preserve tangent generation and structured warnings.                                                                                                           |
+| Preserve shader architecture | Keep the pinned upstream HLSL, generated compatibility layer, linear color workflow, transposed matrices and sampler-budget profiles. A rendering API refactor does not prove Unity parity or enable missing shader families.                                                                                                                   |
+
+[Three's material callback](https://threejs.org/docs/pages/Material.html#onBeforeRender) supplies all arguments required for automatic surface binding. It is too late to introduce shadow setup or new render-list entries for the same frame; neither surface callbacks nor first-use lazy installation alone satisfy the full-feature path. Render-integration tests must cover scene callbacks that mutate materials, reentrant rendering and matrix updates, rather than assuming the host scene is immutable during rendering.
+
+## 54.5 Automatic passes and actual porting work
+
+| Feature         | Current implementation                                                   | Proposed package responsibility                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Forward surface | Generated opaque/cutout/transparent shaders; explicit adapter assignment | Automatically bind scene/object inputs and select the supported profile. Stock renderer use can cover this subset.                                                                                                                                                                                                                                                                                                    |
+| Outline         | Loader or caller attaches an outline child                               | Automatically select the outline shader and schedule a separate draw, including skinning, morphs, group boundaries and material edits. Preserve outline appearance and ordering; do not substitute a screen-space outline effect.                                                                                                                                                                                     |
+| Shadows         | Caller/loader installs depth and distance materials                      | Automatically configure casters before shadow rendering. Use standard material fields only where their alpha/UV semantics agree; preserve custom behavior where required. The [Three shadow implementation](https://github.com/mrdoob/three.js/blob/r185/src/renderers/webgl/WebGLShadowMap.js) reads the current material's map/cutoff fields, which must be tested rather than assumed equivalent to lilToon masks. |
+| Gem/refraction  | Unsupported constructors; loader warns and uses forward fallback         | Port the upstream gem shaders and automatically own background capture, prepass and final pass. The upstream [gem shader](https://github.com/lilxyzw/lilToon/blob/master/Assets/lilToon/Shader/lts_gem.shader) declares a GrabPass, FORWARD_PRE and FORWARD; adapter removal cannot implement them.                                                                                                                   |
+| Fur             | Unsupported constructor                                                  | Port the fur shader and replace its unsupported geometry stage with a WebGL2 geometry-generation approach owned by the package. Preserve masks, deformation and density controls; a simple shell approximation must be labeled and compared against upstream.                                                                                                                                                         |
+
+Fur's [upstream shader](https://github.com/lilxyzw/lilToon/blob/master/Assets/lilToon/Shader/lts_fur.shader) invokes a geometry stage; its [vertex/geometry implementation](https://github.com/lilxyzw/lilToon/blob/master/Assets/lilToon/Shader/Includes/lil_common_vert_fur.hlsl) expands triangles into fur geometry. [WebGL2](https://registry.khronos.org/webgl/specs/latest/2.0/) cannot directly run that stage. Prototype cached expanded topology carrying source-triangle coordinates, skin/morph data and fur parameters, with GPU deformation where feasible. Compare this to bounded shell rendering before selecting the implementation; neither is an automatic HLSL translation or a promise of exact parity.
+
+For scene capture, use package-owned render targets and public rendering APIs with recursion guards. Define captured content, transparency ordering, linear color space, resize/DPR handling and state restoration explicitly. An initial opaque/cutout-only capture must be labeled as an approximation to Unity's queue-dependent GrabPass. Do not access Three's private transmission or PMREM buffers. Three's [Reflector addon](https://github.com/mrdoob/three.js/blob/r180/examples/jsm/objects/Reflector.js) demonstrates encapsulated capture, but is a specialized mesh and is not evidence that an arbitrary material gets automatic multipass support.
+
+Expose shader family as material data, not as pass objects: a future `variant: "gem"` or `variant: "fur"` selects a complete validated recipe. Retain that family through clone/serialization and loading; the current constructor only has render mode and an internal forward/outline pass. Do not infer family from a mesh name. Keep gem/fur unsupported diagnostics and exporter restrictions until each family's port, resource budget and visual checks pass. Future exporter enablement must be a separate aligned change.
+
+## 54.6 Delivery and acceptance
+
+| Step                              | Deliverable and evidence                                                                                                                                                                                                                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1.1: automatic material inputs   | Directly constructed static/skinned materials render without adapter assignment. Test shared materials across meshes, cameras and renderer instances, null shadows and output color space.                                                                                                              |
+| P1.2: standalone pass integration | Implement the renderer integration and automatic outline/casters. Test first-frame behavior, all directions of material replacement, live parameter changes, multi-material groups, off-camera casters, removal/disposal and unchanged authored objects after rendering.                                |
+| P1.3: API and loader migration    | Add tested standard-property aliases and structural invalidation; make loader-created and manually created materials use the same path. Migrate the basic Three and diagnostic examples without any attachment-runtime package. Remove deprecated manual APIs and compatibility exports before release. |
+| P1.4: gem/refraction              | Port capture/prepass/surface rendering and validate transparency, multiple gems, resize, offscreen targets and Unity references. This is feature implementation, not a prerequisite for P1.1–P1.3.                                                                                                      |
+| P1.5: fur                         | Validate the geometry-stage replacement, animated deformation, masks, memory/draw budgets and representative Unity references before advertising support.                                                                                                                                               |
+
+P1.2 begins with a rendering prototype to prove the thin integration can preserve pass ordering using the selected public APIs. If exact special-pass behavior requires private rendering internals, document the concrete limitation and revisit that feature before claiming built-in equivalence. Do not quietly fork Three or globally intercept material assignment.
+
+Run focused unit and Chromium/Firefox WebGL tests, both library/example builds, R3F checks and visual comparisons for changed rendering. Test the locally used r180 and r185 dependency baselines; wider peer compatibility is a separate matrix. Rebuild generated consumer bundles using package tooling and run Prettier. Completed verification is recorded below. Managed Firefox/Chromium were not installed for this run; installed Chrome was used.
+
+## 54.7 Implemented rendering baseline
+
+`LilToonMaterial.onBeforeRender` selects its renderer context automatically, including stock-renderer forward draws. `enableLilToon(renderer)` installs instance-local integration with a reference-counted lease that is safe to release repeatedly. No global prototype changes or Three renderer fork are used.
+
+Pass preparation chains the host scene callback before render-list/shadow collection. Cached outline proxies are present only during rendering, share groups/skinning/morph state, do not raycast, and are removed in `finally`. Current material assignments determine every pass. Source disposal or recipe disuse releases owned pass materials and texture views; authored geometry and input textures are borrowed. Custom caster slots and callbacks are restored after rendering, and host-defined casters take precedence. Main-texture alpha/cutoff/opacity and independent UV transforms are supported; the complete upstream caster remains outside this approximation.
+
+The loader only reconstructs material data/textures and prepares missing tangents; its renderer/pass options are removed. Constructor/runtime aliases cover `color`, `opacity`, `map` and `alphaTest`, with mutable Color and clone support. Texture setters reselect compiled profiles and preserve original property uniforms; unsupported combinations still report warnings. Manual adapter/pass APIs are removed; maintained examples use the enable helpers. Both viewers and the basic Three example use automatic rendering.
+
+Verification: 83 runtime unit tests, library typechecking and tsup bundling pass. Two standalone Chrome WebGL tests cover r180 static/morph/skinned rendering and direct construction, first-frame outlines/casters, material replacement, group boundaries, scene edits, cutout textures, offscreen targets and cleanup. Eight attachment-viewer Chrome tests exercise r185 with loading, expressions, material swaps/undo and composition. The diagnostic viewer was synced to the final bundle and passes typecheck/lint and its production build. The attachment viewer production build passes. An isolated package consumer imports root and `/gltf` and typechecks with no three-vrm or avatar runtime installed. Installed Chrome was used because Playwright's managed Chromium executable is absent. Generated shader inputs and upstream source are unchanged; no new shader compilation, Unity export or Unity visual-parity run was performed.
+
+## 54.8 Independent enable helpers
+
+The 2026-09-06 refinement is implemented by `src/vrm/enableLilToonVRM.ts`. Register the enhanced standard plugin once for lilToon material loading, tangent preparation and VRM expression adaptation. The helper returns the same instance, preserves standard options and unrelated hooks, delegates custom material fallbacks and propagates errors. A weak set prevents duplicate enhancement. Plain glTF/GLB uses the material path without requiring VRM data. Root and `/gltf` stay independent of the optional VRM peer; renderer enablement stays separate. Deprecated subclasses and manual APIs are removed; maintained examples and tests use standard constructors.
+
+Validation: 90 unit tests, nine Chrome viewer tests, library typecheck/bundle, both viewer production builds, diagnostic viewer lint and basic example build pass. Browser coverage includes GLB tangents/outlines without a VRM and actual VRM expression adaptation. An isolated tarball consumer verifies root/glTF imports and types without three-vrm. No shader or Unity behavior changed.
+
+## 54.9 Pre-release API cleanup
+
+All deprecated setup classes, exports and material adapter assignment are removed. `enableLilToon.ts` owns scheduling and `rendererContext.ts` owns private per-renderer inputs. The public setup remains `enableLilToon(renderer)`, `enableLilToonVRM(new VRMLoaderPlugin(parser, options))`, or the independent `GLTFLilToonExtension` for glTF-only loading. No compatibility aliases are retained. Avatar asset runtime has no deprecated functions/classes.
+
+Verification: 89 unit tests, two standalone Chrome tests, nine attachment-viewer Chrome tests, library typechecking/bundling and both viewer production builds pass. The rebuilt tarball and declarations exclude removed APIs; an isolated root/glTF consumer runs and typechecks without VRM. Shader and Unity behavior are unchanged.

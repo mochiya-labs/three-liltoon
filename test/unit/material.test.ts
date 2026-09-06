@@ -337,6 +337,8 @@ describe("LilToonMaterial", () => {
 	it("uploads per-object globals again when a shared material draws another mesh", () => {
 		const material = new LilToonMaterial();
 		const renderer = {
+			info: { render: { frame: 0 } },
+			shadowMap: { enabled: false },
 			outputColorSpace: SRGBColorSpace,
 			getRenderTarget() {
 				return null;

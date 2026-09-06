@@ -1,11 +1,5 @@
-import {
-	Vector4,
-	type Camera,
-	type Object3D,
-	type Scene,
-	type WebGLRenderer,
-} from "three";
-import { LilToonMaterial } from "../material/LilToonMaterial.js";
+import { Vector4, type Scene, type WebGLRenderer } from "three";
+import type { LilToonMaterial } from "../material/LilToonMaterial.js";
 import { LilToonEnvironmentAdapter } from "./LilToonEnvironmentAdapter.js";
 import {
 	LilToonLightAdapter,
@@ -18,7 +12,20 @@ interface SceneFrameState {
 	lighting: LilToonSceneLighting;
 }
 
-export class LilToonRendererAdapter {
+const contexts = new WeakMap<WebGLRenderer, RendererContext>();
+
+/** @internal Context is selected for the renderer performing this draw. */
+export function rendererContext(renderer: WebGLRenderer): RendererContext {
+	let context = contexts.get(renderer);
+	if (!context) {
+		context = new RendererContext(renderer);
+		contexts.set(renderer, context);
+	}
+	return context;
+}
+
+/** Private lighting and texture state for one renderer. */
+class RendererContext {
 	readonly lightAdapter = new LilToonLightAdapter();
 	readonly shadowAdapter = new LilToonShadowAdapter();
 	readonly environmentAdapter = new LilToonEnvironmentAdapter();
@@ -26,26 +33,8 @@ export class LilToonRendererAdapter {
 
 	constructor(readonly renderer: WebGLRenderer) {}
 
-	attach(root: Object3D): this {
-		root.traverse((object) => {
-			const material = (object as Object3D & { material?: unknown }).material;
-			const materials = Array.isArray(material) ? material : [material];
-			for (const candidate of materials) {
-				if (candidate instanceof LilToonMaterial)
-					candidate.setRendererAdapter(this);
-			}
-		});
-		return this;
-	}
-
-	prepareMaterial(
-		material: LilToonMaterial,
-		renderer: WebGLRenderer,
-		scene: Scene,
-		_camera: Camera,
-		_object: Object3D,
-		_elapsedSeconds: number,
-	): void {
+	prepareMaterial(material: LilToonMaterial, scene: Scene): void {
+		const renderer = this.renderer;
 		const frame = renderer.info.render.frame;
 		let state = this.#sceneState.get(scene);
 		if (!state || state.frame !== frame) {
@@ -105,10 +94,5 @@ export class LilToonRendererAdapter {
 			"__environment",
 			this.environmentAdapter.bind(scene, material.globalUniforms),
 		);
-	}
-
-	render(scene: Scene, camera: Camera): void {
-		this.attach(scene);
-		this.renderer.render(scene, camera);
 	}
 }

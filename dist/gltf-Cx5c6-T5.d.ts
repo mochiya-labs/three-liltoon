@@ -1,33 +1,25 @@
-import { Color, Vector2, Vector3, Vector4, Texture, Matrix4, RawShaderMaterial, Object3D, WebGLRenderer, Scene, DirectionalLight, Camera, Material, Loader, LoadingManager } from 'three';
-import { GLTFLoaderPlugin, GLTFParser, GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { L as LilToonWarning } from './GLTFLilToonExtension-2SkJrHyN.js';
+import { Color, Vector2, Vector3, Vector4, ColorRepresentation, Texture, Matrix4, RawShaderMaterial, Object3D, WebGLRenderer, Loader, LoadingManager } from 'three';
 
 type LilToonRenderMode = "opaque" | "cutout" | "transparent";
 type LilToonScalarOrVector = number | boolean | number[] | Color | Vector2 | Vector3 | Vector4;
 interface LilToonMaterialParameters {
+    color?: ColorRepresentation;
+    opacity?: number;
+    map?: Texture | null;
+    alphaTest?: number;
     name?: string;
     renderMode?: LilToonRenderMode;
     properties?: Record<string, LilToonScalarOrVector>;
     textures?: Record<string, Texture | null>;
     /** Enables the generated skin/morph vertex ABI. Safe for static meshes too. */
     deformation?: boolean;
-    /** @internal Used by OutlinePass. */
+    /** @internal Used by automatic outline rendering. */
     pass?: "forward" | "outline";
 }
 
 type UniformPrimitive = number | Matrix4 | Vector2 | Vector3 | Vector4 | UniformPrimitive[];
 type LilToonGlobalUniforms = Record<string, UniformPrimitive>;
-
-type LilToonWarningCode = "unsupported-feature" | "unused-texture" | "texture-type-mismatch" | "spec-version-mismatch" | "unsupported-shader-variant";
-/** Serializable, non-fatal compatibility diagnostic. */
-interface LilToonWarning {
-    severity: "warning";
-    code: LilToonWarningCode;
-    materialName: string;
-    materialIndex?: number;
-    shaderKey: string;
-    property: string;
-    message: string;
-}
 
 interface LilToonFeatureSet {
     main2nd: boolean;
@@ -59,6 +51,7 @@ interface SerializedLilToonMaterial {
 
 declare class LilToonMaterial extends RawShaderMaterial {
     #private;
+    color: Color;
     readonly isLilToonMaterial = true;
     readonly lilToonProperties: Record<string, LilToonScalarOrVector>;
     readonly lilToonTextures: Record<string, Texture | null>;
@@ -66,9 +59,8 @@ declare class LilToonMaterial extends RawShaderMaterial {
     renderMode: LilToonRenderMode;
     pass: "forward" | "outline";
     featureSet: LilToonFeatureSet;
-    rendererAdapter?: LilToonRendererAdapter;
     constructor(parameters?: LilToonMaterialParameters);
-    /** The actual compiled program; edits do not automatically reselect it. */
+    /** The actual compiled program, reselected when texture requirements change. */
     get shaderKey(): string;
     /** Recheck active forward features and textures without logging or changing the material. */
     getWarnings(): LilToonWarning[];
@@ -76,63 +68,15 @@ declare class LilToonMaterial extends RawShaderMaterial {
     getProperty<T extends LilToonScalarOrVector = LilToonScalarOrVector>(name: string): T | undefined;
     toLilToonJSON(resolveTexture?: (texture: Texture, property: string) => string | number | null): SerializedLilToonMaterial;
     setTexture(name: string, texture: Texture | null): this;
-    setRendererAdapter(adapter: LilToonRendererAdapter | undefined): this;
     copy(source: LilToonMaterial): this;
+    get map(): Texture | null;
+    set map(texture: Texture | null);
+    private readColor;
+    private syncColor;
+    private refreshProgram;
     /** @internal Renderer ABI texture binding. */
     setSystemTexture(binding: "__environment" | "__shadow" | "__bones" | "__morphs", texture: Texture | null): void;
     updateDeformationUniforms(object: Object3D, renderer: WebGLRenderer): void;
-}
-
-declare class LilToonEnvironmentAdapter {
-    #private;
-    read(scene: Scene): Texture | null;
-    bind(scene: Scene, globals: LilToonGlobalUniforms): Texture | null;
-}
-
-interface LilToonSceneLighting {
-    main?: DirectionalLight;
-    direction: Vector3;
-    color: Color;
-    ambient: Color;
-}
-declare class LilToonLightAdapter {
-    read(scene: Scene): LilToonSceneLighting;
-}
-
-interface LilToonShadowBinding {
-    texture: Texture | null;
-}
-declare class LilToonShadowAdapter {
-    bind(light: DirectionalLight | undefined, globals: LilToonGlobalUniforms, shadowsEnabled?: boolean): LilToonShadowBinding;
-}
-
-declare class LilToonRendererAdapter {
-    #private;
-    readonly renderer: WebGLRenderer;
-    readonly lightAdapter: LilToonLightAdapter;
-    readonly shadowAdapter: LilToonShadowAdapter;
-    readonly environmentAdapter: LilToonEnvironmentAdapter;
-    constructor(renderer: WebGLRenderer);
-    attach(root: Object3D): this;
-    prepareMaterial(material: LilToonMaterial, renderer: WebGLRenderer, scene: Scene, _camera: Camera, _object: Object3D, _elapsedSeconds: number): void;
-    render(scene: Scene, camera: Camera): void;
-}
-
-interface GLTFLilToonExtensionOptions {
-    rendererAdapter?: LilToonRendererAdapter;
-    addOutlines?: boolean;
-    configureShadowCasters?: boolean;
-    /** Non-fatal compatibility warnings. Omit to log them to the console. */
-    onWarning?: (warning: LilToonWarning) => void;
-}
-declare class GLTFLilToonExtension implements GLTFLoaderPlugin {
-    #private;
-    readonly parser: GLTFParser;
-    readonly options: GLTFLilToonExtensionOptions;
-    readonly name = "MOCHIYA_materials_liltoon";
-    constructor(parser: GLTFParser, options?: GLTFLilToonExtensionOptions);
-    loadMaterial(materialIndex: number): Promise<Material> | null;
-    afterRoot(result: GLTF): Promise<void>;
 }
 
 declare class LilToonMaterialLoader extends Loader<LilToonMaterial> {
@@ -158,4 +102,4 @@ interface GLTFLilToonMaterialDefinition {
     textures?: Record<string, GLTFLilToonTextureInfo | number>;
 }
 
-export { GLTFLilToonExtension as G, LilToonMaterial as L, type SerializedLilToonMaterial as S, LilToonRendererAdapter as a, type GLTFLilToonExtensionOptions as b, LILTOON_GLTF_EXTENSION as c, LILTOON_GLTF_SPEC_VERSION as d, LilToonEnvironmentAdapter as e, type LilToonFeatureSet as f, LilToonLightAdapter as g, LilToonMaterialLoader as h, type LilToonMaterialParameters as i, type LilToonRenderMode as j, type LilToonScalarOrVector as k, LilToonShadowAdapter as l, type LilToonWarning as m, type LilToonWarningCode as n, detectLilToonFeatures as o, type GLTFLilToonMaterialDefinition as p, type GLTFLilToonTextureInfo as q };
+export { type GLTFLilToonMaterialDefinition as G, LilToonMaterial as L, type SerializedLilToonMaterial as S, type LilToonGlobalUniforms as a, LILTOON_GLTF_EXTENSION as b, LILTOON_GLTF_SPEC_VERSION as c, type LilToonFeatureSet as d, LilToonMaterialLoader as e, type LilToonMaterialParameters as f, type LilToonRenderMode as g, type LilToonScalarOrVector as h, detectLilToonFeatures as i, type GLTFLilToonTextureInfo as j };

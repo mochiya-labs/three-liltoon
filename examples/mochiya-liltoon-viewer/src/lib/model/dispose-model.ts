@@ -1,4 +1,5 @@
 import { LilToonMaterial } from "three-liltoon";
+import { uninstallLilToonExpressionBindings } from "three-liltoon/vrm";
 import {
 	BufferGeometry,
 	Material,
@@ -33,6 +34,7 @@ function collectMaterialTextures(material: Material, textures: Set<Texture>) {
 }
 
 export function disposeModel(model: LoadedModel) {
+	if (model.vrm) uninstallLilToonExpressionBindings(model.vrm);
 	const geometries = new Set<BufferGeometry>();
 	const skeletons = new Set<Skeleton>();
 	const materials = new Set<Material>();

@@ -1,27 +1,37 @@
-import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonRendererAdapter } from './gltf-HpUJqscG.js';
-export { G as GLTFLilToonExtension, b as GLTFLilToonExtensionOptions, c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonEnvironmentAdapter, f as LilToonFeatureSet, g as LilToonLightAdapter, h as LilToonMaterialLoader, i as LilToonMaterialParameters, j as LilToonRenderMode, k as LilToonScalarOrVector, l as LilToonShadowAdapter, m as LilToonWarning, n as LilToonWarningCode, o as detectLilToonFeatures } from './gltf-HpUJqscG.js';
-import { Texture, WebGLRenderer, Scene, Camera, Mesh } from 'three';
+import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms } from './gltf-Cx5c6-T5.js';
+export { b as LILTOON_GLTF_EXTENSION, c as LILTOON_GLTF_SPEC_VERSION, d as LilToonFeatureSet, e as LilToonMaterialLoader, f as LilToonMaterialParameters, g as LilToonRenderMode, h as LilToonScalarOrVector, i as detectLilToonFeatures } from './gltf-Cx5c6-T5.js';
+import { WebGLRenderer, Texture, Scene, DirectionalLight, Vector3, Color } from 'three';
+export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-2SkJrHyN.js';
 import 'three/examples/jsm/loaders/GLTFLoader.js';
+
+/** Install automatic passes on an existing renderer. Release the returned lease on teardown. */
+declare function enableLilToon(renderer: WebGLRenderer): () => void;
 
 declare class LilToonMaterialFactory {
     create(source: SerializedLilToonMaterial, textures?: Record<string, Texture | null>): LilToonMaterial;
 }
 
-declare class LilToonPassManager {
-    readonly renderer: WebGLRenderer;
-    readonly adapter: LilToonRendererAdapter;
-    constructor(renderer: WebGLRenderer);
-    render(scene: Scene, camera: Camera): void;
+interface LilToonSceneLighting {
+    main?: DirectionalLight;
+    direction: Vector3;
+    color: Color;
+    ambient: Color;
+}
+declare class LilToonLightAdapter {
+    read(scene: Scene): LilToonSceneLighting;
 }
 
-declare class OutlinePass {
+interface LilToonShadowBinding {
+    texture: Texture | null;
+}
+declare class LilToonShadowAdapter {
+    bind(light: DirectionalLight | undefined, globals: LilToonGlobalUniforms, shadowsEnabled?: boolean): LilToonShadowBinding;
+}
+
+declare class LilToonEnvironmentAdapter {
     #private;
-    attach(mesh: Mesh, sourceMaterial: LilToonMaterial): Mesh;
-    detach(mesh: Mesh): void;
-}
-
-declare class ShadowCasterPass {
-    configure(mesh: Mesh, material: LilToonMaterial): void;
+    read(scene: Scene): Texture | null;
+    bind(scene: Scene, globals: LilToonGlobalUniforms): Texture | null;
 }
 
 declare class RefractionPass {
@@ -5138,4 +5148,4 @@ declare const LILTOON_UPSTREAM_COMMIT = "72fc09625b24c9a750591c286e9192512a5177a
 declare const LILTOON_UPSTREAM_VERSION = "2.1.1";
 declare const THREE_VERSION_RANGE = ">=0.180.0 <0.190.0";
 
-export { FurPass, GemPass, LILTOON_DEFAULTS, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonMaterial, LilToonMaterialFactory, LilToonPassManager, LilToonRendererAdapter, OutlinePass, RefractionPass, SerializedLilToonMaterial, ShadowCasterPass, THREE_VERSION_RANGE, UnsupportedFeatureError };
+export { FurPass, GemPass, LILTOON_DEFAULTS, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonMaterialFactory, LilToonShadowAdapter, RefractionPass, SerializedLilToonMaterial, THREE_VERSION_RANGE, UnsupportedFeatureError, enableLilToon };

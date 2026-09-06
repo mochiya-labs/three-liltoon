@@ -1,8 +1,10 @@
 # three-liltoon
 
-An unofficial Three.js/WebGL2 port and integration that cross-compiles portions of the upstream [lilToon](https://github.com/lilxyzw/lilToon) HLSL. It keeps lilToon as an untouched Git submodule and supplies a web compatibility ABI, deterministic shader build, Three.js material/runtime adapter, outline pass, shadow integration, deformation support, and a glTF loader extension.
+An unofficial Three.js/WebGL2 port and integration that cross-compiles portions of the upstream [lilToon](https://github.com/lilxyzw/lilToon) HLSL. It keeps lilToon as an untouched Git submodule and supplies a web compatibility ABI, deterministic shader build, Three.js material, automatic outline and shadow integration, deformation support, and a glTF loader extension.
 
 This is an alpha and is not affiliated with or endorsed by lilToon. See the exact [feature matrix](docs/FEATURE_MATRIX.md) and [known porting differences](docs/PORTING_EXCEPTIONS.md) before shipping an avatar.
+
+Maintained by [Mochiya](https://mochiya.org).
 
 ## Compatibility
 
@@ -21,88 +23,120 @@ The runtime JavaScript and TypeScript declarations under `dist/` are committed s
 npm install three https://github.com/zekailin00/three-liltoon.git
 ```
 
-## Basic use
+## Choose your setup
+
+| API                                                      | Use it for                                     | What it does                                                                                   |
+| -------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `enableLilToon(renderer)`                                | Every app rendering lilToon materials          | Enables automatic outline and shadow passes on an existing `WebGLRenderer`.                    |
+| `enableLilToonVRM(new VRMLoaderPlugin(parser, options))` | Apps loading VRM, or a mix of VRM and glTF/GLB | Adds lilToon material loading and VRM material-expression bindings to the standard VRM plugin. |
+| `new GLTFLilToonExtension(parser)`                       | Apps loading glTF/GLB without three-vrm        | Loads lilToon materials and prepares tangents. No VRM dependency.                              |
+
+Enable the renderer once, then choose either loader setup below. Manually created materials need only the renderer setup.
+
+## Render lilToon materials
 
 ```ts
-import * as THREE from "three";
-import {
-	LilToonMaterial,
-	LilToonRendererAdapter,
-	OutlinePass,
-} from "three-liltoon";
+import { Mesh, WebGLRenderer } from "three";
+import { LilToonMaterial, enableLilToon } from "three-liltoon";
 
-const renderer = new THREE.WebGLRenderer();
-renderer.outputColorSpace = THREE.SRGBColorSpace;
+const renderer = new WebGLRenderer({ antialias: true });
+const releaseRendering = enableLilToon(renderer);
 renderer.shadowMap.enabled = true;
-
 const material = new LilToonMaterial({
-	renderMode: "opaque", // opaque | cutout | transparent
-	properties: {
-		_Color: [0.91, 0.35, 0.48, 1],
-		_UseShadow: 1,
-		_UseRim: 1,
-		_OutlineWidth: 0.05,
-	},
-	textures: {
-		_MainTex: mainTexture,
-	},
+	color: "#e85a7a",
+	map: mainTexture,
+	properties: { _UseShadow: 1, _UseOutline: 1, _OutlineWidth: 0.05 },
 });
-
-const mesh = new THREE.Mesh(geometry, material);
-mesh.castShadow = true;
-mesh.receiveShadow = true;
+const mesh = new Mesh(geometry, material);
+mesh.castShadow = mesh.receiveShadow = true;
 scene.add(mesh);
-
-const adapter = new LilToonRendererAdapter(renderer);
-material.setRendererAdapter(adapter);
-new OutlinePass().attach(mesh, material);
-
-function frame() {
-	adapter.render(scene, camera);
-	requestAnimationFrame(frame);
-}
-frame();
+renderer.setAnimationLoop(() => renderer.render(scene, camera));
 ```
 
-The adapter reads one `DirectionalLight`, ambient/hemisphere lighting, the directional shadow map, and `scene.environment` through public Three.js APIs. `SkinnedMesh` bone textures and mesh morph targets are bound automatically. Morph targets are limited to 64.
+Use ordinary Three.js meshes, lights and scene setup. The package binds one directional light, ambient/hemisphere lighting, supported environment inputs, skinning and up to 64 morph targets automatically. Outlines and casters follow the current material, including replacement and removal.
 
-## glTF extension
+Call `releaseRendering()` when its owner unmounts; disposing the renderer also releases its integration. React Three Fiber: `useEffect(() => enableLilToon(gl), [gl])`. Each installation returns an independent, idempotent cleanup function. No adapter or pass manager is needed. Gem/refraction and fur remain unsupported.
+
+| Familiar property         | Original lilToon value                                              |
+| ------------------------- | ------------------------------------------------------------------- |
+| `color` (mutable `Color`) | `_Color` RGB                                                        |
+| `opacity`                 | `_Color` alpha; select `renderMode: "transparent"` for transparency |
+| `map`                     | `_MainTex`                                                          |
+| `alphaTest`               | `_Cutoff`; a positive value selects cutout mode                     |
+
+Original property names remain available through `setProperty()` and `setTexture()`. Texture changes automatically reselect the supported shader profile. Independent texture transforms stay in their `_ST` properties. Dispose materials and geometries normally; shared input textures remain caller-owned. The renderer releases its own pass resources and restores authored custom casters.
+
+## Load glTF/GLB without VRM
 
 The package defines `MOCHIYA_materials_liltoon`; it only replaces materials that explicitly carry that extension.
 
 ```ts
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { LilToonRendererAdapter } from "three-liltoon";
-import { GLTFLilToonExtension, type LilToonWarning } from "three-liltoon/gltf";
+import { GLTFLilToonExtension } from "three-liltoon/gltf";
 
-const adapter = new LilToonRendererAdapter(renderer);
 const loader = new GLTFLoader();
-const renderingWarnings: LilToonWarning[] = [];
-loader.register(
-	(parser) =>
-		new GLTFLilToonExtension(parser, {
-			rendererAdapter: adapter,
-			addOutlines: true,
-			configureShadowCasters: true,
-			onWarning: (warning) => renderingWarnings.push(warning), // optional frontend collection
-		}),
-);
+loader.register((parser) => new GLTFLilToonExtension(parser));
 
 const gltf = await loader.loadAsync("/avatar.glb");
 scene.add(gltf.scene);
 ```
 
-The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT.md).
+Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. The serialized schema is documented in [MATERIAL_FORMAT.md](docs/MATERIAL_FORMAT.md).
+
+## Load VRM and glTF/GLB
+
+Install `@pixiv/three-vrm` 3.4 or newer within major version 3 when loading VRM avatars. It is an optional peer; `three-liltoon` and `three-liltoon/gltf` work without it.
+
+Use this loader setup when your app supports VRM:
+
+```ts
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { VRMLoaderPlugin } from "@pixiv/three-vrm";
+import { enableLilToonVRM } from "three-liltoon/vrm";
+
+const loader = new GLTFLoader();
+loader.register((parser) => enableLilToonVRM(new VRMLoaderPlugin(parser)));
+const gltf = await loader.loadAsync("/avatar.vrm");
+const vrm = gltf.userData.vrm;
+scene.add(vrm?.scene ?? gltf.scene);
+vrm?.expressionManager?.setValue("happy", 0.5);
+// Each frame, before rendering:
+vrm?.update(deltaSeconds);
+```
+
+The helper enhances and returns the same plugin instance. Pass standard VRM options to `new VRMLoaderPlugin(parser, options)`. It includes `GLTFLilToonExtension` internally, so register only the enhanced VRM plugin. Repeated enhancement is a no-op. Ordinary glTF/GLB also loads; expression adaptation runs only when a VRM runtime exists. Materials without the lilToon extension retain their normal loading behavior.
+
+### VRM material expressions
+
+| VRM binding                               | lilToon property                                                               |
+| ----------------------------------------- | ------------------------------------------------------------------------------ |
+| Base color / alpha                        | `_Color`                                                                       |
+| Emission, shade, matcap, rim, outline RGB | `_EmissionColor`, `_ShadowColor`, `_MatCapColor`, `_RimColor`, `_OutlineColor` |
+| Texture scale / offset                    | `_MainTex_ST` only; other texture slots keep their own transforms              |
+| Morph targets and other materials         | Handled unchanged by three-vrm                                                 |
+
+Generated outlines follow animated colors and main UVs. Shader feature/profile limits still apply. This mapping requires neither attachment data nor `avatar-asset-runtime`.
+
+For custom loading, `/vrm` also exports `installLilToonExpressionBindings(vrm)`, which returns an undo function, and `uninstallLilToonExpressionBindings(vrm)`. Repeated installation is safe. Install before the first expression update; undo and reinstall after changing the expression bindings themselves. Uninstall restores the original bindings and values without disposing materials or textures. The loader installs automatically, so ordinary loading needs no manual setup call.
 
 The runtime chooses a material-specific shader profile so layered-color masks, MatCap masks, custom normals, or reflection controls fit Three/WebGL's texture-unit budget. A maximal lilToon shader is intentionally not used: skinned/morphed avatars reserve two of the renderer's sixteen allocated units for deformation, and every generated profile is tested to keep the complete linked program within that limit.
 
 ### Rendering warnings
 
+Both loader setups accept an optional lilToon warning callback:
+
+```ts
+new GLTFLilToonExtension(parser, { onWarning });
+enableLilToonVRM(new VRMLoaderPlugin(parser, vrmOptions), { onWarning });
+```
+
+Use one setup per loader; the first enhancement's warning options apply. The renderer setup is independent of these loading options.
+
 `LilToonWarning` is exported from both `three-liltoon` and `three-liltoon/gltf`. Warnings contain `severity: "warning"`, a stable `code`, `materialName`, glTF `materialIndex`, `property`, `shaderKey`, and a readable `message`. They do not reject loading or change authored settings. With no callback they are logged to the console; the completed load also exposes them as `gltf.userData.lilToonWarnings`. Use a fresh collection per load if reusing a loader.
 
 Checks cover known enabled forward features missing from the selected program, active assigned textures without samplers, incompatible 2D/cube textures, extension-version differences, and unsupported Unity shader families. Dormant texture slots and supported shared MatCap normals do not produce warnings. For example, enabling reflection and assigning a MatCap mask alongside an emission mask reports what the emission-mask profile cannot reproduce. A lack of warnings is not a guarantee of Unity visual parity or GPU/geometry correctness.
 
-Direct material users can call `material.getWarnings()` and inspect `material.shaderKey`; this check is side-effect-free. Recheck after `setProperty` / `setTexture`: edits do not automatically choose a new shader profile. `LilToonMaterialLoader.onWarning` provides the same feature diagnostics for standalone JSON loads (that loader does not resolve serialized texture references). Outline, shadow, and other passes are outside the forward-profile check. Real file/parse failures still reject; explicit unsupported pass constructors still throw.
+Direct material users can call `material.getWarnings()` and inspect `material.shaderKey`; this check is side-effect-free. Recheck after `setProperty` / `setTexture`: texture edits automatically reselect the shader profile; unsupported combinations still warn. `LilToonMaterialLoader.onWarning` provides the same feature diagnostics for standalone JSON loads (that loader does not resolve serialized texture references). Outline, shadow, and other passes are outside the forward-profile check. Real file/parse failures still reject; explicit unsupported pass constructors still throw.
 
 Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.liltoon-exporter`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
