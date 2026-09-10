@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import NextImage from "next/image";
 import {
-	CubeIcon,
 	ImageIcon,
 	InfoIcon,
 	MagnifyingGlassIcon,
@@ -13,13 +12,6 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -66,25 +58,29 @@ function PropertyRows({
 
 	return (
 		<div className="divide-y divide-border/70">
-			{filtered.map((entry) => (
-				<div
-					key={entry.name}
-					className="grid min-h-8 grid-cols-[minmax(0,1fr)_minmax(5rem,42%)] items-center gap-3 px-3 py-1.5 [contain-intrinsic-size:auto_32px] [content-visibility:auto]"
-				>
-					<dt
-						className="truncate font-mono text-[0.6875rem] font-medium text-foreground"
-						title={entry.name}
+			{filtered.map((entry) => {
+				const label = entry.labelKey ? t[entry.labelKey] : entry.name;
+				const value = entry.valueKey ? t[entry.valueKey] : entry.value;
+				return (
+					<div
+						key={entry.name}
+						className="grid min-h-8 grid-cols-[minmax(0,1fr)_minmax(5rem,42%)] items-center gap-3 px-3 py-1.5 [contain-intrinsic-size:auto_32px] [content-visibility:auto]"
 					>
-						{entry.name}
-					</dt>
-					<dd
-						className="truncate text-right font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
-						title={entry.value}
-					>
-						{entry.value}
-					</dd>
-				</div>
-			))}
+						<dt
+							className="truncate font-mono text-[0.6875rem] font-medium text-foreground"
+							title={label}
+						>
+							{label}
+						</dt>
+						<dd
+							className="truncate text-right font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+							title={value}
+						>
+							{value}
+						</dd>
+					</div>
+				);
+			})}
 		</div>
 	);
 }
@@ -114,11 +110,11 @@ function TextureRows({
 					key={texture.id}
 					className="grid grid-cols-[5rem_minmax(0,1fr)] gap-3 px-3 py-3"
 				>
-					<div className="relative aspect-square overflow-hidden border bg-muted">
+					<div className="relative aspect-square overflow-hidden rounded-md border bg-muted">
 						{texture.previewUrl ? (
 							<NextImage
 								src={texture.previewUrl}
-								alt={`${texture.name} ${t.texturePreview}`}
+								alt={`${texture.name || t.unnamedTexture} ${t.texturePreview}`}
 								fill
 								sizes="80px"
 								className="object-contain"
@@ -140,15 +136,15 @@ function TextureRows({
 						</div>
 						<div
 							className="mt-0.5 truncate text-[0.6875rem] text-muted-foreground"
-							title={texture.name}
+							title={texture.name || t.unnamedTexture}
 						>
-							{texture.name}
+							{texture.name || t.unnamedTexture}
 						</div>
 						<dl className="mt-2 space-y-1 text-[0.6875rem]">
 							{[
-								[t.size, texture.size],
-								[t.colorSpace, texture.colorSpace],
-								[t.flipY, texture.flipY],
+								[t.size, texture.size || t.unknown],
+								[t.colorSpace, texture.colorSpace || t.noColorSpace],
+								[t.flipY, texture.flipY ? t.yes : t.no],
 								[t.wrap, texture.wrap],
 								[t.filter, texture.filter],
 							].map(([label, value]) => (
@@ -259,18 +255,23 @@ export function MaterialInspector({
 		materials[0];
 
 	return (
-		<Card className="inspector-sidebar min-h-[36rem] rounded-none border-0 border-l bg-background shadow-none ring-0 max-[880px]:border-t max-[880px]:border-l-0 lg:min-h-0">
-			<CardHeader className="shrink-0 gap-0 border-b px-0 pt-0">
-				<div className="flex h-12 items-center justify-between gap-3 px-4">
-					<CardTitle>{t.materialInspector}</CardTitle>
+		<aside
+			className="inspector-sidebar flex flex-col border-l bg-background max-[880px]:border-t max-[880px]:border-l-0"
+			aria-label={t.materialInspector}
+		>
+			<div className="shrink-0 border-b">
+				<header className="flex h-12 items-center justify-between gap-3 px-4">
+					<h2 className="text-xs font-medium">{t.materialInspector}</h2>
 					{materials.length > 0 && (
 						<Badge variant="outline">{materials.length}</Badge>
 					)}
-				</div>
+				</header>
 				<div className="space-y-3 border-t px-4 py-3">
-					<CardDescription>{t.readOnlyDescription}</CardDescription>
+					<p className="text-[11px] leading-relaxed text-muted-foreground">
+						{t.readOnlyDescription}
+					</p>
 					{inspection && inspection.warnings.length > 0 && (
-						<details className="min-w-0 border bg-muted/40 p-2 text-xs">
+						<details className="min-w-0 overflow-hidden rounded-md border bg-muted/20 p-2.5 text-xs">
 							<summary className="cursor-pointer font-medium">
 								<WarningCircleIcon className="mr-1 inline size-3.5" />
 								{inspection.warnings.length} {t.renderingWarnings}
@@ -311,20 +312,12 @@ export function MaterialInspector({
 						</details>
 					)}
 				</div>
-			</CardHeader>
+			</div>
 
 			{!selected ? (
-				<CardContent className="grid flex-1 place-items-center px-8 text-center">
-					<div>
-						<CubeIcon className="mx-auto mb-3 size-6 text-muted-foreground" />
-						<div className="font-heading text-sm font-medium">
-							{t.noMaterial}
-						</div>
-						<p className="mt-1 max-w-64 text-xs text-muted-foreground">
-							{t.noMaterialHint}
-						</p>
-					</div>
-				</CardContent>
+				<div className="p-4 text-[11px] leading-relaxed text-muted-foreground">
+					<p>{t.noMaterialHint}</p>
+				</div>
 			) : (
 				<div className="flex min-h-0 flex-1 flex-col">
 					<div className="space-y-3 px-4 py-3">
@@ -335,7 +328,8 @@ export function MaterialInspector({
 							<SelectContent>
 								{materials.map((material) => (
 									<SelectItem key={material.id} value={material.id}>
-										{material.name}
+										{material.name ||
+											`${t.unnamedMaterial} (${material.sourceMaterialIndex ?? t.generated})`}
 										{material.warnings.length > 0 &&
 											` (${material.warnings.length} ${t.warnings})`}
 									</SelectItem>
@@ -364,6 +358,6 @@ export function MaterialInspector({
 					<InspectorBody key={selected.id} material={selected} t={t} />
 				</div>
 			)}
-		</Card>
+		</aside>
 	);
 }

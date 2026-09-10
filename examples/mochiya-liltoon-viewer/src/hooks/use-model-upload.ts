@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ModelSource } from "@/lib/model/types";
 
 const SUPPORTED_EXTENSIONS = new Set(["glb", "vrm"]);
+export type UploadError = "unsupportedFile" | "emptyFile";
 
 function extensionOf(fileName: string) {
 	return fileName.split(".").pop()?.toLowerCase() ?? "";
@@ -12,17 +13,17 @@ function extensionOf(fileName: string) {
 
 export function useModelUpload() {
 	const [source, setSource] = useState<ModelSource | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<UploadError | null>(null);
 	const objectUrlRef = useRef<string | null>(null);
 
 	const selectFile = useCallback((file: File) => {
 		const extension = extensionOf(file.name);
 		if (!SUPPORTED_EXTENSIONS.has(extension)) {
-			setError("Choose a binary .glb model or a .vrm avatar.");
+			setError("unsupportedFile");
 			return false;
 		}
 		if (file.size === 0) {
-			setError("This file is empty.");
+			setError("emptyFile");
 			return false;
 		}
 

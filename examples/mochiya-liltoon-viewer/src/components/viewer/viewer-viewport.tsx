@@ -2,7 +2,6 @@
 
 import { useState, type DragEvent } from "react";
 import {
-	CheckCircleIcon,
 	CircleNotchIcon,
 	CubeIcon,
 	FileArrowUpIcon,
@@ -12,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import type { UploadError } from "@/hooks/use-model-upload";
 import type { Labels } from "@/lib/i18n";
 import type {
 	LoadStatus,
@@ -26,7 +26,7 @@ type ViewerViewportProps = {
 	source: ModelSource | null;
 	inspection: ModelInspection | null;
 	status: LoadStatus;
-	uploadError: string | null;
+	uploadError: UploadError | null;
 	dark: boolean;
 	t: Labels;
 	onChooseFile: () => void;
@@ -54,8 +54,11 @@ export function ViewerViewport({
 	onStatusChange,
 }: ViewerViewportProps) {
 	const [dragging, setDragging] = useState(false);
-	const error =
-		uploadError ?? (status.phase === "error" ? status.message : null);
+	const error = uploadError
+		? t[uploadError]
+		: status.phase === "error"
+			? (status.message ?? t.loadError)
+			: null;
 
 	function handleDrop(event: DragEvent<HTMLElement>) {
 		event.preventDefault();
@@ -67,7 +70,7 @@ export function ViewerViewport({
 	return (
 		<section
 			className={cn(
-				"viewer-main relative flex min-h-0 min-w-0 flex-col bg-background",
+				"viewer-main relative flex min-w-0 flex-col bg-background",
 				dragging && "ring-2 ring-inset ring-primary",
 			)}
 			aria-label={t.preview}
@@ -83,30 +86,23 @@ export function ViewerViewport({
 			onDrop={handleDrop}
 		>
 			<header className="flex h-12 shrink-0 items-center justify-between border-b px-3">
-				<div className="flex items-center gap-2 text-xs font-medium">
+				<div className="flex shrink-0 items-center gap-2 whitespace-nowrap text-xs">
 					<span className="inline-block size-1.5 rounded-full bg-primary" />
 					{t.preview}
+					<Badge variant="secondary">{inspection ? 1 : 0}</Badge>
 				</div>
-				{status.phase === "ready" ? (
-					<Badge className="shrink-0" role="status">
-						{inspection?.warnings.length ? (
-							<WarningCircleIcon />
-						) : (
-							<CheckCircleIcon />
-						)}
-						{t.ready}
-						{inspection?.warnings.length
-							? ` · ${inspection.warnings.length} ${t.warnings}`
-							: ""}
-					</Badge>
-				) : null}
+				<div className="flex items-center gap-2">
+					<Button variant="outline" onClick={onChooseFile}>
+						<FileArrowUpIcon aria-hidden="true" />
+						{source ? t.replaceModel : t.openModel}
+					</Button>
+				</div>
 			</header>
 
-			<div className="relative min-h-64 flex-1">
+			<div className="relative min-h-64 flex-1" data-testid="viewport">
 				<ModelCanvas
 					source={source}
 					dark={dark}
-					loadFailureMessage={t.loadError}
 					onInspectionChange={onInspectionChange}
 					onStatusChange={onStatusChange}
 				/>
@@ -135,17 +131,15 @@ export function ViewerViewport({
 
 				{!source ? (
 					<div className="pointer-events-none absolute inset-0 grid place-items-center p-6 text-center">
-						<div className="pointer-events-auto max-w-sm border bg-background/95 p-6 shadow-sm">
-							<div className="mx-auto grid size-12 place-items-center border bg-primary/15 text-primary-foreground">
-								<CubeIcon className="size-6" />
+						<div className="pointer-events-auto max-w-80 rounded-xl border bg-background/95 p-6 text-center shadow-sm">
+							<div className="mx-auto mb-4 grid size-12 place-items-center rounded-xl bg-primary/15 text-primary-foreground">
+								<CubeIcon size={25} aria-hidden="true" />
 							</div>
-							<h2 className="mt-4 font-heading text-base font-medium">
-								{t.openPrompt}
-							</h2>
-							<p className="mt-1 text-xs/relaxed text-muted-foreground">
+							<h2 className="text-base font-semibold">{t.openPrompt}</h2>
+							<p className="mt-2 text-xs leading-relaxed text-muted-foreground">
 								{t.emptyHint}
 							</p>
-							<Button className="mt-4" size="lg" onClick={onChooseFile}>
+							<Button className="mt-5 w-full" size="lg" onClick={onChooseFile}>
 								<FileArrowUpIcon /> {t.chooseFile}
 							</Button>
 						</div>
@@ -153,9 +147,9 @@ export function ViewerViewport({
 				) : null}
 
 				{source && status.phase === "loading" ? (
-					<div className="absolute inset-0 grid place-items-center bg-black/25 p-6 backdrop-blur-[2px]">
-						<div className="w-full max-w-xs border bg-card p-4 text-card-foreground shadow-xl">
-							<div className="flex items-center gap-2 font-heading text-sm font-medium">
+					<div className="absolute inset-x-4 top-4 flex justify-center">
+						<div className="w-full max-w-xs rounded-lg border bg-background p-4 text-foreground shadow-sm">
+							<div className="flex items-center gap-2 text-xs font-medium">
 								<CircleNotchIcon className="size-4 animate-spin text-primary" />
 								{t.loadingModel}
 							</div>
@@ -168,14 +162,17 @@ export function ViewerViewport({
 				) : null}
 
 				{error ? (
-					<div className="absolute inset-x-3 bottom-3 border border-destructive/30 bg-card p-3 text-card-foreground shadow-xl">
+					<div
+						role="alert"
+						className="absolute inset-x-4 bottom-4 rounded-lg border border-destructive/30 bg-background p-3 text-xs"
+					>
 						<div className="flex items-start gap-2">
 							<WarningCircleIcon className="mt-0.5 size-4 shrink-0 text-destructive" />
 							<div className="min-w-0 flex-1">
-								<div className="font-heading text-xs font-medium">
+								<div className="text-xs font-medium text-destructive">
 									{t.loadError}
 								</div>
-								<p className="mt-0.5 break-words text-xs text-muted-foreground">
+								<p className="mt-1 break-words text-xs leading-relaxed text-muted-foreground">
 									{error}
 								</p>
 							</div>
@@ -186,29 +183,36 @@ export function ViewerViewport({
 					</div>
 				) : null}
 
-				{source && status.phase === "ready" ? (
-					<div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/45 to-transparent p-3 pt-12 text-white">
-						<div className="min-w-0">
-							<div className="truncate text-xs font-medium">
-								{source.fileName}
-							</div>
-							<div className="text-[0.6875rem] text-white/55">
-								{formatBytes(source.fileSize)}
-							</div>
-						</div>
-						<div className="text-right text-[0.6875rem] text-white/55">
-							{t.orbitHint}
-						</div>
-					</div>
-				) : null}
+				<div className="pointer-events-none absolute bottom-3 left-3 text-[10px] text-muted-foreground">
+					{t.orbitHint}
+				</div>
 
 				{dragging ? (
-					<div className="pointer-events-none absolute inset-3 grid place-items-center border border-dashed border-primary bg-primary/10 text-center backdrop-blur-sm">
+					<div className="pointer-events-none absolute inset-3 grid place-items-center rounded-xl border border-dashed border-primary bg-primary/10 text-center text-xs backdrop-blur-sm">
 						<div>
 							<FileArrowUpIcon className="mx-auto mb-2 size-6 text-primary" />
 							{t.dropToReplace}
 						</div>
 					</div>
+				) : null}
+			</div>
+			<div className="flex min-h-12 shrink-0 items-center justify-between gap-2 border-t px-3 py-2">
+				<div className="flex min-w-0 items-center gap-2">
+					<CubeIcon
+						className="size-3.5 shrink-0 text-muted-foreground"
+						aria-hidden="true"
+					/>
+					<div className="min-w-0">
+						<p className="text-[10px] text-muted-foreground">{t.modelFile}</p>
+						<p className="truncate text-xs" title={source?.fileName}>
+							{source?.fileName ?? t.noModel}
+						</p>
+					</div>
+				</div>
+				{source ? (
+					<span className="shrink-0 text-[10px] text-muted-foreground">
+						{formatBytes(source.fileSize)}
+					</span>
 				) : null}
 			</div>
 		</section>

@@ -22,6 +22,7 @@ import type {
 	TextureInspection,
 } from "./types";
 import { createTexturePreview } from "./texture-preview";
+import type { Labels } from "../i18n";
 
 type LilToonExtensionDefinition = {
 	specVersion?: string;
@@ -84,18 +85,18 @@ function textureSize(texture: Texture) {
 		{ width?: number; height?: number } | undefined;
 	return image?.width && image?.height
 		? `${image.width} × ${image.height}`
-		: "Unknown";
+		: "";
 }
 
 function textureInspection(slot: string, texture: Texture): TextureInspection {
 	return {
 		id: `${slot}:${texture.uuid}`,
 		slot,
-		name: texture.name || "Unnamed texture",
+		name: texture.name,
 		previewUrl: createTexturePreview(texture),
 		size: textureSize(texture),
-		colorSpace: texture.colorSpace || "No color space",
-		flipY: texture.flipY ? "Yes" : "No",
+		colorSpace: texture.colorSpace,
+		flipY: texture.flipY,
 		wrap: `${texture.wrapS} / ${texture.wrapT}`,
 		filter: `${texture.minFilter} / ${texture.magFilter}`,
 	};
@@ -173,42 +174,42 @@ function inspectMaterial(
 	const isLilToon = material instanceof LilToonMaterial;
 	const materialIndex = sourceMaterialIndex(parser, material);
 	const extension = extensionDefinition(parser, materialIndex);
+	function detail(
+		labelKey: keyof Labels,
+		value: unknown,
+		fallback: keyof Labels = "notDeclared",
+	): InspectorEntry {
+		return {
+			name: labelKey,
+			labelKey,
+			value: value == null || value === "" ? "" : formatValue(value),
+			valueKey: value == null || value === "" ? fallback : undefined,
+		};
+	}
 	const details: InspectorEntry[] = [
-		{ name: "Name", value: material.name || "Unnamed material" },
-		{ name: "Three.js type", value: material.type },
-		{ name: "UUID", value: material.uuid },
-		{
-			name: "Source material index",
-			value: materialIndex == null ? "Generated" : String(materialIndex),
-		},
-		{ name: "Transparent", value: String(material.transparent) },
-		{ name: "Opacity", value: formatNumber(material.opacity) },
-		{ name: "Alpha test", value: formatNumber(material.alphaTest) },
-		{ name: "Depth test", value: String(material.depthTest) },
-		{ name: "Depth write", value: String(material.depthWrite) },
-		{ name: "Side", value: String(material.side) },
+		detail("materialName", material.name, "unnamedMaterial"),
+		detail("threeType", material.type),
+		detail("uuid", material.uuid),
+		detail("sourceMaterialIndex", materialIndex, "generated"),
+		detail("transparent", material.transparent),
+		detail("opacity", material.opacity),
+		detail("alphaTest", material.alphaTest),
+		detail("depthTest", material.depthTest),
+		detail("depthWrite", material.depthWrite),
+		detail("side", material.side),
 	];
 
 	if (isLilToon) {
 		details.splice(
 			2,
 			0,
-			{ name: "Mochiya extension", value: LILTOON_GLTF_EXTENSION },
-			{ name: "Specification", value: extension?.specVersion ?? "1.0" },
-			{
-				name: "lilToon version",
-				value: String(extension?.lilToonVersion ?? "Not declared"),
-			},
-			{
-				name: "Unity shader",
-				value: extension?.shaderVariant ?? "Not declared",
-			},
-			{
-				name: "Render mode",
-				value: extension?.renderMode ?? material.renderMode,
-			},
-			{ name: "Runtime pass", value: material.pass },
-			{ name: "Shader profile", value: material.shaderKey },
+			detail("mochiyaExtension", LILTOON_GLTF_EXTENSION),
+			detail("specification", extension?.specVersion ?? "1.0"),
+			detail("lilToonVersion", extension?.lilToonVersion),
+			detail("unityShader", extension?.shaderVariant),
+			detail("renderMode", extension?.renderMode ?? material.renderMode),
+			detail("runtimePass", material.pass),
+			detail("shaderProfile", material.shaderKey),
 		);
 	}
 
@@ -220,7 +221,7 @@ function inspectMaterial(
 
 	return {
 		id: materialIndex == null ? material.uuid : `material-${materialIndex}`,
-		name: material.name || `Material ${materialIndex ?? "generated"}`,
+		name: material.name,
 		type: isLilToon ? "lilToon" : material.type,
 		isLilToon,
 		sourceMaterialIndex: materialIndex,

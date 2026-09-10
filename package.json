@@ -10,10 +10,10 @@
 	"homepage": "https://mochiya.org",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/zekailin00/three-liltoon.git"
+		"url": "git+https://github.com/mochiya-labs/three-liltoon.git"
 	},
 	"bugs": {
-		"url": "https://github.com/zekailin00/three-liltoon/issues"
+		"url": "https://github.com/mochiya-labs/three-liltoon/issues"
 	},
 	"keywords": [
 		"three.js",

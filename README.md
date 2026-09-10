@@ -2,7 +2,7 @@
 
 An unofficial Three.js/WebGL2 port and integration that cross-compiles portions of the upstream [lilToon](https://github.com/lilxyzw/lilToon) HLSL. It keeps lilToon as an untouched Git submodule and supplies a web compatibility ABI, deterministic shader build, Three.js material, automatic outline and shadow integration, deformation support, and a glTF loader extension.
 
-This is an alpha and is not affiliated with or endorsed by lilToon. See the exact [feature matrix](docs/FEATURE_MATRIX.md) and [known porting differences](docs/PORTING_EXCEPTIONS.md) before shipping an avatar.
+This is an alpha and is not affiliated with or endorsed by lilToon. See the exact [feature matrix](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/FEATURE_MATRIX.md) and [known porting differences](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/PORTING_EXCEPTIONS.md) before shipping an avatar.
 
 Maintained by [Mochiya](https://mochiya.org).
 
@@ -83,7 +83,7 @@ const gltf = await loader.loadAsync("/avatar.glb");
 scene.add(gltf.scene);
 ```
 
-Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. See the [format guide](https://github.com/zekailin00/three-liltoon/blob/main/docs/MATERIAL_FORMAT.md) and [JSON Schema](dist/schema/MOCHIYA_materials_liltoon.schema.json), also available as `@mochiya/three-liltoon/schema`. The schema validates each material's extension payload, not an entire glTF document or rendered feature support.
+Loading reconstructs materials and tangents; it takes no renderer and creates no render passes. Render with the setup above. See the [format guide](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/MATERIAL_FORMAT.md) and [JSON Schema](dist/schema/MOCHIYA_materials_liltoon.schema.json), also available as `@mochiya/three-liltoon/schema`. The schema validates each material's extension payload, not an entire glTF document or rendered feature support.
 
 ## Load VRM and glTF/GLB
 
@@ -140,7 +140,7 @@ Checks cover known enabled forward features missing from the selected program, a
 
 Direct material users can call `material.getWarnings()` and inspect `material.shaderKey`; this check is side-effect-free. Recheck after `setProperty` / `setTexture`: texture edits automatically reselect the shader profile; unsupported combinations still warn. `LilToonMaterialLoader.onWarning` provides the same feature diagnostics for standalone JSON loads (that loader does not resolve serialized texture references). Outline, shadow, and other passes are outside the forward-profile check. Real file/parse failures still reject; explicit unsupported pass constructors still throw.
 
-Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.avatar-tools`](https://github.com/zekailin00/liltoon-unity-exporter) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
+Unity-authored `.glb` models and VRM 1.0 `.vrm` avatars can be produced with the companion [`org.mochiya.avatar-tools`](https://github.com/mochiya-labs/unity-avatar-tools) package. It delegates geometry and VRM behavior to UniVRM and adds this material extension to supported lilToon materials.
 
 ## Develop and verify
 
@@ -170,7 +170,7 @@ The browser test installs no browser automatically. On a developer machine or CI
 
 ## Viewer example
 
-[`examples/mochiya-liltoon-viewer`](examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI uses the `radix-mira` shadcn preset, olive color tokens, and Phosphor icons.
+[`examples/mochiya-liltoon-viewer`](https://github.com/mochiya-labs/three-liltoon/blob/main/examples/mochiya-liltoon-viewer/README.md) is a standalone Next.js and React Three Fiber app for uploading a `.glb` or `.vrm`, rendering the Mochiya lilToon extension, and inspecting every effective material property. Its UI uses the `radix-mira` shadcn preset, olive color tokens, and Phosphor icons.
 
 The viewer installs the checked-in package artifact from the repository root. Its development command refreshes that local package without rebuilding shaders; deployment uses the artifact installed during Vercel's dependency-install step and does not mutate dependencies during `next build`.
 
@@ -182,12 +182,12 @@ npm run dev
 
 ## Documentation
 
-- [Architecture](https://github.com/zekailin00/three-liltoon/blob/main/docs/ARCHITECTURE.md)
-- [Feature matrix](https://github.com/zekailin00/three-liltoon/blob/main/docs/FEATURE_MATRIX.md)
-- [Porting exceptions](https://github.com/zekailin00/three-liltoon/blob/main/docs/PORTING_EXCEPTIONS.md)
-- [Material/glTF format](https://github.com/zekailin00/three-liltoon/blob/main/docs/MATERIAL_FORMAT.md)
-- [Upgrading lilToon](https://github.com/zekailin00/three-liltoon/blob/main/docs/UPGRADING_LILTOON.md)
-- [Publishing](https://github.com/zekailin00/three-liltoon/blob/main/docs/PUBLISHING.md)
+- [Architecture](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/ARCHITECTURE.md)
+- [Feature matrix](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/FEATURE_MATRIX.md)
+- [Porting exceptions](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/PORTING_EXCEPTIONS.md)
+- [Material/glTF format](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/MATERIAL_FORMAT.md)
+- [Upgrading lilToon](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/UPGRADING_LILTOON.md)
+- [Publishing](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/PUBLISHING.md)
 
 ## License
 

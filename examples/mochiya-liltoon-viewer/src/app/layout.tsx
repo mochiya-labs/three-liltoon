@@ -24,6 +24,7 @@ const monoFont = JetBrains_Mono({
 
 export const metadata: Metadata = {
 	title: "lilToon model viewer — Mochiya",
+	icons: { icon: "/mochiya-icon-192.png" },
 	description:
 		"Inspect and render Mochiya lilToon GLB and VRM files in Three.js.",
 };

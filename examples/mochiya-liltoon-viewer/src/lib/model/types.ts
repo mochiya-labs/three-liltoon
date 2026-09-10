@@ -1,6 +1,7 @@
 import type { VRM } from "@pixiv/three-vrm";
 import type { AnimationClip, Group } from "three";
 import type { LilToonWarning } from "@mochiya/three-liltoon";
+import type { Labels } from "../i18n";
 
 export type ModelSource = {
 	id: string;
@@ -12,6 +13,8 @@ export type ModelSource = {
 export type InspectorEntry = {
 	name: string;
 	value: string;
+	labelKey?: keyof Labels;
+	valueKey?: keyof Labels;
 };
 
 export type TextureInspection = {
@@ -21,7 +24,7 @@ export type TextureInspection = {
 	previewUrl?: string;
 	size: string;
 	colorSpace: string;
-	flipY: string;
+	flipY: boolean;
 	wrap: string;
 	filter: string;
 };
@@ -62,4 +65,4 @@ export type LoadStatus =
 	| { phase: "idle" }
 	| { phase: "loading"; progress?: number }
 	| { phase: "ready" }
-	| { phase: "error"; message: string };
+	| { phase: "error"; message?: string };

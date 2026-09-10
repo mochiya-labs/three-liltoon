@@ -19,7 +19,6 @@ import { ViewerLighting } from "./viewer-lighting";
 type ModelCanvasProps = {
 	source: ModelSource | null;
 	dark: boolean;
-	loadFailureMessage: string;
 	onInspectionChange: (inspection: ModelInspection | null) => void;
 	onStatusChange: (status: LoadStatus) => void;
 };
@@ -60,7 +59,6 @@ type ModelLoaderProps = Omit<ModelCanvasProps, "source" | "dark"> & {
 
 function ModelLoader({
 	source,
-	loadFailureMessage,
 	onInspectionChange,
 	onStatusChange,
 }: ModelLoaderProps) {
@@ -89,8 +87,7 @@ function ModelLoader({
 			})
 			.catch((error: unknown) => {
 				if (!active) return;
-				const message =
-					error instanceof Error ? error.message : loadFailureMessage;
+				const message = error instanceof Error ? error.message : undefined;
 				onStatusChange({ phase: "error", message });
 			});
 
@@ -98,7 +95,7 @@ function ModelLoader({
 			active = false;
 			if (loadedModel) disposeModel(loadedModel);
 		};
-	}, [loadFailureMessage, onInspectionChange, onStatusChange, source]);
+	}, [onInspectionChange, onStatusChange, source]);
 
 	return model ? <AnimatedModel model={model} /> : null;
 }
@@ -121,7 +118,6 @@ export function ModelCanvas(props: ModelCanvasProps) {
 				<ModelLoader
 					key={props.source.url}
 					source={props.source}
-					loadFailureMessage={props.loadFailureMessage}
 					onInspectionChange={props.onInspectionChange}
 					onStatusChange={props.onStatusChange}
 				/>
