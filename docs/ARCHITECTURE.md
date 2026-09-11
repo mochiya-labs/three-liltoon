@@ -40,7 +40,7 @@ Materials assigning `_EmissionBlendMask` or `_Emission2ndBlendMask` select the `
 - Three directional shadow-map sampling;
 - CubeTexture environment sampling;
 - fog, stereo, and instancing fallbacks;
-- bone-texture skinning and array-texture morph targets;
+- bone-texture skinning (morphs are applied by Three.js at the runtime vertex boundary);
 - explicit declarations or diagnostics for unsupported Unity/VRC facilities.
 
 The ABI uses one generated `_Globals` structured uniform value in Three.js plus independently bound texture samplers. `LilToonUniformBinder` constructs its shape from active GLSL struct members, initializes lilToon defaults, and updates transposed matrices per draw. The transpose is required because the DXC/SPIRV-Cross path preserves the upstream HLSL row-vector operations in GLSL.
@@ -58,6 +58,18 @@ Inactive directional shadow maps must contribute no occlusion. The shadow adapte
 Outline proxies temporarily share the source geometry, groups, skeleton and morphs. Hidden array entries preserve non-outline group boundaries. Proxies do not participate in raycasting and are removed in `finally`, including failed draws. Temporary depth/distance casters honor authored custom casters; main alpha, opacity, cutoff and a privately owned UV-transform texture view are synchronized before shadow draws. The source texture is never disposed or transformed by a caster. Caster behavior remains an approximation of upstream's full shader.
 
 Recipes are renderer-owned, released after disuse or material/renderer disposal. Renderer installation uses reference-counted, idempotent leases. Nested renders preserve surrounding state. Material setters retain original ABI names; familiar color/opacity/map/alphaTest aliases and texture-driven program reselection are tested. Gem/refraction and fur are still separate unsupported shader milestones.
+
+### Three.js morph integration
+
+`src/renderer/threeMorphTargets.ts` wraps the compiled vertex entry with the installed Three.js peer's `morphtarget_pars_vertex`, `morphnormal_vertex` and `morphtarget_vertex` ShaderChunk includes. Their output positions/normals feed the original lilToon entry before the existing bone-skinning compatibility code. The upstream lilToon checkout stays unchanged. No morph equations or shader chunks are copied into the package.
+
+Three's WebGLRenderer owns texture packing, caching, per-draw weights/base influence and geometry disposal through its standard top-level morph uniforms. Those uniforms are deliberately absent from the lilToon material's uniform map so material uploads cannot overwrite renderer-owned values. Standard Three materials and lilToon materials sharing geometry use the same morph texture. Outlines use the same boundary; depth/distance casters already use Three's implementation.
+
+RawShaderMaterial omits Three's automatic geometry defines, so the small bridge sets the full target count, attribute stride and position/normal feature defines before each draw. Program selection updates only when that metadata changes, including different geometries sharing a material. Weight-only animation does not repack data or change programs. A precompile made before the first draw can compile the no-morph variant; the first draw specializes it to the actual geometry. The bridge uses public material/geometry APIs, with no private renderer imports or state access.
+
+There is no package-defined count limit, target selection, custom morph texture cache or CPU overflow. Three allocates one texture-array layer and one weight per authored target, including zero-weight targets. Device array-layer, vertex-uniform, texture-size and memory limits apply to the entire target set; exceeding them can fail texture allocation or shader linking just as with standard Three materials. For example, a device exposing 256 array layers cannot directly store a 526-target geometry in this layout. This is not an unlimited-target guarantee.
+
+Weights, relative/absolute base influence and signed contributions use Three's implementation. Geometry follows the [Three.js morph lifecycle](https://threejs.org/docs/pages/BufferGeometry.html#morphAttributes): after rendering, replace and dispose geometry to change morph attribute data; animating weights remains supported. Unity multi-frame interpolation absent from exported glTF, tangent/color morph deformation, normal-only target sets outside the standard loader path, instancing and WebGPU are not added by this revision. The texture stride still accounts for color data when present so position/normal lookup stays compatible.
 
 ## glTF loading
 

@@ -1,6 +1,6 @@
 {
 	"name": "@mochiya/three-liltoon",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Unofficial lilToon material and shader integration for Three.js WebGL2",
 	"license": "MIT",
 	"author": {

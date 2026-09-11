@@ -1,25 +1,13 @@
 #ifndef LIL_WEB_DEFORMATION_INCLUDED
 #define LIL_WEB_DEFORMATION_INCLUDED
 
-#define LIL_WEB_MAX_MORPHS 64
-
 Texture2D<float4> boneTexture;
 SamplerState sampler_boneTexture;
-Texture2DArray<float4> morphTargetsTexture;
-SamplerState sampler_morphTargetsTexture;
 
 float4x4 uBindMatrix;
 float4x4 uBindMatrixInverse;
 float4 uBoneTextureSize;
 uint uSkinningEnabled;
-float4 uMorphTargetsTextureSize;
-float uMorphTargetInfluences[LIL_WEB_MAX_MORPHS];
-uint uMorphTargetCount;
-uint uMorphVertexDataStride;
-uint uMorphHasPositions;
-uint uMorphHasNormals;
-uint uMorphTargetsRelative;
-float uMorphTargetBaseInfluence;
 
 float4 lilWebLoadBoneTexel(uint texelIndex)
 {
@@ -35,41 +23,6 @@ float4x4 lilWebGetBoneMatrix(uint boneIndex)
     float4 row2 = lilWebLoadBoneTexel(texel + 2u);
     float4 row3 = lilWebLoadBoneTexel(texel + 3u);
     return transpose(float4x4(row0, row1, row2, row3));
-}
-
-float4 lilWebLoadMorph(uint vertexID, uint targetIndex, uint componentOffset)
-{
-    uint width = max((uint)uMorphTargetsTextureSize.x, 1u);
-    uint texel = vertexID * uMorphVertexDataStride + componentOffset;
-    return morphTargetsTexture.Load(int4(texel % width, texel / width, targetIndex, 0));
-}
-
-void lilWebApplyMorphTargets(uint vertexID, inout float4 positionOS, inout float3 normalOS)
-{
-    #if defined(LIL_WEB_MORPHTARGETS)
-        if(uMorphTargetCount == 0u) return;
-        float3 position = uMorphTargetsRelative != 0u ? positionOS.xyz : positionOS.xyz * uMorphTargetBaseInfluence;
-        float3 normal = uMorphTargetsRelative != 0u ? normalOS : normalOS * uMorphTargetBaseInfluence;
-        [loop]
-        for(uint target = 0u; target < LIL_WEB_MAX_MORPHS; target++)
-        {
-            if(target >= uMorphTargetCount) break;
-            float influence = uMorphTargetInfluences[target];
-            if(influence == 0.0) continue;
-            uint offset = 0u;
-            if(uMorphHasPositions != 0u)
-            {
-                position += lilWebLoadMorph(vertexID, target, offset).xyz * influence;
-                offset += 1u;
-            }
-            if(uMorphHasNormals != 0u)
-            {
-                normal += lilWebLoadMorph(vertexID, target, offset).xyz * influence;
-            }
-        }
-        positionOS.xyz = position;
-        normalOS = normal;
-    #endif
 }
 
 void lilWebApplySkinning(
@@ -115,7 +68,7 @@ void lilWebApplyDeformation(
     float4 skinWeight,
     uint vertexID)
 {
-    lilWebApplyMorphTargets(vertexID, positionOS, normalOS);
+    // Three.js shader chunks apply morphs before the compiled vertex entry.
     lilWebApplySkinning(positionOS, normalOS, tangentOS, skinIndex, skinWeight);
 }
 

@@ -75,7 +75,7 @@ declare class LilToonMaterial extends RawShaderMaterial {
     private syncColor;
     private refreshProgram;
     /** @internal Renderer ABI texture binding. */
-    setSystemTexture(binding: "__environment" | "__shadow" | "__bones" | "__morphs", texture: Texture | null): void;
+    setSystemTexture(binding: "__environment" | "__shadow" | "__bones", texture: Texture | null): void;
     updateDeformationUniforms(object: Object3D, renderer: WebGLRenderer): void;
 }
 

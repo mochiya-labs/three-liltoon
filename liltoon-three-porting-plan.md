@@ -1985,7 +1985,7 @@ THREE.RawShaderMaterial;
 
 `RawShaderMaterial` is preferred because Three does not automatically prepend the normal ShaderMaterial built-ins.
 
-Do not make generated shaders depend on Three's private GLSL chunks.
+Keep the compiled lilToon HLSL independent of renderer internals. The runtime morph boundary reuses Three's exported ShaderChunk includes, as specified in section 17; do not copy them or import private renderer modules.
 
 ---
 
@@ -2068,6 +2068,16 @@ This avoids repeatedly uploading material constants that did not change.
 
 # 17. Skinning and morph targets
 
+## Three.js morph integration revision (2026-09-10)
+
+Preserve authored position/normal targets and Three.js weights, including high indices, negative weights and weights above one. Unity's [indexed blendshape weights](https://docs.unity3d.com/2022.3/Documentation/ScriptReference/SkinnedMeshRenderer.SetBlendShapeWeight.html) and [GPU blendshape buffers](https://docs.unity3d.com/2022.3/Documentation/ScriptReference/Mesh.GetBlendShapeBuffer.html) establish the source behavior. Reuse Three's [r180](https://github.com/mrdoob/three.js/blob/r180/src/renderers/webgl/WebGLMorphtargets.js) / [r185](https://github.com/mrdoob/three.js/blob/r185/src/renderers/webgl/WebGLMorphtargets.js) renderer-owned morph textures and weight uploads, plus the installed peer's morph shader chunks, instead of maintaining parallel transport or blending algorithms.
+
+Remove the 64-slot HLSL declarations, custom morph adapter, active-target repacking and CPU overflow. Wrap the generated vertex main with Three's `morphtarget_pars_vertex`, `morphnormal_vertex` and `morphtarget_vertex` includes, passing morphed attributes into the unchanged compiled lilToon entry before bone skinning. RawShaderMaterial needs only the geometry-dependent count/stride/feature defines supplied before drawing; standard top-level uniform names let WebGLRenderer bind its own resources. Never register duplicate morph texture uniforms, access renderer properties, patch Three, or mutate source geometry/weights. Outlines use the same boundary; depth/distance casters already use Three's morph path.
+
+The supported count is now governed by Three/WebGL resource limits, including array texture layers, vertex uniforms, texture dimensions and memory. All authored targets occupy storage even when weights are zero. No CPU fallback or universal target-count guarantee is added. Geometry edits follow Three's documented morph immutability/lifecycle contract. Unity multi-frame export semantics, tangent/color morphs, instancing and WebGPU remain separate capabilities.
+
+Verify indices 63/64/69/525 and more than 64 simultaneously active shapes on capable devices, signed weights, relative/absolute positions and normals, weight reset, shared geometry/materials with different counts, profile changes, outlines, skinning and stock casters. Compare actual GPU output and resource sharing with standard Three materials and independent baked reference geometry. Load the private Shinano export through the viewer's normal plugins. Keep purchased assets/captures ignored. Rebuild artifacts, sync local consumers, run suites/builds and record measured device limits and exact results in the handoff.
+
 This requires deliberate integration.
 
 The upstream Unity shader expects Unity-provided mesh deformation semantics.
@@ -2099,7 +2109,7 @@ Prefer a web compatibility implementation matching Three's CPU-provided data:
 - skin weights
 - morph attributes
 
-Do not depend on private Three GLSL chunks unless they are copied under compatible license and explicitly versioned.
+Reuse the installed Three peer's exported morph ShaderChunk includes at the runtime boundary. The compiled HLSL stays independent, and Three remains an external peer. Validate the integration against the supported peer versions rather than maintaining copied shader code.
 
 If using Three's exposed skeleton/bone texture data, create explicit uniforms in the private renderer context.
 

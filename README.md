@@ -55,7 +55,7 @@ scene.add(mesh);
 renderer.setAnimationLoop(() => renderer.render(scene, camera));
 ```
 
-Use ordinary Three.js meshes, lights and scene setup. The package binds one directional light, ambient/hemisphere lighting, supported environment inputs, skinning and up to 64 morph targets automatically. Outlines and casters follow the current material, including replacement and removal.
+Use ordinary Three.js meshes, lights and scene setup. The package binds one directional light, ambient/hemisphere lighting, supported environment inputs, skinning and position/normal morph targets automatically. Morphs reuse Three.js's GPU textures, weight uploads and shader chunks, with no package-defined target cap or CPU overflow. Three.js/WebGL device limits still apply. Outlines and casters follow the current material, including replacement and removal. See [Three.js morph integration](docs/ARCHITECTURE.md#threejs-morph-integration) for resource and lifecycle limits.
 
 Call `releaseRendering()` when its owner unmounts; disposing the renderer also releases its integration. React Three Fiber: `useEffect(() => enableLilToon(gl), [gl])`. Each installation returns an independent, idempotent cleanup function. No adapter or pass manager is needed. Gem/refraction and fur remain unsupported.
 

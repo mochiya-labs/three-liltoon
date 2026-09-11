@@ -56,7 +56,7 @@ describe("generated shader artifacts", () => {
 		expect(vertex).toContain("in vec3 normal;");
 		expect(vertex).toContain("in vec4 skinIndex;");
 		expect(vertex).toContain("in vec4 skinWeight;");
-		expect(vertex).toContain("sampler2DArray");
+		expect(vertex).not.toContain("uMorphTarget");
 	});
 
 	it.each([
@@ -179,7 +179,8 @@ describe("generated shader artifacts", () => {
 	it.each(variants)(
 		"stays within Three.js's 16 allocated texture units for %s",
 		(variant) => {
-			const samplers = new Set<string>();
+			// Three's runtime morph chunk adds one sampler outside the HLSL build.
+			const samplers = new Set<string>(["morphTargetsTexture"]);
 			for (const stage of ["vert", "frag"] as const) {
 				const glsl = readFileSync(
 					resolve(

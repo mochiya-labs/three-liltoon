@@ -30,7 +30,6 @@ function inferTextureProperty(uniformName: string): string {
 	if (/^unity_SpecCube0/.test(tail)) return "__environment";
 	if (/^uMainShadowMap/.test(tail)) return "__shadow";
 	if (/^boneTexture/.test(tail)) return "__bones";
-	if (/^morphTargetsTexture/.test(tail)) return "__morphs";
 	return (
 		textureNames.find((name) => tail.startsWith(name.replace(/^_/, ""))) ??
 		`__unknown:${uniformName}`

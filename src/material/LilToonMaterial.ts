@@ -27,7 +27,10 @@ import {
 	type LilToonGlobalUniforms,
 } from "../renderer/LilToonUniformBinder.js";
 import { rendererContext } from "../renderer/rendererContext.js";
-import { LilToonMorphAdapter } from "../renderer/LilToonMorphAdapter.js";
+import {
+	updateThreeMorphDefines,
+	withThreeMorphTargets,
+} from "../renderer/threeMorphTargets.js";
 import {
 	getLilToonShaderProgram,
 	getOutlineShaderProgram,
@@ -160,8 +163,6 @@ function addOutputColorSpaceConversion(fragmentShader: string): string {
 	return `${withUniform.slice(0, adjustedMainEnd)}${conversion}${withUniform.slice(adjustedMainEnd)}`;
 }
 
-const morphAdapter = new LilToonMorphAdapter();
-
 export class LilToonMaterial extends RawShaderMaterial {
 	color = new Color(1, 1, 1);
 	readonly isLilToonMaterial = true;
@@ -217,7 +218,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 			// Three owns the final #version placement because it prepends material
 			// defines even for RawShaderMaterial. Generated artifacts retain their
 			// standalone directive for offline validation.
-			vertexShader: program.vertexShader.replace(/^#version 300 es\s*/, ""),
+			vertexShader: withThreeMorphTargets(program.vertexShader).replace(
+				/^#version 300 es\s*/,
+				"",
+			),
 			fragmentShader: addOutputColorSpaceConversion(
 				program.fragmentShader,
 			).replace(/^#version 300 es\s*/, ""),
@@ -511,7 +515,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 			program.vertexShader,
 			program.fragmentShader,
 		);
-		this.vertexShader = program.vertexShader.replace(/^#version 300 es\s*/, "");
+		this.vertexShader = withThreeMorphTargets(program.vertexShader).replace(
+			/^#version 300 es\s*/,
+			"",
+		);
 		this.fragmentShader = addOutputColorSpaceConversion(
 			program.fragmentShader,
 		).replace(/^#version 300 es\s*/, "");
@@ -549,7 +556,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 
 	/** @internal Renderer ABI texture binding. */
 	setSystemTexture(
-		binding: "__environment" | "__shadow" | "__bones" | "__morphs",
+		binding: "__environment" | "__shadow" | "__bones",
 		texture: Texture | null,
 	): void {
 		// An empty packed-depth sampler must mean far depth, not Three's zero-depth
@@ -592,6 +599,6 @@ export class LilToonMaterial extends RawShaderMaterial {
 		if (bindMatrixInverse instanceof Matrix4 && skinned.bindMatrixInverse)
 			bindMatrixInverse.copy(skinned.bindMatrixInverse).transpose();
 		if ((object as { isMesh?: boolean }).isMesh)
-			morphAdapter.update(object as Mesh, this, renderer);
+			updateThreeMorphDefines(this, (object as Mesh).geometry);
 	}
 }

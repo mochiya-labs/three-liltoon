@@ -1,6 +1,6 @@
-export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-W5RSCIWC.js';
-import { UnsupportedFeatureError, LilToonMaterial, setGlobalProperty } from './chunk-LEOYQ4DX.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-LEOYQ4DX.js';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-QOMEX37Y.js';
+import { UnsupportedFeatureError, LilToonMaterial, setGlobalProperty } from './chunk-EYWUUDGT.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-EYWUUDGT.js';
 import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, BackSide, SkinnedMesh, Mesh } from 'three';
 
 var helpers = /* @__PURE__ */ new WeakSet();

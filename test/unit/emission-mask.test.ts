@@ -131,9 +131,10 @@ describe("emission blend masks", () => {
 					`_Globals._${name}_ScrollRotate`,
 				);
 			}
-			expect(program.samplerBindings.size).toBeLessThanOrEqual(16);
+			// The runtime Three morph chunk contributes the additional sampler.
+			expect(program.samplerBindings.size + 1).toBeLessThanOrEqual(16);
 			expect(program.vertexShader).toContain("skinIndex");
-			expect(program.vertexShader).toContain("sampler2DArray");
+			expect(program.vertexShader).not.toContain("uMorphTarget");
 		},
 	);
 });
