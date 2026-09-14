@@ -24,7 +24,7 @@ describe("material profile warnings", () => {
 	});
 
 	it.each(["opaque", "cutout", "transparent"] as const)(
-		"reports mixed emission/MatCap/reflection requirements for %s",
+		"supports mixed emission/MatCap/reflection requirements for %s",
 		(renderMode) => {
 			const material = new LilToonMaterial({
 				name: "Face",
@@ -37,33 +37,7 @@ describe("material profile warnings", () => {
 				},
 			});
 			const warnings = material.getWarnings();
-			expect(warnings).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						code: "unsupported-feature",
-						property: "_UseReflection",
-					}),
-					expect.objectContaining({
-						code: "unused-texture",
-						property: "_MatCapBlendMask",
-					}),
-				]),
-			);
-			expect(
-				warnings.every(
-					(warning) =>
-						warning.severity === "warning" &&
-						warning.materialName === "Face" &&
-						warning.shaderKey === `standard-${renderMode}-emission-mask`,
-				),
-			).toBe(true);
-			expect(
-				warnings.some((warning) => warning.property === "_EmissionBlendMask"),
-			).toBe(false);
-			// The parent warning covers reflection; do not repeat one for every child texture.
-			expect(
-				warnings.some((warning) => warning.property === "_SmoothnessTex"),
-			).toBe(false);
+			expect(warnings).toEqual([]);
 			expect(material.getProperty("_UseReflection")).toBe(1);
 			expect(material.clone().getWarnings()).toEqual(warnings);
 			expect(JSON.parse(JSON.stringify(warnings))).toEqual(warnings);
@@ -88,14 +62,14 @@ describe("material profile warnings", () => {
 		material.setTexture("_EmissionBlendMask", new DataTexture());
 		expect(material.getWarnings()).toEqual([]);
 		material.setProperty("_UseEmission", 1);
-		expect(material.shaderKey).toBe("standard-opaque-emission-mask");
+		expect(material.fragmentShader).toContain("Combined_EmissionBlendMask");
 		expect(material.getWarnings()).toEqual([]);
 		material.setTexture("_EmissionBlendMask", null);
-		expect(material.shaderKey).toBe("standard-opaque");
+		expect(material.fragmentShader).not.toContain("Combined_EmissionBlendMask");
 		expect(material.getWarnings()).toEqual([]);
 	});
 
-	it("accepts shared MatCap normal aliases but detects later incompatible replacements", () => {
+	it("accepts both shared and independent MatCap normals", () => {
 		const normal = new DataTexture();
 		const material = new LilToonMaterial({
 			properties: {
@@ -116,12 +90,7 @@ describe("material profile warnings", () => {
 		});
 		expect(material.getWarnings()).toEqual([]);
 		material.setTexture("_MatCapBumpMap", new DataTexture());
-		expect(material.getWarnings()).toContainEqual(
-			expect.objectContaining({
-				property: "_ShadowBorderMask",
-				code: "unused-texture",
-			}),
-		);
+		expect(material.getWarnings()).toEqual([]);
 	});
 
 	it("warns rather than throwing for unsupported platform features", () => {
@@ -152,12 +121,7 @@ describe("material profile warnings", () => {
 				_OutlineTex: new DataTexture(),
 			},
 		});
-		expect(material.getWarnings()).toContainEqual(
-			expect.objectContaining({
-				property: "_DissolveParams",
-				code: "unsupported-feature",
-			}),
-		);
+		expect(material.getWarnings()).toEqual([]);
 		expect(
 			material
 				.getWarnings()
@@ -218,7 +182,7 @@ describe("glTF warning delivery", () => {
 						extensions: {
 							[LILTOON_GLTF_EXTENSION]: {
 								specVersion: "999",
-								shaderVariant: "Hidden/lilToonFur",
+								shaderVariant: "Hidden/lilToonFurOnly",
 								properties: { _TessellationMode: 1 },
 							},
 						},

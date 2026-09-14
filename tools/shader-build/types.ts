@@ -2,7 +2,18 @@ export type ShaderStage = "vertex" | "fragment";
 
 export interface ShaderVariantRecipe {
 	key: string;
-	renderMode: "opaque" | "cutout" | "transparent" | "outline" | "smoke";
+	renderMode:
+		| "opaque"
+		| "cutout"
+		| "transparent"
+		| "refraction"
+		| "refraction-blur"
+		| "fur-cutout"
+		| "fur-two-pass"
+		| "fur"
+		| "gem"
+		| "outline"
+		| "smoke";
 	sources: Record<ShaderStage, string>;
 	entries: Record<ShaderStage, string>;
 	defines: string[];

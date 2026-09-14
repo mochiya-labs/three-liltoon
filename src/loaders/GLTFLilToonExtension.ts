@@ -22,6 +22,13 @@ export interface GLTFLilToonExtensionOptions {
 function renderModeFromDefinition(definition: GLTFLilToonMaterialDefinition) {
 	if (definition.renderMode) return definition.renderMode;
 	const name = definition.shaderVariant?.toLowerCase() ?? "";
+	if (name.includes("refractionblur")) return "refraction-blur" as const;
+	if (name.includes("furcutout")) return "fur-cutout" as const;
+	if (name.includes("furtwopass")) return "fur-two-pass" as const;
+	if (name.includes("refraction") && !name.includes("blur"))
+		return "refraction" as const;
+	if (name.endsWith("fur")) return "fur" as const;
+	if (name.endsWith("gem")) return "gem" as const;
 	if (name.includes("cutout")) return "cutout" as const;
 	if (name.includes("trans")) return "transparent" as const;
 	return "opaque" as const;
@@ -58,6 +65,13 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
 			const material = new LilToonMaterial({
 				name: materialDefinition.name,
 				renderMode: renderModeFromDefinition(definition),
+				transparencyMode:
+					definition.transparencyMode ??
+					(/TwoPassTransparent/i.test(definition.shaderVariant ?? "")
+						? "two-pass"
+						: /OnePassTransparent/i.test(definition.shaderVariant ?? "")
+							? "one-pass"
+							: "normal"),
 				properties: definition.properties,
 				textures,
 				deformation: true,
@@ -66,6 +80,8 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
 			const warnings = material.getWarnings();
 			if (
 				definition.specVersion &&
+				definition.specVersion !== "1.0" &&
+				definition.specVersion !== "1.1" &&
 				definition.specVersion !== LILTOON_GLTF_SPEC_VERSION
 			) {
 				warnings.push({
@@ -78,7 +94,7 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
 				});
 			}
 			if (
-				/fur|gem|refraction|tessellation|liltoonlite/i.test(
+				/furonly|tessellation|liltoonlite|liltoonmulti/i.test(
 					definition.shaderVariant ?? "",
 				)
 			) {

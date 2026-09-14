@@ -64,6 +64,9 @@ describe("GLTFLilToonExtension", () => {
 									_BumpMap_ST: [2, 3, 0.1, 0.2],
 									_Bump2ndMap_ST: [7, 5, 0.3, 0.4],
 									_UseReflection: 1,
+									_UseMatCap: 1,
+									_UseBumpMap: 1,
+									_UseBump2ndMap: 1,
 								},
 								textures: {
 									_BumpMap: { index: 0 },
@@ -114,6 +117,11 @@ describe("GLTFLilToonExtension", () => {
 							[LILTOON_GLTF_EXTENSION]: {
 								specVersion: LILTOON_GLTF_SPEC_VERSION,
 								renderMode: "transparent",
+								properties: {
+									_UseMain2ndTex: 1,
+									_UseMain3rdTex: 1,
+									_UseMatCap: 1,
+								},
 								textures: {
 									_Main2ndTex: { index: 0 },
 									_Main2ndBlendMask: { index: 1 },

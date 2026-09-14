@@ -4,8 +4,7 @@ import type { BufferGeometry, RawShaderMaterial } from "three";
 export function withThreeMorphTargets(source: string): string {
 	if (
 		!source.includes("void main()") ||
-		!source.includes("in vec4 position;") ||
-		!source.includes("in vec3 normal;")
+		!source.includes("in vec4 position;")
 	) {
 		throw new Error(
 			"[three-liltoon] Compiled vertex entry no longer matches the Three.js morph integration.",
@@ -22,7 +21,7 @@ void lilToonMain(vec4 position, vec3 normal)`,
 		`
 void main() {
 	vec3 transformed = position.xyz;
-	vec3 objectNormal = normal;
+	vec3 objectNormal = ${source.includes("in vec3 normal;") ? "normal" : "vec3(0.0, 0.0, 1.0)"};
 	#include <morphnormal_vertex>
 	#include <morphtarget_vertex>
 	lilToonMain(vec4(transformed, position.w), objectNormal);

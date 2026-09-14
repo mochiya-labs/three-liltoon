@@ -9,7 +9,11 @@
       "properties": {
         "specVersion": {
           "type": "string",
-          "const": "1.0",
+          "enum": [
+            "1.0",
+            "1.1",
+            "1.2"
+          ],
           "description": "Extension version. When omitted, the current version is assumed."
         },
         "lilToonVersion": {
@@ -25,7 +29,11 @@
         },
         "renderMode": {
           "$ref": "#/definitions/LilToonRenderMode",
-          "description": "When omitted, inferred from shaderVariant (cutout, trans, otherwise opaque)."
+          "description": "When omitted, inferred from the original supported shader family."
+        },
+        "transparencyMode": {
+          "$ref": "#/definitions/LilToonTransparencyMode",
+          "description": "Transparent family pass configuration. Defaults to normal or is inferred from shaderVariant."
         },
         "properties": {
           "type": "object",
@@ -59,7 +67,21 @@
       "enum": [
         "opaque",
         "cutout",
-        "transparent"
+        "transparent",
+        "refraction",
+        "refraction-blur",
+        "fur",
+        "fur-cutout",
+        "fur-two-pass",
+        "gem"
+      ]
+    },
+    "LilToonTransparencyMode": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "one-pass",
+        "two-pass"
       ]
     },
     "GLTFLilToonPropertyValue": {

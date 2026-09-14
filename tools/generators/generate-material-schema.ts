@@ -9,11 +9,27 @@ import {
 import { parseShaderLab } from "../shaderlab/parser.js";
 import type { ShaderProperty } from "../shaderlab/types.js";
 
-const source = readFileSync(resolve(LILTOON_SHADER, "lts.shader"), "utf8");
-const parsed = parseShaderLab(source);
+const parsed = parseShaderLab(
+	readFileSync(resolve(LILTOON_SHADER, "lts.shader"), "utf8"),
+);
+const extra = [
+	"lts_ref.shader",
+	"lts_ref_blur.shader",
+	"lts_fur.shader",
+	"lts_fur_cutout.shader",
+	"lts_fur_two.shader",
+	"lts_gem.shader",
+].flatMap(
+	(file) =>
+		parseShaderLab(readFileSync(resolve(LILTOON_SHADER, file), "utf8"))
+			.properties,
+);
 const properties = [
 	...new Map(
-		parsed.properties.map((property) => [property.name, property]),
+		[...extra, ...parsed.properties].map((property) => [
+			property.name,
+			property,
+		]),
 	).values(),
 ];
 
@@ -32,6 +48,34 @@ const defaults = Object.fromEntries(
 				: property.defaultValue;
 		return [property.name, value];
 	}),
+);
+const modeDefaults = Object.fromEntries(
+	[
+		["transparent", "lts_trans.shader"],
+		["refraction-blur", "lts_ref_blur.shader"],
+		["fur-cutout", "lts_fur_cutout.shader"],
+		["fur-two-pass", "lts_fur_two.shader"],
+		["refraction", "lts_ref.shader"],
+		["fur", "lts_fur.shader"],
+		["gem", "lts_gem.shader"],
+	].map(([mode, file]) => [
+		mode,
+		Object.fromEntries(
+			parseShaderLab(readFileSync(resolve(LILTOON_SHADER, file!), "utf8"))
+				.properties.map((p) => {
+					const value =
+						typeof p.defaultValue === "number" &&
+						p.attributes.some((a) => /^Gamma\b/i.test(a))
+							? srgbToLinear(p.defaultValue)
+							: p.defaultValue;
+					return [p.name, value];
+				})
+				.filter(
+					([name, value]) =>
+						JSON.stringify(value) !== JSON.stringify(defaults[name as string]),
+				),
+		),
+	]),
 );
 
 function classifyTexture(
@@ -79,7 +123,7 @@ writeFileSync(
 );
 writeFileSync(
 	resolve(GENERATED_SOURCE_ROOT, "defaults.ts"),
-	`${banner}export const LILTOON_DEFAULTS = ${JSON.stringify(defaults, null, 2)} as const;\n`,
+	`${banner}export const LILTOON_DEFAULTS = ${JSON.stringify(defaults, null, 2)} as const;\nexport const LILTOON_MODE_DEFAULTS: Readonly<Record<string, Record<string, unknown>>> = ${JSON.stringify(modeDefaults, null, 2)};\n`,
 );
 writeFileSync(
 	resolve(GENERATED_SOURCE_ROOT, "textureSemantics.ts"),

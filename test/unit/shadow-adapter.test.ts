@@ -132,9 +132,11 @@ describe("directional shadow fallback", () => {
 		"initializes and clears %s system shadow samplers with far depth",
 		(variant) => {
 			const material = new LilToonMaterial(
-				variant === "outline" ? { pass: "outline" } : { renderMode: variant },
+				variant === "outline"
+					? { pass: "outline", properties: { _OutlineLitShadowReceive: 1 } }
+					: { renderMode: variant, properties: { _UseShadow: 1 } },
 			);
-			// Some outline profiles compile shadow receiving out entirely.
+			// Only enabled shadow consumers need a system texture binding.
 			const textures = shadowTextures(material);
 			if (variant !== "outline") expect(textures.length).toBeGreaterThan(0);
 			for (const texture of textures)

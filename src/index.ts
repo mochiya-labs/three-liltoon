@@ -4,6 +4,7 @@ export { LilToonMaterialFactory } from "./material/LilToonMaterialFactory.js";
 export type {
 	LilToonMaterialParameters,
 	LilToonRenderMode,
+	LilToonTransparencyMode,
 	LilToonScalarOrVector,
 } from "./material/LilToonMaterialParameters.js";
 export type { SerializedLilToonMaterial } from "./material/LilToonMaterialState.js";

@@ -1,5 +1,5 @@
-import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms } from './gltf-4R9KLypd.js';
-export { b as LILTOON_GLTF_EXTENSION, c as LILTOON_GLTF_SPEC_VERSION, d as LilToonFeatureSet, e as LilToonMaterialLoader, f as LilToonMaterialParameters, g as LilToonRenderMode, h as LilToonScalarOrVector, i as detectLilToonFeatures } from './gltf-4R9KLypd.js';
+import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf--FEX0hvH.js';
+export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonTransparencyMode, j as detectLilToonFeatures } from './gltf--FEX0hvH.js';
 import { WebGLRenderer, Texture, Scene, DirectionalLight, Vector3, Color } from 'three';
 export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-2SkJrHyN.js';
 import 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -34,16 +34,19 @@ declare class LilToonEnvironmentAdapter {
     bind(scene: Scene, globals: LilToonGlobalUniforms): Texture | null;
 }
 
-declare class RefractionPass {
-    constructor();
+/** @deprecated Use LilToonMaterial with renderMode: "refraction" and enableLilToon(renderer). */
+declare class RefractionPass extends LilToonMaterial {
+    constructor(parameters?: Omit<LilToonMaterialParameters, "renderMode" | "pass">);
 }
 
-declare class GemPass {
-    constructor();
+/** @deprecated Use LilToonMaterial with renderMode: "gem" and enableLilToon(renderer). */
+declare class GemPass extends LilToonMaterial {
+    constructor(parameters?: Omit<LilToonMaterialParameters, "renderMode" | "pass">);
 }
 
-declare class FurPass {
-    constructor();
+/** @deprecated Use LilToonMaterial with renderMode: "fur" and enableLilToon(renderer). */
+declare class FurPass extends LilToonMaterial {
+    constructor(parameters?: Omit<LilToonMaterialParameters, "renderMode" | "pass">);
 }
 
 declare class UnsupportedFeatureError extends Error {
@@ -3226,6 +3229,353 @@ declare const LILTOON_PROPERTIES: readonly [{
     readonly defaultValue: 0;
     readonly attributes: readonly [];
 }, {
+    readonly name: "_RefractionStrength";
+    readonly displayName: "sStrength";
+    readonly type: "Range";
+    readonly range: readonly [-1, 1];
+    readonly defaultValue: 0.5;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_RefractionFresnelPower";
+    readonly displayName: "sRefractionFresnel";
+    readonly type: "Range";
+    readonly range: readonly [0.01, 10];
+    readonly defaultValue: 1;
+    readonly attributes: readonly ["PowerSlider(3.0)"];
+}, {
+    readonly name: "_RefractionColorFromMain";
+    readonly displayName: "sColorFromMain";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["lilToggle"];
+}, {
+    readonly name: "_RefractionColor";
+    readonly displayName: "sColor";
+    readonly type: "Color";
+    readonly defaultValue: readonly [1, 1, 1, 1];
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurNoiseMask";
+    readonly displayName: "Noise";
+    readonly type: "2D";
+    readonly defaultValue: {
+        readonly texture: "white";
+    };
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurMask";
+    readonly displayName: "Mask";
+    readonly type: "2D";
+    readonly defaultValue: {
+        readonly texture: "white";
+    };
+    readonly attributes: readonly ["NoScaleOffset"];
+}, {
+    readonly name: "_FurLengthMask";
+    readonly displayName: "Length Mask";
+    readonly type: "2D";
+    readonly defaultValue: {
+        readonly texture: "white";
+    };
+    readonly attributes: readonly ["NoScaleOffset"];
+}, {
+    readonly name: "_FurVectorTex";
+    readonly displayName: "Vector";
+    readonly type: "2D";
+    readonly defaultValue: {
+        readonly texture: "bump";
+    };
+    readonly attributes: readonly ["NoScaleOffset", "Normal"];
+}, {
+    readonly name: "_FurVectorScale";
+    readonly displayName: "Vector scale";
+    readonly type: "Range";
+    readonly range: readonly [-10, 10];
+    readonly defaultValue: 1;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurVector";
+    readonly displayName: "sFurVectors";
+    readonly type: "Vector";
+    readonly defaultValue: readonly [0, 0, 1, 0.02];
+    readonly attributes: readonly ["lilVec3Float"];
+}, {
+    readonly name: "_VertexColor2FurVector";
+    readonly displayName: "sVertexColor2Vector";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["lilToggle"];
+}, {
+    readonly name: "_FurGravity";
+    readonly displayName: "sGravity";
+    readonly type: "Range";
+    readonly range: readonly [0, 1];
+    readonly defaultValue: 0.25;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurRandomize";
+    readonly displayName: "sRandomize";
+    readonly type: "Float";
+    readonly defaultValue: 0;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurAO";
+    readonly displayName: "sAO";
+    readonly type: "Range";
+    readonly range: readonly [0, 1];
+    readonly defaultValue: 0;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurLayerNum";
+    readonly displayName: "sLayerNum";
+    readonly type: "Range";
+    readonly range: readonly [1, 3];
+    readonly defaultValue: 2;
+    readonly attributes: readonly ["IntRange"];
+}, {
+    readonly name: "_FurRootOffset";
+    readonly displayName: "sRootWidth";
+    readonly type: "Range";
+    readonly range: readonly [-1, 0];
+    readonly defaultValue: 0;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurCutoutLength";
+    readonly displayName: "sLength+ (Cutout)";
+    readonly type: "Float";
+    readonly defaultValue: 0.8;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurTouchStrength";
+    readonly displayName: "sTouchStrength";
+    readonly type: "Range";
+    readonly range: readonly [0, 1];
+    readonly defaultValue: 0;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurRimColor";
+    readonly displayName: "sColor";
+    readonly type: "Color";
+    readonly defaultValue: readonly [0, 0, 0, 1];
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurRimFresnelPower";
+    readonly displayName: "sFresnelPower";
+    readonly type: "Range";
+    readonly range: readonly [0.01, 50];
+    readonly defaultValue: 3;
+    readonly attributes: readonly ["PowerSlider(3.0)"];
+}, {
+    readonly name: "_FurRimAntiLight";
+    readonly displayName: "sAntiLight";
+    readonly type: "Range";
+    readonly range: readonly [0, 1];
+    readonly defaultValue: 0.5;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurCull";
+    readonly displayName: "sCullModes";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["lilEnum"];
+}, {
+    readonly name: "_FurSrcBlend";
+    readonly displayName: "sSrcBlendRGB";
+    readonly type: "Int";
+    readonly defaultValue: 5;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurDstBlend";
+    readonly displayName: "sDstBlendRGB";
+    readonly type: "Int";
+    readonly defaultValue: 10;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurSrcBlendAlpha";
+    readonly displayName: "sSrcBlendAlpha";
+    readonly type: "Int";
+    readonly defaultValue: 1;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurDstBlendAlpha";
+    readonly displayName: "sDstBlendAlpha";
+    readonly type: "Int";
+    readonly defaultValue: 10;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurBlendOp";
+    readonly displayName: "sBlendOpRGB";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendOp)"];
+}, {
+    readonly name: "_FurBlendOpAlpha";
+    readonly displayName: "sBlendOpAlpha";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendOp)"];
+}, {
+    readonly name: "_FurSrcBlendFA";
+    readonly displayName: "sSrcBlendRGB";
+    readonly type: "Int";
+    readonly defaultValue: 1;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurDstBlendFA";
+    readonly displayName: "sDstBlendRGB";
+    readonly type: "Int";
+    readonly defaultValue: 1;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurSrcBlendAlphaFA";
+    readonly displayName: "sSrcBlendAlpha";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurDstBlendAlphaFA";
+    readonly displayName: "sDstBlendAlpha";
+    readonly type: "Int";
+    readonly defaultValue: 1;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendMode)"];
+}, {
+    readonly name: "_FurBlendOpFA";
+    readonly displayName: "sBlendOpRGB";
+    readonly type: "Int";
+    readonly defaultValue: 4;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendOp)"];
+}, {
+    readonly name: "_FurBlendOpAlphaFA";
+    readonly displayName: "sBlendOpAlpha";
+    readonly type: "Int";
+    readonly defaultValue: 4;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.BlendOp)"];
+}, {
+    readonly name: "_FurZClip";
+    readonly displayName: "sZClip";
+    readonly type: "Int";
+    readonly defaultValue: 1;
+    readonly attributes: readonly ["lilToggle"];
+}, {
+    readonly name: "_FurZWrite";
+    readonly displayName: "sZWrite";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["lilToggle"];
+}, {
+    readonly name: "_FurZTest";
+    readonly displayName: "sZTest";
+    readonly type: "Int";
+    readonly defaultValue: 4;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.CompareFunction)"];
+}, {
+    readonly name: "_FurStencilRef";
+    readonly displayName: "Ref";
+    readonly type: "Range";
+    readonly range: readonly [0, 255];
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["IntRange"];
+}, {
+    readonly name: "_FurStencilReadMask";
+    readonly displayName: "ReadMask";
+    readonly type: "Range";
+    readonly range: readonly [0, 255];
+    readonly defaultValue: 255;
+    readonly attributes: readonly ["IntRange"];
+}, {
+    readonly name: "_FurStencilWriteMask";
+    readonly displayName: "WriteMask";
+    readonly type: "Range";
+    readonly range: readonly [0, 255];
+    readonly defaultValue: 255;
+    readonly attributes: readonly ["IntRange"];
+}, {
+    readonly name: "_FurStencilComp";
+    readonly displayName: "Comp";
+    readonly type: "Float";
+    readonly defaultValue: 8;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.CompareFunction)"];
+}, {
+    readonly name: "_FurStencilPass";
+    readonly displayName: "Pass";
+    readonly type: "Float";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.StencilOp)"];
+}, {
+    readonly name: "_FurStencilFail";
+    readonly displayName: "Fail";
+    readonly type: "Float";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.StencilOp)"];
+}, {
+    readonly name: "_FurStencilZFail";
+    readonly displayName: "ZFail";
+    readonly type: "Float";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["Enum(UnityEngine.Rendering.StencilOp)"];
+}, {
+    readonly name: "_FurOffsetFactor";
+    readonly displayName: "sOffsetFactor";
+    readonly type: "Float";
+    readonly defaultValue: 0;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurOffsetUnits";
+    readonly displayName: "sOffsetUnits";
+    readonly type: "Float";
+    readonly defaultValue: 0;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_FurColorMask";
+    readonly displayName: "sColorMask";
+    readonly type: "Int";
+    readonly defaultValue: 15;
+    readonly attributes: readonly ["lilColorMask"];
+}, {
+    readonly name: "_FurAlphaToMask";
+    readonly displayName: "sAlphaToMask";
+    readonly type: "Int";
+    readonly defaultValue: 0;
+    readonly attributes: readonly ["lilToggle"];
+}, {
+    readonly name: "_GemChromaticAberration";
+    readonly displayName: "sChromaticAberration";
+    readonly type: "Range";
+    readonly range: readonly [0, 1];
+    readonly defaultValue: 0.02;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_GemEnvContrast";
+    readonly displayName: "sContrast";
+    readonly type: "Float";
+    readonly defaultValue: 2;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_GemEnvColor";
+    readonly displayName: "sEnvironmentColor";
+    readonly type: "Color";
+    readonly defaultValue: readonly [1, 1, 1, 1];
+    readonly attributes: readonly ["lilHDR"];
+}, {
+    readonly name: "_GemParticleLoop";
+    readonly displayName: "sParticleLoop";
+    readonly type: "Float";
+    readonly defaultValue: 8;
+    readonly attributes: readonly [];
+}, {
+    readonly name: "_GemParticleColor";
+    readonly displayName: "sColor";
+    readonly type: "Color";
+    readonly defaultValue: readonly [4, 4, 4, 1];
+    readonly attributes: readonly ["lilHDR"];
+}, {
+    readonly name: "_GemVRParallaxStrength";
+    readonly displayName: "sVRParallaxStrength";
+    readonly type: "Range";
+    readonly range: readonly [0, 1];
+    readonly defaultValue: 1;
+    readonly attributes: readonly [];
+}, {
     readonly name: "_OutlineCull";
     readonly displayName: "sCullModes";
     readonly type: "Int";
@@ -3997,6 +4347,68 @@ declare const LILTOON_DEFAULTS: {
     readonly _ColorMask: 15;
     readonly _AlphaToMask: 0;
     readonly _lilShadowCasterBias: 0;
+    readonly _RefractionStrength: 0.5;
+    readonly _RefractionFresnelPower: 1;
+    readonly _RefractionColorFromMain: 0;
+    readonly _RefractionColor: readonly [1, 1, 1, 1];
+    readonly _FurNoiseMask: {
+        readonly texture: "white";
+    };
+    readonly _FurMask: {
+        readonly texture: "white";
+    };
+    readonly _FurLengthMask: {
+        readonly texture: "white";
+    };
+    readonly _FurVectorTex: {
+        readonly texture: "bump";
+    };
+    readonly _FurVectorScale: 1;
+    readonly _FurVector: readonly [0, 0, 1, 0.02];
+    readonly _VertexColor2FurVector: 0;
+    readonly _FurGravity: 0.25;
+    readonly _FurRandomize: 0;
+    readonly _FurAO: 0;
+    readonly _FurLayerNum: 2;
+    readonly _FurRootOffset: 0;
+    readonly _FurCutoutLength: 0.8;
+    readonly _FurTouchStrength: 0;
+    readonly _FurRimColor: readonly [0, 0, 0, 1];
+    readonly _FurRimFresnelPower: 3;
+    readonly _FurRimAntiLight: 0.5;
+    readonly _FurCull: 0;
+    readonly _FurSrcBlend: 5;
+    readonly _FurDstBlend: 10;
+    readonly _FurSrcBlendAlpha: 1;
+    readonly _FurDstBlendAlpha: 10;
+    readonly _FurBlendOp: 0;
+    readonly _FurBlendOpAlpha: 0;
+    readonly _FurSrcBlendFA: 1;
+    readonly _FurDstBlendFA: 1;
+    readonly _FurSrcBlendAlphaFA: 0;
+    readonly _FurDstBlendAlphaFA: 1;
+    readonly _FurBlendOpFA: 4;
+    readonly _FurBlendOpAlphaFA: 4;
+    readonly _FurZClip: 1;
+    readonly _FurZWrite: 0;
+    readonly _FurZTest: 4;
+    readonly _FurStencilRef: 0;
+    readonly _FurStencilReadMask: 255;
+    readonly _FurStencilWriteMask: 255;
+    readonly _FurStencilComp: 8;
+    readonly _FurStencilPass: 0;
+    readonly _FurStencilFail: 0;
+    readonly _FurStencilZFail: 0;
+    readonly _FurOffsetFactor: 0;
+    readonly _FurOffsetUnits: 0;
+    readonly _FurColorMask: 15;
+    readonly _FurAlphaToMask: 0;
+    readonly _GemChromaticAberration: 0.02;
+    readonly _GemEnvContrast: 2;
+    readonly _GemEnvColor: readonly [1, 1, 1, 1];
+    readonly _GemParticleLoop: 8;
+    readonly _GemParticleColor: readonly [4, 4, 4, 1];
+    readonly _GemVRParallaxStrength: 1;
     readonly _OutlineCull: 1;
     readonly _OutlineSrcBlend: 1;
     readonly _OutlineDstBlend: 0;
@@ -5148,4 +5560,4 @@ declare const LILTOON_UPSTREAM_COMMIT = "72fc09625b24c9a750591c286e9192512a5177a
 declare const LILTOON_UPSTREAM_VERSION = "2.1.1";
 declare const THREE_VERSION_RANGE = ">=0.180.0 <0.190.0";
 
-export { FurPass, GemPass, LILTOON_DEFAULTS, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonMaterialFactory, LilToonShadowAdapter, RefractionPass, SerializedLilToonMaterial, THREE_VERSION_RANGE, UnsupportedFeatureError, enableLilToon };
+export { FurPass, GemPass, LILTOON_DEFAULTS, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialParameters, LilToonShadowAdapter, RefractionPass, SerializedLilToonMaterial, THREE_VERSION_RANGE, UnsupportedFeatureError, enableLilToon };

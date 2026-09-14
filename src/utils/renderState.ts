@@ -187,7 +187,9 @@ export function applyLilToonRenderState(
 		(properties._ZTest as Mappable) ?? 4,
 		LessEqualDepth,
 	);
-	material.transparent = renderMode === "transparent";
+	material.transparent = !["opaque", "cutout", "fur-cutout"].includes(
+		renderMode,
+	);
 	if (material.transparent) {
 		material.blending = CustomBlending;
 		material.blendSrc = mapped(
@@ -282,3 +284,53 @@ export const renderStateMappings = {
 	stencilFunctionMap,
 	stencilOperationMap,
 };
+
+/** ShaderLab pass-local state overrides; properties retain their original shader names. */
+export function applyLilToonPassState(
+	material: Material,
+	mode: LilToonRenderMode,
+	properties: Record<string, unknown>,
+	pass: import("../material/LilToonMaterialParameters.js").LilToonPass,
+) {
+	const mappedProperties = { ...properties };
+	const prefix =
+		pass === "outline"
+			? "_Outline"
+			: pass === "transparent-pre"
+				? "_Pre"
+				: pass.startsWith("fur")
+					? "_Fur"
+					: "";
+	if (prefix)
+		for (const [key, value] of Object.entries(properties)) {
+			if (key.startsWith(prefix))
+				mappedProperties[`_${key.slice(prefix.length)}`] = value;
+		}
+	if (pass === "fur-pre")
+		Object.assign(mappedProperties, {
+			_ZWrite: 1,
+			_SrcBlend: 1,
+			_DstBlend: 0,
+			_SrcBlendAlpha: 1,
+			_DstBlendAlpha: 10,
+			_BlendOp: 0,
+			_BlendOpAlpha: 0,
+			_AlphaToMask: 1,
+		});
+	if (pass === "refraction-blur-pre")
+		Object.assign(mappedProperties, {
+			_SrcBlend: 1,
+			_DstBlend: 0,
+			_SrcBlendAlpha: 1,
+			_DstBlendAlpha: 0,
+			_BlendOp: 0,
+			_BlendOpAlpha: 0,
+			_ColorMask: 15,
+			_OffsetFactor: 0,
+			_OffsetUnits: 0,
+			_StencilReadMask: 255,
+			_StencilWriteMask: 255,
+		});
+	applyLilToonRenderState(material, mode, mappedProperties);
+	material.forceSinglePass = true;
+}

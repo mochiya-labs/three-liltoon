@@ -6,28 +6,20 @@ import { PROJECT_ROOT } from "../../tools/paths.js";
 
 describe("generated shader artifacts", () => {
 	const variants = [
-		"minimal-opaque",
 		"standard-opaque",
 		"standard-cutout",
 		"standard-transparent",
-		"standard-opaque-dissolve-noise",
-		"standard-cutout-dissolve-noise",
-		"standard-transparent-dissolve-noise",
-		"standard-opaque-matcap-mask",
-		"standard-cutout-matcap-mask",
-		"standard-transparent-matcap-mask",
-		"standard-opaque-layered-matcap",
-		"standard-cutout-layered-matcap",
-		"standard-transparent-layered-matcap",
-		"standard-opaque-surface-controls",
-		"standard-cutout-surface-controls",
-		"standard-transparent-surface-controls",
-		"standard-opaque-layered-surface-controls",
-		"standard-cutout-layered-surface-controls",
-		"standard-transparent-layered-surface-controls",
+		"standard-refraction-blur",
+		"refraction-blur-pre",
+		"standard-fur-cutout",
+		"standard-fur-two-pass",
+		"fur-cutout",
+		"fur-pre",
+		"transparent-pre",
+		"outline-transparent",
+		"outline-cutout",
 		"outline",
 	];
-
 	it.each(variants)("ships validated artifacts for %s", (variant) => {
 		for (const stage of ["vert", "frag"]) {
 			expect(
@@ -63,9 +55,6 @@ describe("generated shader artifacts", () => {
 		"standard-opaque",
 		"standard-cutout",
 		"standard-transparent",
-		"standard-opaque-shadow-border",
-		"standard-cutout-shadow-border",
-		"standard-transparent-shadow-border",
 		"outline",
 	])("applies receiver normal bias in the %s shadow lookup", (variant) => {
 		const vertex = readFileSync(
@@ -93,7 +82,7 @@ describe("generated shader artifacts", () => {
 			const fragment = readFileSync(
 				resolve(
 					PROJECT_ROOT,
-					`shader/generated/glsl/standard-${renderMode}-matcap-mask.frag.glsl`,
+					`shader/generated/glsl/standard-${renderMode}.frag.glsl`,
 				),
 				"utf8",
 			);
@@ -110,7 +99,7 @@ describe("generated shader artifacts", () => {
 			const fragment = readFileSync(
 				resolve(
 					PROJECT_ROOT,
-					`shader/generated/glsl/standard-${renderMode}-layered-matcap.frag.glsl`,
+					`shader/generated/glsl/standard-${renderMode}.frag.glsl`,
 				),
 				"utf8",
 			);
@@ -135,7 +124,7 @@ describe("generated shader artifacts", () => {
 			const fragment = readFileSync(
 				resolve(
 					PROJECT_ROOT,
-					`shader/generated/glsl/standard-${renderMode}-layered-surface-controls.frag.glsl`,
+					`shader/generated/glsl/standard-${renderMode}.frag.glsl`,
 				),
 				"utf8",
 			);
@@ -155,7 +144,7 @@ describe("generated shader artifacts", () => {
 			const fragment = readFileSync(
 				resolve(
 					PROJECT_ROOT,
-					`shader/generated/glsl/standard-${renderMode}-surface-controls.frag.glsl`,
+					`shader/generated/glsl/standard-${renderMode}.frag.glsl`,
 				),
 				"utf8",
 			);
@@ -176,30 +165,22 @@ describe("generated shader artifacts", () => {
 		},
 	);
 
-	it.each(variants)(
-		"stays within Three.js's 16 allocated texture units for %s",
-		(variant) => {
-			// Three's runtime morph chunk adds one sampler outside the HLSL build.
-			const samplers = new Set<string>(["morphTargetsTexture"]);
-			for (const stage of ["vert", "frag"] as const) {
-				const glsl = readFileSync(
-					resolve(
-						PROJECT_ROOT,
-						`shader/generated/glsl/${variant}.${stage}.glsl`,
-					),
-					"utf8",
-				);
-				for (const match of glsl.matchAll(
-					/uniform\s+(?:\w+\s+)?sampler(?:2D|2DArray|Cube|2DShadow)\s+([A-Za-z_][A-Za-z0-9_]*)/g,
-				))
-					samplers.add(match[1]!);
-			}
-			expect(
-				samplers.size,
-				`${variant} makes Three.js allocate ${samplers.size} texture units`,
-			).toBeLessThanOrEqual(16);
-		},
-	);
+	it("retains the full texture vocabulary for runtime specialization", () => {
+		const shader = readFileSync(
+			resolve(PROJECT_ROOT, "shader/generated/glsl/standard-cutout.frag.glsl"),
+			"utf8",
+		);
+		for (const property of [
+			"EmissionMap",
+			"RimColorTex",
+			"AlphaMask",
+			"MatCapBlendMask",
+			"MetallicGlossMap",
+			"Main2ndBlendMask",
+		])
+			expect(shader).toContain(`Combined_${property}`);
+		expect(shader).toContain("SPIRV_CROSS_CONSTANT_ID_0");
+	});
 
 	it.each(variants)("uses matching WebGL2 varying names for %s", (variant) => {
 		const vertex = readFileSync(

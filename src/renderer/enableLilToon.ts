@@ -12,8 +12,14 @@ import {
 } from "three";
 import { LilToonMaterial } from "../material/LilToonMaterial.js";
 import { setGlobalProperty } from "./LilToonUniformBinder.js";
+import { SceneColorPasses } from "./SceneColorPasses.js";
+import { FurPasses } from "./FurPasses.js";
+import { TransparencyPasses } from "./TransparencyPasses.js";
+import { applyLilToonPassState } from "../utils/renderState.js";
+import { ownsPassSource } from "./passOwnership.js";
 
 type Recipe = {
+	owners: Map<Mesh, Object3D>;
 	source: LilToonMaterial;
 	outline: LilToonMaterial;
 	depth: MeshDepthMaterial;
@@ -33,7 +39,6 @@ class AutomaticPasses {
 	private readonly recipes = new Map<LilToonMaterial, Recipe>();
 	private readonly proxies = new WeakMap<Mesh, Mesh>();
 	private readonly hidden = new MeshBasicMaterial({ visible: false });
-	private readonly active = new Set<LilToonMaterial>();
 	private depth = 0;
 
 	begin() {
@@ -41,12 +46,13 @@ class AutomaticPasses {
 	}
 	end() {
 		if (--this.depth !== 0) return;
-		for (const [source, recipe] of this.recipes)
-			if (!this.active.has(source)) recipe.release();
-		this.active.clear();
+		for (const [source, recipe] of this.recipes) {
+			for (const [mesh, root] of recipe.owners)
+				if (!ownsPassSource(root, mesh, source)) recipe.owners.delete(mesh);
+			if (!recipe.owners.size) recipe.release();
+		}
 	}
-	private recipe(source: LilToonMaterial): Recipe {
-		this.active.add(source);
+	private recipe(source: LilToonMaterial, mesh: Mesh, scene: Object3D): Recipe {
 		let recipe = this.recipes.get(source);
 		if (!recipe) {
 			const outline = new LilToonMaterial({
@@ -58,6 +64,7 @@ class AutomaticPasses {
 			const depth = new MeshDepthMaterial({ depthPacking: RGBADepthPacking });
 			const distance = new MeshDistanceMaterial();
 			recipe = {
+				owners: new Map(),
 				source,
 				outline,
 				depth,
@@ -76,6 +83,7 @@ class AutomaticPasses {
 			this.recipes.set(source, recipe);
 			source.addEventListener("dispose", recipe.release);
 		}
+		recipe.owners.set(mesh, scene);
 		// Read mutable standard Color edits as well as original property setters.
 		source.getProperty("_Color");
 		for (const [name, value] of Object.entries(source.lilToonProperties)) {
@@ -87,7 +95,13 @@ class AutomaticPasses {
 			if (recipe.outline.lilToonTextures[name] !== texture)
 				recipe.outline.setTexture(name, texture);
 		}
-		recipe.outline.side = BackSide;
+		recipe.outline.renderMode = source.renderMode;
+		applyLilToonPassState(
+			recipe.outline,
+			source.renderMode,
+			source.lilToonProperties,
+			"outline",
+		);
 		recipe.outline.visible = source.visible;
 		if (recipe.input !== source.map) {
 			recipe.map?.dispose();
@@ -128,13 +142,14 @@ class AutomaticPasses {
 					: [mesh.material];
 				const recipes = materials.map((material) =>
 					material instanceof LilToonMaterial && material.pass === "forward"
-						? this.recipe(material)
+						? this.recipe(material, mesh, scene)
 						: undefined,
 				);
 				const first = recipes.find((recipe) => recipe !== undefined);
 				if (!first) continue;
 				const outlines = recipes.map((recipe) =>
 					recipe &&
+					recipe.source.renderMode !== "transparent" &&
 					Number(recipe.source.lilToonProperties._UseOutline ?? 1) !== 0 &&
 					Number(recipe.source.lilToonProperties._OutlineWidth ?? 0) > 0
 						? recipe.outline
@@ -253,6 +268,9 @@ export function enableLilToon(renderer: WebGLRenderer): () => void {
 	const existing = installations.get(renderer);
 	if (existing) return existing.acquire();
 	const passes = new AutomaticPasses();
+	const sceneColors = new SceneColorPasses();
+	const fur = new FurPasses();
+	const transparency = new TransparencyPasses();
 	const render = renderer.render,
 		dispose = renderer.dispose;
 	let users = 0,
@@ -262,21 +280,34 @@ export function enableLilToon(renderer: WebGLRenderer): () => void {
 		const previous = scene.onBeforeRender;
 		const original = originalHooks.get(previous) ?? previous;
 		let restore: (() => void) | undefined;
+		let restoreColors: (() => void) | undefined;
+		let restoreFur: (() => void) | undefined;
+		let restoreTransparency: (() => void) | undefined;
 		const hook: Object3D["onBeforeRender"] = function (
 			this: Object3D,
 			...args
 		) {
 			original.apply(this, args);
 			restore ??= passes.prepare(scene);
+			restoreColors ??= sceneColors.prepare(renderer, scene, render);
+			restoreFur ??= fur.prepare(renderer, scene, render);
+			restoreTransparency ??= transparency.prepare(renderer, scene, render);
 		};
 		originalHooks.set(hook, original);
 		scene.onBeforeRender = hook;
 		try {
 			// Three invokes the scene hook before collecting render lists and shadows.
-			if (!(scene as { isScene?: boolean }).isScene)
+			if (!(scene as { isScene?: boolean }).isScene) {
 				restore = passes.prepare(scene);
+				restoreColors = sceneColors.prepare(renderer, scene, render);
+				restoreFur = fur.prepare(renderer, scene, render);
+				restoreTransparency = transparency.prepare(renderer, scene, render);
+			}
 			render.call(renderer, scene, camera);
 		} finally {
+			restoreTransparency?.();
+			restoreFur?.();
+			restoreColors?.();
 			restore?.();
 			if (scene.onBeforeRender === hook) scene.onBeforeRender = previous;
 			passes.end();
@@ -293,6 +324,9 @@ export function enableLilToon(renderer: WebGLRenderer): () => void {
 			if (renderer.render === wrapped) renderer.render = render;
 			if (renderer.dispose === wrappedDispose) renderer.dispose = dispose;
 			passes.dispose();
+			sceneColors.dispose();
+			fur.dispose();
+			transparency.dispose();
 			installations.delete(renderer);
 		},
 		acquire: () => {

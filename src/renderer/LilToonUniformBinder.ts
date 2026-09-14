@@ -156,6 +156,8 @@ export function updateObjectCameraUniforms(
 		1,
 	);
 	renderer.getDrawingBufferSize(drawingBufferSize);
+	const target = renderer.getRenderTarget();
+	if (target) drawingBufferSize.set(target.width, target.height);
 	(globals.uScreenParams as Vector4 | undefined)?.set(
 		drawingBufferSize.x,
 		drawingBufferSize.y,

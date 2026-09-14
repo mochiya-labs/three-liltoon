@@ -1,7 +1,6 @@
 import {
 	DataTexture,
 	LinearFilter,
-	LinearMipmapLinearFilter,
 	LinearSRGBColorSpace,
 	RGBAFormat,
 	RepeatWrapping,
@@ -12,7 +11,6 @@ import {
 import { LILTOON_TEXTURE_SEMANTICS } from "../generated/textureSemantics.js";
 
 const neutralTextures = new Map<string, DataTexture>();
-const LILTOON_MIN_ANISOTROPY = 16;
 
 function pixelForDefault(name: string): [number, number, number, number] {
 	switch (name.toLowerCase()) {
@@ -21,7 +19,7 @@ function pixelForDefault(name: string): [number, number, number, number] {
 		case "gray":
 			return [128, 128, 128, 255];
 		case "bump":
-			return [128, 128, 255, 255];
+			return [128, 128, 255, 128];
 		case "red":
 			return [255, 0, 0, 255];
 		case "white":
@@ -63,13 +61,6 @@ export function normalizeLilToonTexture(
 	texture.flipY = false;
 	texture.wrapS ||= RepeatWrapping;
 	texture.wrapT ||= RepeatWrapping;
-	texture.magFilter = LinearFilter;
-	if (texture.generateMipmaps || texture.mipmaps.length > 0) {
-		// Unity's bilinear import setting maps to nearest-mip selection in glTF.
-		// Blend adjacent mip levels on the web to avoid visible distance bands.
-		texture.minFilter = LinearMipmapLinearFilter;
-		texture.anisotropy = Math.max(texture.anisotropy, LILTOON_MIN_ANISOTROPY);
-	}
 	texture.needsUpdate = true;
 	return texture;
 }

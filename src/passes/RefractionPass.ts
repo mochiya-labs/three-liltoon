@@ -1,9 +1,11 @@
-import { UnsupportedFeatureError } from "../utils/diagnostics.js";
+import { LilToonMaterial } from "../material/LilToonMaterial.js";
+import type { LilToonMaterialParameters } from "../material/LilToonMaterialParameters.js";
 
-export class RefractionPass {
-	constructor() {
-		throw new UnsupportedFeatureError(
-			"Refraction requires scene-color capture and is not shipped in the WebGL2 alpha.",
-		);
+/** @deprecated Use LilToonMaterial with renderMode: "refraction" and enableLilToon(renderer). */
+export class RefractionPass extends LilToonMaterial {
+	constructor(
+		parameters: Omit<LilToonMaterialParameters, "renderMode" | "pass"> = {},
+	) {
+		super({ ...parameters, renderMode: "refraction" });
 	}
 }

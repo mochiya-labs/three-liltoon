@@ -40,7 +40,7 @@ describe("emission blend masks", () => {
 								uniform.value?.source === texture.source,
 						),
 					).toBe(true);
-					expect(texture.colorSpace).toBe(LinearSRGBColorSpace);
+					expect(texture.colorSpace).toBe("");
 				}
 				expect(
 					(candidate.globalUniforms._EmissionBlendMask_ST as Vector4).toArray(),
@@ -62,6 +62,7 @@ describe("emission blend masks", () => {
 
 	it("selects the mask profile when only the second emission mask is assigned", () => {
 		const material = new LilToonMaterial({
+			properties: { _UseEmission2nd: 1 },
 			textures: { _Emission2ndBlendMask: new DataTexture() },
 		});
 		expect(material.fragmentShader).toContain("Combined_Emission2ndBlendMask");
@@ -104,7 +105,7 @@ describe("emission blend masks", () => {
 			Object.entries(material.uniforms).some(
 				([name, uniform]) =>
 					name.includes("Combined_EmissionBlendMask") &&
-					uniform.value === textures[0],
+					uniform.value?.source === textures[0].source,
 			),
 		).toBe(true);
 		expect(material.getProperty("_EmissionColor")).toEqual([
@@ -115,7 +116,19 @@ describe("emission blend masks", () => {
 	it.each(["opaque", "cutout", "transparent"] as const)(
 		"ships complete, sampler-safe %s emission shaders",
 		(renderMode) => {
-			const program = getLilToonShaderProgram(renderMode, "emission-mask");
+			const program = getLilToonShaderProgram(
+				renderMode,
+				{ _UseEmission: 1, _UseEmission2nd: 1, _UseShadow: 1 },
+				Object.fromEntries(
+					[
+						"_EmissionMap",
+						"_Emission2ndMap",
+						"_EmissionBlendMask",
+						"_Emission2ndBlendMask",
+						"_ShadowBorderMask",
+					].map((p) => [p, new DataTexture()]),
+				),
+			);
 			for (const name of [
 				"EmissionMap",
 				"Emission2ndMap",
@@ -131,8 +144,11 @@ describe("emission blend masks", () => {
 					`_Globals._${name}_ScrollRotate`,
 				);
 			}
-			// The runtime Three morph chunk contributes the additional sampler.
-			expect(program.samplerBindings.size + 1).toBeLessThanOrEqual(16);
+			expect(
+				program.resources.filter(
+					(r) => r.stage === "fragment" && !r.property.startsWith("__"),
+				),
+			).toHaveLength(5);
 			expect(program.vertexShader).toContain("skinIndex");
 			expect(program.vertexShader).not.toContain("uMorphTarget");
 		},

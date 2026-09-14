@@ -4,9 +4,7 @@ A small, read-only Next.js example for loading one local `.glb` model or `.vrm` 
 
 The file never leaves the browser. It is exposed to `GLTFLoader` through a temporary object URL and disposed when it is replaced or the page closes.
 
-The viewer uses the Mochiya application layout and olive theme: the viewport and inspector meet at one square panel boundary without workspace gutters. Its navigation matches Avatar Composition and the Mochiya website, with the Mochiya mascot and wordmark, a [GitHub source link](https://github.com/mochiya-labs/three-liltoon), an English/日本語 menu, and Light/Dark/System appearance choices. Language and appearance preferences are saved in the browser.
-
-Both sample viewers share rounded empty-state cards and icon containers, typography, control sizes, and responsive viewport/inspector sizing. Model information sits below the canvas. Loading progress and errors appear in the viewport, and warnings are available in the inspector. On narrow screens, the inspector stacks below the preview.
+The viewer provides a model preview, material inspector, English/Japanese interface and Light/Dark/System appearance. Language and appearance preferences are saved in the browser. On narrow screens the inspector sits below the preview.
 
 Use **Open model** or **Replace model** in the Preview toolbar to choose a file. Changing language translates the interface, file validation, and inspector labels while preserving the loaded model and selected inspector tab. Authored names, shader property identifiers, and runtime diagnostic payloads retain their original values.
 
@@ -31,7 +29,7 @@ npm install
 npm run dev
 ```
 
-`npm run dev` packs and force-refreshes the checked-in `three-liltoon` artifact before Next.js starts. It does not regenerate or compile shaders. The refresh is required for local development because npm caches `file:` dependencies by package version. `npm run build` uses the package installed by the preceding dependency-install step and does not modify `node_modules` during the Next.js build.
+`npm run dev` packs and force-refreshes the checked-in `three-liltoon` artifact before Next.js starts. It does not run the package's HLSL translation toolchain; WebGL compiles the specialized GLSL at runtime. The refresh is required for local development because npm caches `file:` dependencies by package version. `npm run build` uses the package installed by the preceding dependency-install step and does not modify `node_modules` during the Next.js build.
 
 Open `http://localhost:3000`, then choose or drop a `.glb` or `.vrm` file. After changing `three-liltoon` package or shader source, run `npm run build:package` from the repository root to regenerate `dist/`, then restart the development server. Before a local production build with an existing install, run `npm run sync:liltoon` explicitly to refresh the package.
 
@@ -54,9 +52,9 @@ The inspector deduplicates cloned runtime materials by their original glTF mater
 
 For lilToon materials, the Properties tab shows the full effective `lilToonProperties` table, including defaults filled by `LilToonMaterial`. The Details tab shows source extension metadata such as the exact Unity shader name, lilToon version, specification version, and render mode. Ordinary glTF and VRM materials are displayed using their serializable Three.js material properties.
 
-The loader collects structured `three-liltoon` compatibility warnings without marking the load as failed. Expand **rendering warnings** in the inspector for affected materials, parameters, and shader profiles. Click a material name to select it. Each material's Details tab includes its actual runtime shader profile and warnings. Replacing the model clears the previous inspection/warnings. Diagnostics identify unsupported active features or texture bindings, not every possible visual mismatch; disabled feature slots are ignored.
+The loader collects structured `three-liltoon` compatibility warnings without marking the load as failed. Expand **rendering warnings** in the inspector for affected materials, parameters, and shader configurations. Click a material name to select it. Each material's Details tab includes its actual runtime shader configuration and warnings. Replacing the model clears the previous inspection/warnings. Diagnostics identify unsupported active features or texture bindings, not every possible visual mismatch; disabled feature slots are ignored.
 
-The canvas is present before and after loading a model. Its empty scene matches the Avatar Composition viewer: light/dark olive backgrounds, a 0.25-unit grid, shadow receiver, hemisphere fill, fixed world-space directional light, neutral tone mapping, sRGB output, and OrbitControls. Orbiting, panning, and zooming do not move the light or its target. Rendering stays direct to the canvas without post-processing.
+The canvas is present before and after loading a model. Its scene uses light/dark olive backgrounds, a 0.25-unit grid, shadow receiver, hemisphere fill, fixed world-space directional light, neutral tone mapping, sRGB output, and OrbitControls. Orbiting, panning, and zooming do not move the light or its target. Rendering stays direct to the canvas without post-processing.
 
 ## Source layout
 

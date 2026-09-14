@@ -39,7 +39,7 @@ describe("LilToonMaterial", () => {
 			.filter(([name]) => name.includes("Combined_MainTex"))
 			.map(([, uniform]) => uniform.value);
 		expect(bound.length).toBeGreaterThan(0);
-		expect(bound.every((value) => value === texture)).toBe(true);
+		expect(bound.every((value) => value.source === texture.source)).toBe(true);
 	});
 
 	it("converts linear shader output for an sRGB display", () => {
@@ -82,7 +82,7 @@ describe("LilToonMaterial", () => {
 			Object.entries(material.uniforms).some(
 				([name, uniform]) =>
 					name.includes("Combined_MatCapBlendMask") &&
-					uniform.value === matCapMask,
+					uniform.value?.source === matCapMask.source,
 			),
 		).toBe(true);
 	});
@@ -140,7 +140,7 @@ describe("LilToonMaterial", () => {
 				const cubeBindings = Object.entries(candidate.uniforms).filter(
 					([name]) => name.includes("Combined_ReflectionCubeTex"),
 				);
-				expect(cubeBindings.length).toBeGreaterThan(0);
+				expect(cubeBindings).toHaveLength(0);
 				expect(
 					cubeBindings.every(([, uniform]) => uniform.value === null),
 				).toBe(true);
@@ -175,6 +175,7 @@ describe("LilToonMaterial", () => {
 	it("applies independent masks to Main Color 2nd and 3rd in the layered MatCap profile", () => {
 		const material = new LilToonMaterial({
 			renderMode: "transparent",
+			properties: { _UseMain2ndTex: 1, _UseMain3rdTex: 1, _UseMatCap: 1 },
 			textures: {
 				_Main2ndTex: new DataTexture(),
 				_Main2ndBlendMask: new DataTexture(),
@@ -195,6 +196,8 @@ describe("LilToonMaterial", () => {
 		const material = new LilToonMaterial({
 			renderMode: "transparent",
 			properties: {
+				_UseMain2ndTex: 1,
+				_UseReflection: 1,
 				_MatCapBumpMap_ST: [2, 3, 0.1, 0.2],
 				_MatCap2ndBumpMap_ST: [7, 5, 0.3, 0.4],
 			},
@@ -241,7 +244,7 @@ describe("LilToonMaterial", () => {
 			Object.entries(material.uniforms).some(
 				([name, uniform]) =>
 					name.includes("Combined_ShadowBorderMask") &&
-					uniform.value === shadowBorderMask,
+					uniform.value?.source === shadowBorderMask.source,
 			),
 		).toBe(true);
 	});
@@ -340,6 +343,7 @@ describe("LilToonMaterial", () => {
 			info: { render: { frame: 0 } },
 			shadowMap: { enabled: false },
 			outputColorSpace: SRGBColorSpace,
+			getContext: () => ({ getParameter: () => 32 }),
 			getRenderTarget() {
 				return null;
 			},

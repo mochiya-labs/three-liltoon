@@ -1,9 +1,11 @@
-import { UnsupportedFeatureError } from "../utils/diagnostics.js";
+import { LilToonMaterial } from "../material/LilToonMaterial.js";
+import type { LilToonMaterialParameters } from "../material/LilToonMaterialParameters.js";
 
-export class GemPass {
-	constructor() {
-		throw new UnsupportedFeatureError(
-			"Gem rendering is not shipped in the WebGL2 alpha.",
-		);
+/** @deprecated Use LilToonMaterial with renderMode: "gem" and enableLilToon(renderer). */
+export class GemPass extends LilToonMaterial {
+	constructor(
+		parameters: Omit<LilToonMaterialParameters, "renderMode" | "pass"> = {},
+	) {
+		super({ ...parameters, renderMode: "gem" });
 	}
 }

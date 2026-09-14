@@ -1,27 +1,1085 @@
-export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-QOMEX37Y.js';
-import { UnsupportedFeatureError, LilToonMaterial, setGlobalProperty } from './chunk-EYWUUDGT.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-EYWUUDGT.js';
-import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, BackSide, SkinnedMesh, Mesh } from 'three';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-W6OLKWPZ.js';
+import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-RBNOH5NO.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-RBNOH5NO.js';
+import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, BufferGeometry, Scene, Vector4, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
 
+// src/renderer/passOwnership.ts
+function ownsPassSource(root, mesh, source) {
+  if (source.pass !== "forward") return false;
+  const assigned = Array.isArray(mesh.material) ? mesh.material.includes(source) : mesh.material === source;
+  if (!assigned) return false;
+  for (let node = mesh; node; node = node.parent)
+    if (node === root) return true;
+  return false;
+}
+
+// src/renderer/AuxiliaryPassDraw.ts
+function syncPassMaterial(source, target) {
+  source.getProperty("_Color");
+  target.renderMode = source.renderMode;
+  target.transparencyMode = source.transparencyMode;
+  for (const [key, value] of Object.entries(source.lilToonProperties)) {
+    target.lilToonProperties[key] = value;
+    setGlobalProperty(target.globalUniforms, key, value);
+  }
+  target.setProperty("_Color", source.getProperty("_Color"));
+  for (const [key, value] of Object.entries(source.lilToonTextures))
+    if (target.lilToonTextures[key] !== value) target.setTexture(key, value);
+  applyLilToonPassState(
+    target,
+    source.renderMode,
+    source.lilToonProperties,
+    target.pass
+  );
+}
+var AuxiliaryPassDraw = class {
+  recipes = /* @__PURE__ */ new Map();
+  depth = 0;
+  begin() {
+    this.depth++;
+  }
+  end() {
+    if (--this.depth === 0) {
+      for (const r of this.recipes.values())
+        if (!ownsPassSource(r.owner, r.mesh, r.source) || r.mesh.geometry !== r.sourceGeometry || r.mode !== r.source.renderMode || r.transparencyMode !== r.source.transparencyMode)
+          r.release();
+    }
+  }
+  draw(renderer, render, mesh, source, pass, scene, camera, group, configure) {
+    const key = `${mesh.uuid}:${mesh.geometry.uuid}:${source.uuid}:${pass}`;
+    let r = this.recipes.get(key);
+    if (r && (r.mode !== source.renderMode || r.transparencyMode !== source.transparencyMode)) {
+      r.release();
+      r = void 0;
+    }
+    if (!r) {
+      const geometry2 = new BufferGeometry(), sourceGeometry = mesh.geometry;
+      const material2 = new LilToonMaterial({
+        renderMode: source.renderMode,
+        pass,
+        properties: source.lilToonProperties,
+        textures: source.lilToonTextures
+      });
+      const proxy2 = mesh.isSkinnedMesh ? new SkinnedMesh(geometry2, material2) : new Mesh(geometry2, material2);
+      proxy2.matrixAutoUpdate = false;
+      proxy2.frustumCulled = false;
+      const temporary = new Scene();
+      temporary.add(proxy2);
+      const release = () => {
+        source.removeEventListener("dispose", release);
+        sourceGeometry.removeEventListener("dispose", release);
+        geometry2.attributes = {};
+        geometry2.index = null;
+        geometry2.morphAttributes = {};
+        geometry2.dispose();
+        material2.dispose();
+        this.recipes.delete(key);
+      };
+      r = {
+        mesh,
+        owner: scene,
+        sourceGeometry,
+        mode: source.renderMode,
+        transparencyMode: source.transparencyMode,
+        source,
+        geometry: geometry2,
+        material: material2,
+        proxy: proxy2,
+        scene: temporary,
+        release
+      };
+      this.recipes.set(key, r);
+      source.addEventListener("dispose", release);
+      sourceGeometry.addEventListener("dispose", release);
+    }
+    r.owner = scene;
+    const { geometry, material, proxy } = r;
+    syncPassMaterial(source, material);
+    geometry.attributes = mesh.geometry.attributes;
+    geometry.index = mesh.geometry.index;
+    geometry.morphAttributes = mesh.geometry.morphAttributes;
+    geometry.morphTargetsRelative = mesh.geometry.morphTargetsRelative;
+    const range = mesh.geometry.drawRange, start = Math.max(range.start, group?.start ?? 0);
+    geometry.setDrawRange(
+      start,
+      Math.max(
+        0,
+        Math.min(
+          range.start + range.count,
+          group ? group.start + group.count : Infinity
+        ) - start
+      )
+    );
+    proxy.matrix.copy(mesh.matrixWorld);
+    proxy.layers.mask = mesh.layers.mask;
+    proxy.morphTargetInfluences = mesh.morphTargetInfluences;
+    if (proxy.isSkinnedMesh) {
+      const skin = mesh, out = proxy;
+      out.skeleton = skin.skeleton;
+      out.bindMode = skin.bindMode;
+      out.bindMatrix.copy(skin.bindMatrix);
+      out.bindMatrixInverse.copy(skin.bindMatrixInverse);
+    }
+    const before = material.onBeforeRender;
+    material.onBeforeRender = (renderer2, _scene, camera2, geometry2, object, group2) => {
+      before.call(material, renderer2, scene, camera2, geometry2, object, group2);
+      configure?.(material);
+    };
+    const auto = renderer.autoClear, info = renderer.info.autoReset, shadows = renderer.shadowMap.autoUpdate, needs = renderer.shadowMap.needsUpdate;
+    const viewport = renderer.getViewport(new Vector4()), scissor = renderer.getScissor(new Vector4()), scissorTest = renderer.getScissorTest();
+    try {
+      renderer.autoClear = false;
+      renderer.info.autoReset = false;
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.needsUpdate = false;
+      render.call(renderer, r.scene, camera);
+    } finally {
+      material.onBeforeRender = before;
+      renderer.autoClear = auto;
+      renderer.info.autoReset = info;
+      renderer.shadowMap.autoUpdate = shadows;
+      renderer.shadowMap.needsUpdate = needs;
+      renderer.setViewport(viewport);
+      renderer.setScissor(scissor);
+      renderer.setScissorTest(scissorTest);
+    }
+  }
+  dispose() {
+    for (const r of this.recipes.values()) r.release();
+  }
+};
+
+// src/renderer/SceneColorPasses.ts
+var SceneColorPasses = class {
+  captures = [];
+  grabs = [];
+  blur = new AuxiliaryPassDraw();
+  resolves = [];
+  depth = 0;
+  gems = /* @__PURE__ */ new Map();
+  prepare(renderer, scene, render) {
+    const slot = this.depth++;
+    this.blur.begin();
+    let captured;
+    const undo = [];
+    scene.traverse((node) => {
+      const mesh = node;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      if (!materials.some(
+        (m) => m instanceof LilToonMaterial && ["refraction", "refraction-blur", "gem"].includes(m.renderMode) && m.pass === "forward"
+      ))
+        return;
+      const before = mesh.onBeforeRender;
+      const hook = (...args) => {
+        before.apply(mesh, args);
+        const material = args[4];
+        if (!(material instanceof LilToonMaterial) || !["refraction", "refraction-blur", "gem"].includes(
+          material.renderMode
+        ) || material.pass !== "forward")
+          return;
+        if (!captured) {
+          const target = renderer.getRenderTarget();
+          const size = target ? new Vector2(target.width, target.height) : renderer.getDrawingBufferSize(new Vector2());
+          const colorSpace = target?.texture.colorSpace ?? NoColorSpace;
+          let texture = this.captures[slot];
+          if (!texture || texture.image.width !== size.x || texture.image.height !== size.y || texture.colorSpace !== colorSpace || texture.type !== (target?.texture.type ?? UnsignedByteType)) {
+            texture?.dispose();
+            texture = new FramebufferTexture(size.x, size.y);
+            texture.colorSpace = colorSpace;
+            if (target) texture.type = target.texture.type;
+            this.captures[slot] = texture;
+          }
+          this.capture(renderer, texture, slot);
+          captured = texture;
+        }
+        material.setSystemTexture("__background", captured);
+        material.globalUniforms.uBackgroundIsSRGB = !renderer.getRenderTarget() && renderer.outputColorSpace === SRGBColorSpace ? 1 : 0;
+        if (material.renderMode === "refraction-blur") {
+          const background = captured;
+          this.blur.draw(
+            renderer,
+            render,
+            mesh,
+            material,
+            "refraction-blur-pre",
+            scene,
+            args[2],
+            args[5],
+            (pass) => {
+              pass.setSystemTexture("__background", background);
+              pass.setSystemTexture("__grab", background);
+              pass.globalUniforms.uBackgroundIsSRGB = material.globalUniforms.uBackgroundIsSRGB;
+            }
+          );
+          let grab = this.grabs[slot];
+          if (!grab || grab.image.width !== background.image.width || grab.image.height !== background.image.height || grab.type !== background.type || grab.colorSpace !== background.colorSpace) {
+            grab?.dispose();
+            grab = new FramebufferTexture(
+              background.image.width,
+              background.image.height
+            );
+            grab.type = background.type;
+            grab.colorSpace = background.colorSpace;
+            this.grabs[slot] = grab;
+          }
+          this.capture(renderer, grab, slot);
+          material.setSystemTexture("__grab", grab);
+        }
+        if (material.renderMode === "gem")
+          this.clearGem(
+            renderer,
+            render,
+            mesh,
+            material,
+            scene,
+            args[2],
+            args[5]
+          );
+      };
+      mesh.onBeforeRender = hook;
+      undo.push(() => {
+        if (mesh.onBeforeRender === hook) mesh.onBeforeRender = before;
+      });
+    });
+    return () => {
+      undo.reverse().forEach((restore) => restore());
+      this.blur.end();
+      if (--this.depth === 0) {
+        for (const recipe of this.gems.values())
+          if (!ownsPassSource(recipe.owner, recipe.mesh, recipe.source) || recipe.mesh.geometry !== recipe.sourceGeometry || recipe.source.renderMode !== "gem")
+            recipe.release();
+      }
+    };
+  }
+  clearGem(renderer, render, mesh, source, owner, camera, group) {
+    const key = `${mesh.uuid}:${source.uuid}`;
+    let recipe = this.gems.get(key);
+    if (recipe && (recipe.sourceGeometry !== mesh.geometry || recipe.source !== source)) {
+      recipe.release();
+      recipe = void 0;
+    }
+    if (!recipe) {
+      const material2 = new MeshBasicMaterial({
+        color: 0,
+        blending: CustomBlending,
+        blendSrc: OneFactor,
+        blendDst: ZeroFactor,
+        blendSrcAlpha: ZeroFactor,
+        blendDstAlpha: OneFactor
+      });
+      const geometry2 = new BufferGeometry(), sourceGeometry = mesh.geometry;
+      const proxy2 = mesh.isSkinnedMesh ? new SkinnedMesh(geometry2, material2) : new Mesh(geometry2, material2);
+      const temporary2 = new Scene();
+      temporary2.add(proxy2);
+      const release = () => {
+        sourceGeometry.removeEventListener("dispose", release);
+        source.removeEventListener("dispose", release);
+        geometry2.attributes = {};
+        geometry2.index = null;
+        geometry2.morphAttributes = {};
+        geometry2.dispose();
+        material2.dispose();
+        this.gems.delete(key);
+      };
+      recipe = {
+        mesh,
+        owner,
+        source,
+        sourceGeometry,
+        geometry: geometry2,
+        material: material2,
+        proxy: proxy2,
+        scene: temporary2,
+        release
+      };
+      this.gems.set(key, recipe);
+      sourceGeometry.addEventListener("dispose", release);
+      source.addEventListener("dispose", release);
+    }
+    recipe.owner = owner;
+    const { material, geometry, proxy, scene: temporary } = recipe;
+    material.side = source.side;
+    material.depthWrite = source.depthWrite;
+    material.depthTest = source.depthTest;
+    material.depthFunc = source.depthFunc;
+    material.stencilWrite = source.stencilWrite;
+    for (const key2 of [
+      "stencilRef",
+      "stencilFunc",
+      "stencilFuncMask",
+      "stencilWriteMask",
+      "stencilFail",
+      "stencilZFail",
+      "stencilZPass",
+      "colorWrite",
+      "polygonOffset",
+      "polygonOffsetFactor",
+      "polygonOffsetUnits"
+    ])
+      material[key2] = source[key2];
+    geometry.index = mesh.geometry.index;
+    geometry.attributes = mesh.geometry.attributes;
+    geometry.morphAttributes = mesh.geometry.morphAttributes;
+    geometry.morphTargetsRelative = mesh.geometry.morphTargetsRelative;
+    const range = mesh.geometry.drawRange;
+    const start = Math.max(range.start, group?.start ?? 0);
+    geometry.setDrawRange(
+      start,
+      Math.max(
+        0,
+        Math.min(
+          range.start + range.count,
+          group ? group.start + group.count : Infinity
+        ) - start
+      )
+    );
+    proxy.matrixAutoUpdate = false;
+    proxy.matrix.copy(mesh.matrixWorld);
+    proxy.layers.mask = mesh.layers.mask;
+    proxy.frustumCulled = false;
+    proxy.morphTargetInfluences = mesh.morphTargetInfluences;
+    if (proxy.isSkinnedMesh) {
+      const skin = mesh, out = proxy;
+      out.skeleton = skin.skeleton;
+      out.bindMode = skin.bindMode;
+      out.bindMatrix.copy(skin.bindMatrix);
+      out.bindMatrixInverse.copy(skin.bindMatrixInverse);
+    }
+    const autoClear = renderer.autoClear, autoReset = renderer.info.autoReset;
+    const shadowUpdate = renderer.shadowMap.autoUpdate, shadowNeeds = renderer.shadowMap.needsUpdate;
+    const viewport = renderer.getViewport(new Vector4()), scissor = renderer.getScissor(new Vector4()), scissorTest = renderer.getScissorTest();
+    try {
+      renderer.autoClear = false;
+      renderer.info.autoReset = false;
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.needsUpdate = false;
+      render.call(renderer, temporary, camera);
+    } finally {
+      renderer.autoClear = autoClear;
+      renderer.info.autoReset = autoReset;
+      renderer.shadowMap.autoUpdate = shadowUpdate;
+      renderer.shadowMap.needsUpdate = shadowNeeds;
+      renderer.setViewport(viewport);
+      renderer.setScissor(scissor);
+      renderer.setScissorTest(scissorTest);
+    }
+  }
+  capture(renderer, texture, slot) {
+    const gl = renderer.getContext();
+    if (!renderer.getRenderTarget() || gl.getParameter(gl.SAMPLES) === 0) {
+      renderer.copyFramebufferToTexture(texture);
+      return;
+    }
+    const read = gl.getParameter(gl.READ_FRAMEBUFFER_BINDING), draw = gl.getParameter(gl.DRAW_FRAMEBUFFER_BINDING), rb = gl.getParameter(gl.RENDERBUFFER_BINDING);
+    const scissorEnabled = gl.isEnabled(gl.SCISSOR_TEST);
+    const { width, height } = texture.image;
+    const format = texture.colorSpace === SRGBColorSpace ? gl.SRGB8_ALPHA8 : texture.type === HalfFloatType ? gl.RGBA16F : texture.type === FloatType ? gl.RGBA32F : gl.RGBA8;
+    const key = `${width}:${height}:${format}`;
+    let resolve = this.resolves[slot];
+    try {
+      if (!resolve || resolve.key !== key) {
+        if (resolve) {
+          gl.deleteFramebuffer(resolve.framebuffer);
+          gl.deleteRenderbuffer(resolve.color);
+        }
+        const framebuffer = gl.createFramebuffer(), color = gl.createRenderbuffer();
+        if (!framebuffer || !color)
+          throw new Error(
+            "[three-liltoon] Cannot allocate scene-color resolve"
+          );
+        resolve = { gl, framebuffer, color, key };
+        this.resolves[slot] = resolve;
+        gl.bindRenderbuffer(gl.RENDERBUFFER, color);
+        gl.renderbufferStorage(gl.RENDERBUFFER, format, width, height);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer);
+        gl.framebufferRenderbuffer(
+          gl.DRAW_FRAMEBUFFER,
+          gl.COLOR_ATTACHMENT0,
+          gl.RENDERBUFFER,
+          color
+        );
+        if (gl.checkFramebufferStatus(gl.DRAW_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE)
+          throw new Error(
+            "[three-liltoon] Scene-color resolve format is unsupported"
+          );
+      }
+      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, resolve.framebuffer);
+      gl.disable(gl.SCISSOR_TEST);
+      gl.blitFramebuffer(
+        0,
+        0,
+        width,
+        height,
+        0,
+        0,
+        width,
+        height,
+        gl.COLOR_BUFFER_BIT,
+        gl.NEAREST
+      );
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, resolve.framebuffer);
+      renderer.copyFramebufferToTexture(texture);
+    } finally {
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, read);
+      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, draw);
+      gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
+      if (scissorEnabled) gl.enable(gl.SCISSOR_TEST);
+    }
+  }
+  dispose() {
+    this.blur.dispose();
+    for (const texture of this.grabs) texture.dispose();
+    this.grabs = [];
+    for (const recipe of this.gems.values()) recipe.release();
+    for (const texture of this.captures) texture.dispose();
+    this.captures = [];
+    for (const r of this.resolves) {
+      r.gl.deleteFramebuffer(r.framebuffer);
+      r.gl.deleteRenderbuffer(r.color);
+    }
+    this.resolves = [];
+  }
+};
+var FurDeformation = class {
+  target;
+  material;
+  scene = new Scene();
+  quad;
+  version = -1;
+  pose = new Float32Array(0);
+  renderer;
+  invalidate = () => {
+    this.version = -1;
+  };
+  constructor(source) {
+    this.target = new WebGLRenderTarget(
+      source.image.width,
+      source.image.height,
+      {
+        type: FloatType,
+        minFilter: NearestFilter,
+        magFilter: NearestFilter,
+        depthBuffer: false,
+        stencilBuffer: false
+      }
+    );
+    this.material = new RawShaderMaterial({
+      glslVersion: GLSL3,
+      depthTest: false,
+      depthWrite: false,
+      uniforms: {
+        sourceVertices: { value: source },
+        bones: { value: null },
+        bindMatrix: { value: null },
+        bindMatrixInverse: { value: null }
+      },
+      vertexShader: "precision highp float;in vec3 position;void main(){gl_Position=vec4(position.xy,0.0,1.0);}",
+      fragmentShader: `
+precision highp float;
+precision highp int;
+uniform highp sampler2D sourceVertices;
+uniform highp sampler2D bones;
+uniform mat4 bindMatrix;
+uniform mat4 bindMatrixInverse;
+out vec4 result;
+
+vec4 loadSource(int index) {
+    ivec2 size = textureSize(sourceVertices, 0);
+    return texelFetch(sourceVertices, ivec2(index % size.x, index / size.x), 0);
+}
+vec4 loadBone(int index) {
+    int width = textureSize(bones, 0).x;
+    return texelFetch(bones, ivec2(index % width, index / width), 0);
+}
+mat4 bone(int index) {
+    index *= 4;
+    return mat4(loadBone(index), loadBone(index + 1), loadBone(index + 2), loadBone(index + 3));
+}
+vec3 safeNormalize(vec3 value) {
+    float magnitude = length(value);
+    return magnitude > 0.0 ? value / magnitude : vec3(0.0);
+}
+void main() {
+    ivec2 coord = ivec2(gl_FragCoord.xy);
+    int index = coord.y * textureSize(sourceVertices, 0).x + coord.x;
+    int field = index % 8;
+    result = texelFetch(sourceVertices, coord, 0);
+    // UVs, colors, joint indices and weights pass through unchanged.
+    if (field > 2) return;
+    int base = index - field;
+    ivec4 ids = ivec4(loadSource(base + 6));
+    vec4 weights = loadSource(base + 7);
+    mat4 skin = bone(ids.x) * weights.x + bone(ids.y) * weights.y
+              + bone(ids.z) * weights.z + bone(ids.w) * weights.w;
+    mat4 transform = bindMatrixInverse * skin * bindMatrix;
+    if (field == 0) result = vec4((transform * vec4(result.xyz, 1.0)).xyz, 1.0);
+    else result = vec4(safeNormalize(mat3(transform) * result.xyz), result.w);
+}
+`
+    });
+    this.quad = new Mesh(new PlaneGeometry(2, 2), this.material);
+    this.quad.frustumCulled = false;
+    this.scene.add(this.quad);
+  }
+  update(renderer, render, mesh, source, camera) {
+    if (!this.renderer) {
+      this.renderer = renderer;
+      renderer.domElement.addEventListener(
+        "webglcontextrestored",
+        this.invalidate
+      );
+    }
+    const skeleton = mesh.skeleton;
+    if (!skeleton.boneTexture) skeleton.computeBoneTexture();
+    const matrices = skeleton.boneMatrices;
+    const length = matrices.length + 32;
+    let changed = this.version !== source.version || this.pose.length !== length;
+    if (this.pose.length !== length) this.pose = new Float32Array(length);
+    let index = 0;
+    for (const values of [
+      matrices,
+      mesh.bindMatrix.elements,
+      mesh.bindMatrixInverse.elements
+    ])
+      for (const value of values) {
+        const f = Math.fround(value);
+        if (this.pose[index] !== f) changed = true;
+        this.pose[index++] = f;
+      }
+    if (!changed) return;
+    this.material.uniforms.bones.value = skeleton.boneTexture;
+    this.material.uniforms.bindMatrix.value = mesh.bindMatrix;
+    this.material.uniforms.bindMatrixInverse.value = mesh.bindMatrixInverse;
+    const target = renderer.getRenderTarget(), face = renderer.getActiveCubeFace(), level = renderer.getActiveMipmapLevel();
+    const viewport = renderer.getViewport(new Vector4()), scissor = renderer.getScissor(new Vector4()), scissorTest = renderer.getScissorTest();
+    const auto = renderer.autoClear, info = renderer.info.autoReset, shadows = renderer.shadowMap.autoUpdate, needs = renderer.shadowMap.needsUpdate;
+    this.version = -1;
+    this.quad.layers.mask = camera.layers.mask;
+    try {
+      renderer.autoClear = false;
+      renderer.info.autoReset = false;
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.needsUpdate = false;
+      renderer.setRenderTarget(this.target);
+      renderer.setScissorTest(false);
+      render.call(renderer, this.scene, camera);
+      this.version = source.version;
+    } finally {
+      renderer.setRenderTarget(target, face, level);
+      renderer.setViewport(viewport);
+      renderer.setScissor(scissor);
+      renderer.setScissorTest(scissorTest);
+      renderer.autoClear = auto;
+      renderer.info.autoReset = info;
+      renderer.shadowMap.autoUpdate = shadows;
+      renderer.shadowMap.needsUpdate = needs;
+    }
+  }
+  dispose() {
+    this.renderer?.domElement.removeEventListener(
+      "webglcontextrestored",
+      this.invalidate
+    );
+    this.target.dispose();
+    this.quad.geometry.dispose();
+    this.material.dispose();
+  }
+};
+function furFactors(layers) {
+  const a = [1, 0, 0], b = [0, 1, 0], c = [0, 0, 1];
+  const ab = [0.5, 0.5, 0], bc = [0, 0.5, 0.5], ac = [0.5, 0, 0.5];
+  const factors = layers === 1 ? [a, b, c] : layers >= 2 ? [a, bc, b, ac, c, ab] : [];
+  if (layers >= 3)
+    factors.push(
+      [1 / 6, 4 / 6, 1 / 6],
+      bc,
+      [1 / 6, 1 / 6, 4 / 6],
+      ac,
+      [4 / 6, 1 / 6, 1 / 6],
+      ab
+    );
+  factors.push(a);
+  return factors;
+}
+var FurGeometry = class {
+  constructor(mesh, layers, maxSize) {
+    this.mesh = mesh;
+    const source = mesh.geometry, count = source.attributes.position.count;
+    const texels = count * 8, width = Math.min(maxSize, Math.max(1, texels));
+    const height = Math.max(1, Math.ceil(texels / width));
+    if (height > maxSize)
+      throw new Error(
+        "[three-liltoon] Fur vertex data exceeds MAX_TEXTURE_SIZE"
+      );
+    this.data = new Float32Array(width * height * 4);
+    this.texture = new DataTexture(
+      this.data,
+      width,
+      height,
+      RGBAFormat,
+      FloatType
+    );
+    this.texture.needsUpdate = true;
+    const factors = furFactors(layers), stripSize = factors.length * 2;
+    const length = source.index?.count ?? count;
+    const triangles = Math.floor(length / 3), vertexCount = triangles * stripSize;
+    const positions = new Float32Array(vertexCount * 4), corners = new Float32Array(vertexCount * 3);
+    const perTriangle = Math.max(0, stripSize - 2) * 3;
+    const indices = new Uint32Array(triangles * perTriangle);
+    for (let t = 0; t + 2 < length; t += 3) {
+      const ids = [0, 1, 2].map((n) => source.index?.getX(t + n) ?? t + n);
+      const start = t / 3 * stripSize;
+      let vertex = start;
+      for (const factor of factors)
+        for (const tip of [0, 1]) {
+          positions.set([...factor, tip], vertex * 4);
+          corners.set(ids, vertex * 3);
+          vertex++;
+        }
+      for (let j = 0; j + 2 < stripSize; j++)
+        indices.set(
+          [start + j + j % 2, start + j + 1 - j % 2, start + j + 2],
+          t / 3 * perTriangle + j * 3
+        );
+    }
+    this.geometry.setAttribute(
+      "position",
+      new Float32BufferAttribute(positions, 4)
+    );
+    this.geometry.setAttribute(
+      "normal",
+      new Float32BufferAttribute(corners, 3)
+    );
+    this.geometry.setIndex(new Uint32BufferAttribute(indices, 1));
+    for (const group of source.groups)
+      this.geometry.addGroup(
+        Math.floor(group.start / 3) * perTriangle,
+        Math.floor(group.count / 3) * perTriangle,
+        group.materialIndex
+      );
+    this.geometry.setDrawRange(
+      Math.floor(source.drawRange.start / 3) * perTriangle,
+      Number.isFinite(source.drawRange.count) ? Math.floor(source.drawRange.count / 3) * perTriangle : Infinity
+    );
+  }
+  mesh;
+  geometry = new BufferGeometry();
+  texture;
+  data;
+  staticVersion = "";
+  staticAttributes = /* @__PURE__ */ new Map();
+  pose = new Float64Array(0);
+  p = new Vector3();
+  n = new Vector3();
+  delta = new Vector3();
+  tangent = new Vector3();
+  base = new Vector3();
+  bone = new Matrix4();
+  weighted = new Matrix4();
+  combined = new Matrix4();
+  update(cpuSkinning = false) {
+    const mesh = this.mesh, source = mesh.geometry, attrs = source.attributes;
+    const tracked = { ...attrs };
+    for (const [name, targets] of Object.entries(source.morphAttributes))
+      targets?.forEach((attribute, i) => {
+        tracked[name + ":morph:" + i] = attribute;
+      });
+    const version = String(cpuSkinning) + String(source.morphTargetsRelative) + Object.entries(tracked).map(
+      ([key, a]) => key + ":" + a.count + ":" + ("version" in a ? a.version : a.data.version)
+    ).join("|");
+    const skin = mesh;
+    const weights = mesh.morphTargetInfluences ?? [];
+    const useCpuSkin = cpuSkinning && skin.isSkinnedMesh;
+    if (useCpuSkin) skin.skeleton.update();
+    const poseLength = weights.length + (useCpuSkin ? skin.skeleton.boneMatrices.length + 32 : 0);
+    let changed = this.pose.length !== poseLength;
+    if (changed) this.pose = new Float64Array(poseLength);
+    let cursor = 0;
+    const compare = (values) => {
+      for (let i = 0; i < values.length; i++, cursor++) {
+        if (this.pose[cursor] !== values[i]) changed = true;
+        this.pose[cursor] = values[i];
+      }
+    };
+    compare(weights);
+    if (useCpuSkin) {
+      compare(skin.skeleton.boneMatrices);
+      compare(skin.bindMatrix.elements);
+      compare(skin.bindMatrixInverse.elements);
+    }
+    if (!changed && this.staticVersion === version && Object.entries(tracked).every(
+      ([key, a]) => this.staticAttributes.get(key) === a
+    ))
+      return;
+    this.staticVersion = version;
+    this.staticAttributes = new Map(Object.entries(tracked));
+    const { p, n, delta, tangent, base } = this;
+    for (let i = 0; i < attrs.position.count; i++) {
+      Mesh.prototype.getVertexPosition.call(mesh, i, p);
+      n.fromBufferAttribute(attrs.normal, i);
+      const normals = source.morphAttributes.normal;
+      if (normals && mesh.morphTargetInfluences) {
+        base.copy(n);
+        for (let j = 0; j < normals.length; j++) {
+          const weight = mesh.morphTargetInfluences[j] ?? 0;
+          if (!weight) continue;
+          delta.fromBufferAttribute(normals[j], i);
+          if (!source.morphTargetsRelative) delta.sub(base);
+          n.addScaledVector(delta, weight);
+        }
+      }
+      if (attrs.tangent) tangent.fromBufferAttribute(attrs.tangent, i);
+      else tangent.set(1, 0, 0);
+      if (useCpuSkin) {
+        skin.applyBoneTransform(i, p);
+        const { weighted, bone, combined } = this;
+        weighted.elements.fill(0);
+        for (let k = 0; k < 4; k++) {
+          const weight = attrs.skinWeight.getComponent(i, k);
+          if (weight === 0) continue;
+          bone.fromArray(
+            skin.skeleton.boneMatrices,
+            attrs.skinIndex.getComponent(i, k) * 16
+          );
+          for (let e = 0; e < 16; e++)
+            weighted.elements[e] += bone.elements[e] * weight;
+        }
+        combined.multiplyMatrices(skin.bindMatrixInverse, weighted).multiply(skin.bindMatrix);
+        n.transformDirection(combined);
+        tangent.transformDirection(combined);
+      }
+      const offset = i * 32;
+      this.data[offset] = p.x;
+      this.data[offset + 1] = p.y;
+      this.data[offset + 2] = p.z;
+      this.data[offset + 3] = 1;
+      this.data[offset + 4] = n.x;
+      this.data[offset + 5] = n.y;
+      this.data[offset + 6] = n.z;
+      this.data[offset + 7] = 0;
+      this.data[offset + 8] = tangent.x;
+      this.data[offset + 9] = tangent.y;
+      this.data[offset + 10] = tangent.z;
+      this.data[offset + 11] = attrs.tangent?.getW(i) ?? 1;
+      this.data[offset + 12] = attrs.color?.getX(i) ?? 1;
+      this.data[offset + 13] = attrs.color?.getY(i) ?? 1;
+      this.data[offset + 14] = attrs.color?.getZ(i) ?? 1;
+      this.data[offset + 15] = attrs.color && attrs.color.itemSize > 3 ? attrs.color.getW(i) : 1;
+      for (let k = 0; k < 4; k++) {
+        this.data[offset + 24 + k] = skin.isSkinnedMesh ? attrs.skinIndex.getComponent(i, k) : 0;
+        this.data[offset + 28 + k] = skin.isSkinnedMesh ? attrs.skinWeight.getComponent(i, k) : k === 0 ? 1 : 0;
+      }
+      for (let u = 0; u < 4; u++) {
+        const uv = attrs[u === 0 ? "uv" : `uv${u}`];
+        this.data[offset + 16 + u * 2] = uv?.getX(i) ?? 0;
+        this.data[offset + 17 + u * 2] = uv?.getY(i) ?? 0;
+      }
+    }
+    this.texture.needsUpdate = true;
+  }
+  dispose() {
+    this.geometry.dispose();
+    this.texture.dispose();
+  }
+};
+
+// src/renderer/FurPasses.ts
+function sameProperty(value, previous) {
+  if (Array.isArray(value))
+    return Array.isArray(previous) && value.length === previous.length && value.every((v, i) => v === previous[i]);
+  if (typeof value === "object")
+    return previous !== void 0 && value.constructor === previous.constructor && value.equals(previous);
+  return value === previous;
+}
+var FurPasses = class {
+  recipes = /* @__PURE__ */ new Map();
+  depth = 0;
+  prepare(renderer, scene, render) {
+    this.depth++;
+    const undo = [];
+    scene.traverse((node) => {
+      const mesh = node;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      if (!materials.some(
+        (m) => m instanceof LilToonMaterial && m.renderMode.startsWith("fur") && m.pass === "forward"
+      ))
+        return;
+      const after = mesh.onAfterRender;
+      const hook = (...args) => {
+        after.apply(mesh, args);
+        const source = args[4];
+        if (!(source instanceof LilToonMaterial) || !source.renderMode.startsWith("fur") || source.pass !== "forward")
+          return;
+        const layers = Number(source.lilToonProperties._FurLayerNum ?? 2);
+        if ((mesh.geometry.index?.count ?? mesh.geometry.attributes.position.count) < 3)
+          return;
+        const key = `${mesh.uuid}:${source.uuid}`;
+        const topology = `${mesh.geometry.index?.version}:${mesh.geometry.index?.count}:${mesh.geometry.attributes.position.count}`;
+        let recipe = this.recipes.get(key);
+        if (recipe && (recipe.sourceGeometry !== mesh.geometry || recipe.sourceIndex !== mesh.geometry.index || recipe.layers !== layers || recipe.mode !== source.renderMode || recipe.source !== source || recipe.topology !== topology)) {
+          recipe.release();
+          recipe = void 0;
+        }
+        if (!recipe) {
+          const gpuSkinning = mesh.isSkinnedMesh && renderer.extensions.has("EXT_color_buffer_float");
+          const gl = renderer.getContext();
+          const maxSize = gpuSkinning ? Math.min(
+            renderer.capabilities.maxTextureSize,
+            ...gl.getParameter(gl.MAX_VIEWPORT_DIMS)
+          ) : renderer.capabilities.maxTextureSize;
+          const geometry2 = new FurGeometry(mesh, layers, maxSize);
+          const deformation2 = gpuSkinning ? new FurDeformation(geometry2.texture) : void 0;
+          const materials3 = (source.renderMode === "fur-two-pass" ? ["fur-pre", "fur"] : ["fur"]).map(
+            (pass) => new LilToonMaterial({
+              renderMode: source.renderMode,
+              pass,
+              properties: source.lilToonProperties,
+              textures: source.lilToonTextures
+            })
+          );
+          const proxy2 = new Mesh(geometry2.geometry, materials3[0]);
+          const temporary2 = new Scene();
+          temporary2.add(proxy2);
+          proxy2.matrixAutoUpdate = false;
+          proxy2.frustumCulled = false;
+          const sourceGeometry = mesh.geometry;
+          const release = () => {
+            geometry2.dispose();
+            deformation2?.dispose();
+            materials3.forEach((material) => material.dispose());
+            sourceGeometry.removeEventListener("dispose", release);
+            source.removeEventListener("dispose", release);
+            this.recipes.delete(key);
+          };
+          recipe = {
+            mesh,
+            owner: scene,
+            geometry: geometry2,
+            deformation: deformation2,
+            sourceGeometry: mesh.geometry,
+            sourceIndex: mesh.geometry.index,
+            topology,
+            layers,
+            materials: materials3,
+            mode: source.renderMode,
+            scene: temporary2,
+            proxy: proxy2,
+            source,
+            release
+          };
+          mesh.geometry.addEventListener("dispose", release);
+          source.addEventListener("dispose", release);
+          this.recipes.set(key, recipe);
+        }
+        recipe.owner = scene;
+        const {
+          geometry,
+          deformation,
+          materials: materials2,
+          proxy,
+          scene: temporary
+        } = recipe;
+        geometry.update(!deformation);
+        deformation?.update(
+          renderer,
+          render,
+          mesh,
+          geometry.texture,
+          args[2]
+        );
+        source.getProperty("_Color");
+        for (const material of materials2) {
+          let changed = false;
+          for (const key2 in source.lilToonProperties) {
+            const value = source.lilToonProperties[key2];
+            const previous = material.lilToonProperties[key2];
+            if (!sameProperty(value, previous)) {
+              material.setProperty(
+                key2,
+                Array.isArray(value) ? [...value] : value
+              );
+              changed = true;
+            }
+          }
+          for (const key2 of /* @__PURE__ */ new Set([
+            ...Object.keys(source.lilToonTextures),
+            ...Object.keys(material.lilToonTextures)
+          ]))
+            if (material.lilToonTextures[key2] !== source.lilToonTextures[key2])
+              material.setTexture(key2, source.lilToonTextures[key2] ?? null);
+          if (changed)
+            applyLilToonPassState(
+              material,
+              source.renderMode,
+              source.lilToonProperties,
+              material.pass
+            );
+        }
+        const group = args[5] ?? mesh.geometry.drawRange;
+        const previousRange = { ...geometry.geometry.drawRange };
+        if (group) {
+          const perTriangle = geometry.geometry.index.count / Math.floor(
+            (mesh.geometry.index?.count ?? mesh.geometry.attributes.position.count) / 3
+          );
+          const start = Math.max(mesh.geometry.drawRange.start, group.start), end = Math.min(
+            mesh.geometry.drawRange.start + mesh.geometry.drawRange.count,
+            group.start + group.count
+          );
+          geometry.geometry.setDrawRange(
+            Math.floor(start / 3) * perTriangle,
+            Math.max(0, Math.floor((end - start) / 3)) * perTriangle
+          );
+        }
+        proxy.matrix.copy(mesh.matrixWorld);
+        proxy.layers.mask = mesh.layers.mask;
+        const auto = renderer.autoClear, info = renderer.info.autoReset, shadows = renderer.shadowMap.autoUpdate, needs = renderer.shadowMap.needsUpdate;
+        try {
+          renderer.autoClear = false;
+          renderer.info.autoReset = false;
+          renderer.shadowMap.autoUpdate = false;
+          renderer.shadowMap.needsUpdate = false;
+          for (const material of materials2) {
+            proxy.material = material;
+            const before = material.onBeforeRender;
+            material.onBeforeRender = (...draw) => {
+              before.call(
+                material,
+                draw[0],
+                scene,
+                draw[2],
+                draw[3],
+                draw[4],
+                draw[5]
+              );
+              material.setSystemTexture(
+                "__furVertices",
+                deformation?.target.texture ?? geometry.texture
+              );
+            };
+            try {
+              render.call(renderer, temporary, args[2]);
+            } finally {
+              material.onBeforeRender = before;
+            }
+          }
+        } finally {
+          renderer.autoClear = auto;
+          renderer.info.autoReset = info;
+          renderer.shadowMap.autoUpdate = shadows;
+          renderer.shadowMap.needsUpdate = needs;
+          geometry.geometry.setDrawRange(
+            previousRange.start,
+            previousRange.count
+          );
+        }
+      };
+      mesh.onAfterRender = hook;
+      undo.push(() => {
+        if (mesh.onAfterRender === hook) mesh.onAfterRender = after;
+      });
+    });
+    return () => {
+      undo.reverse().forEach((fn) => fn());
+      if (--this.depth === 0) {
+        for (const recipe of this.recipes.values())
+          if (!ownsPassSource(recipe.owner, recipe.mesh, recipe.source) || recipe.mesh.geometry !== recipe.sourceGeometry || recipe.mode !== recipe.source.renderMode)
+            recipe.release();
+      }
+    };
+  }
+  dispose() {
+    for (const recipe of this.recipes.values()) recipe.release();
+  }
+};
+
+// src/renderer/TransparencyPasses.ts
+var TransparencyPasses = class {
+  draws = new AuxiliaryPassDraw();
+  prepare(renderer, scene, render) {
+    this.draws.begin();
+    const undo = [];
+    scene.traverse((node) => {
+      const mesh = node;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      if (!materials.some(
+        (m) => m instanceof LilToonMaterial && m.renderMode === "transparent" && m.pass === "forward"
+      ))
+        return;
+      const before = mesh.onBeforeRender, after = mesh.onAfterRender;
+      const isSurface = (m) => m instanceof LilToonMaterial && m.renderMode === "transparent" && m.pass === "forward";
+      const pre = (...args) => {
+        before.apply(mesh, args);
+        const source = args[4];
+        if (isSurface(source) && source.transparencyMode === "two-pass")
+          this.draws.draw(
+            renderer,
+            render,
+            mesh,
+            source,
+            "transparent-pre",
+            scene,
+            args[2],
+            args[5]
+          );
+      };
+      const post = (...args) => {
+        after.apply(mesh, args);
+        const source = args[4];
+        const manual = mesh.children.some(
+          (c) => c.isMesh && c.material?.pass === "outline"
+        );
+        if (isSurface(source) && !manual && Number(source.lilToonProperties._UseOutline ?? 1) !== 0 && Number(source.lilToonProperties._OutlineWidth ?? 0) > 0)
+          this.draws.draw(
+            renderer,
+            render,
+            mesh,
+            source,
+            "outline",
+            scene,
+            args[2],
+            args[5]
+          );
+      };
+      mesh.onBeforeRender = pre;
+      mesh.onAfterRender = post;
+      undo.push(() => {
+        if (mesh.onBeforeRender === pre) mesh.onBeforeRender = before;
+        if (mesh.onAfterRender === post) mesh.onAfterRender = after;
+      });
+    });
+    return () => {
+      undo.reverse().forEach((fn) => fn());
+      this.draws.end();
+    };
+  }
+  dispose() {
+    this.draws.dispose();
+  }
+};
+
+// src/renderer/enableLilToon.ts
 var helpers = /* @__PURE__ */ new WeakSet();
 var originalHooks = /* @__PURE__ */ new WeakMap();
 var AutomaticPasses = class {
   recipes = /* @__PURE__ */ new Map();
   proxies = /* @__PURE__ */ new WeakMap();
   hidden = new MeshBasicMaterial({ visible: false });
-  active = /* @__PURE__ */ new Set();
   depth = 0;
   begin() {
     this.depth++;
   }
   end() {
     if (--this.depth !== 0) return;
-    for (const [source, recipe] of this.recipes)
-      if (!this.active.has(source)) recipe.release();
-    this.active.clear();
+    for (const [source, recipe] of this.recipes) {
+      for (const [mesh, root] of recipe.owners)
+        if (!ownsPassSource(root, mesh, source)) recipe.owners.delete(mesh);
+      if (!recipe.owners.size) recipe.release();
+    }
   }
-  recipe(source) {
-    this.active.add(source);
+  recipe(source, mesh, scene) {
     let recipe = this.recipes.get(source);
     if (!recipe) {
       const outline = new LilToonMaterial({
@@ -33,6 +1091,7 @@ var AutomaticPasses = class {
       const depth = new MeshDepthMaterial({ depthPacking: RGBADepthPacking });
       const distance = new MeshDistanceMaterial();
       recipe = {
+        owners: /* @__PURE__ */ new Map(),
         source,
         outline,
         depth,
@@ -51,6 +1110,7 @@ var AutomaticPasses = class {
       this.recipes.set(source, recipe);
       source.addEventListener("dispose", recipe.release);
     }
+    recipe.owners.set(mesh, scene);
     source.getProperty("_Color");
     for (const [name, value] of Object.entries(source.lilToonProperties)) {
       recipe.outline.lilToonProperties[name] = value;
@@ -61,7 +1121,13 @@ var AutomaticPasses = class {
       if (recipe.outline.lilToonTextures[name] !== texture)
         recipe.outline.setTexture(name, texture);
     }
-    recipe.outline.side = BackSide;
+    recipe.outline.renderMode = source.renderMode;
+    applyLilToonPassState(
+      recipe.outline,
+      source.renderMode,
+      source.lilToonProperties,
+      "outline"
+    );
     recipe.outline.visible = source.visible;
     if (recipe.input !== source.map) {
       recipe.map?.dispose();
@@ -95,12 +1161,12 @@ var AutomaticPasses = class {
       for (const mesh of meshes) {
         const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         const recipes = materials.map(
-          (material) => material instanceof LilToonMaterial && material.pass === "forward" ? this.recipe(material) : void 0
+          (material) => material instanceof LilToonMaterial && material.pass === "forward" ? this.recipe(material, mesh, scene) : void 0
         );
         const first = recipes.find((recipe) => recipe !== void 0);
         if (!first) continue;
         const outlines = recipes.map(
-          (recipe) => recipe && Number(recipe.source.lilToonProperties._UseOutline ?? 1) !== 0 && Number(recipe.source.lilToonProperties._OutlineWidth ?? 0) > 0 ? recipe.outline : this.hidden
+          (recipe) => recipe && recipe.source.renderMode !== "transparent" && Number(recipe.source.lilToonProperties._UseOutline ?? 1) !== 0 && Number(recipe.source.lilToonProperties._OutlineWidth ?? 0) > 0 ? recipe.outline : this.hidden
         );
         const manualOutline = mesh.children.some(
           (child) => !helpers.has(child) && child.isMesh && child.material?.pass === "outline"
@@ -184,6 +1250,9 @@ function enableLilToon(renderer) {
   const existing = installations.get(renderer);
   if (existing) return existing.acquire();
   const passes = new AutomaticPasses();
+  const sceneColors = new SceneColorPasses();
+  const fur = new FurPasses();
+  const transparency = new TransparencyPasses();
   const render = renderer.render, dispose = renderer.dispose;
   let users = 0, disposed = false;
   const wrapped = function(scene, camera) {
@@ -191,17 +1260,30 @@ function enableLilToon(renderer) {
     const previous = scene.onBeforeRender;
     const original = originalHooks.get(previous) ?? previous;
     let restore;
+    let restoreColors;
+    let restoreFur;
+    let restoreTransparency;
     const hook = function(...args) {
       original.apply(this, args);
       restore ??= passes.prepare(scene);
+      restoreColors ??= sceneColors.prepare(renderer, scene, render);
+      restoreFur ??= fur.prepare(renderer, scene, render);
+      restoreTransparency ??= transparency.prepare(renderer, scene, render);
     };
     originalHooks.set(hook, original);
     scene.onBeforeRender = hook;
     try {
-      if (!scene.isScene)
+      if (!scene.isScene) {
         restore = passes.prepare(scene);
+        restoreColors = sceneColors.prepare(renderer, scene, render);
+        restoreFur = fur.prepare(renderer, scene, render);
+        restoreTransparency = transparency.prepare(renderer, scene, render);
+      }
       render.call(renderer, scene, camera);
     } finally {
+      restoreTransparency?.();
+      restoreFur?.();
+      restoreColors?.();
       restore?.();
       if (scene.onBeforeRender === hook) scene.onBeforeRender = previous;
       passes.end();
@@ -218,6 +1300,9 @@ function enableLilToon(renderer) {
       if (renderer.render === wrapped) renderer.render = render;
       if (renderer.dispose === wrappedDispose) renderer.dispose = dispose;
       passes.dispose();
+      sceneColors.dispose();
+      fur.dispose();
+      transparency.dispose();
       installations.delete(renderer);
     },
     acquire: () => {
@@ -237,29 +1322,23 @@ function enableLilToon(renderer) {
 }
 
 // src/passes/RefractionPass.ts
-var RefractionPass = class {
-  constructor() {
-    throw new UnsupportedFeatureError(
-      "Refraction requires scene-color capture and is not shipped in the WebGL2 alpha."
-    );
+var RefractionPass = class extends LilToonMaterial {
+  constructor(parameters = {}) {
+    super({ ...parameters, renderMode: "refraction" });
   }
 };
 
 // src/passes/GemPass.ts
-var GemPass = class {
-  constructor() {
-    throw new UnsupportedFeatureError(
-      "Gem rendering is not shipped in the WebGL2 alpha."
-    );
+var GemPass = class extends LilToonMaterial {
+  constructor(parameters = {}) {
+    super({ ...parameters, renderMode: "gem" });
   }
 };
 
 // src/passes/FurPass.ts
-var FurPass = class {
-  constructor() {
-    throw new UnsupportedFeatureError(
-      "Fur shell rendering is not shipped in the WebGL2 alpha."
-    );
+var FurPass = class extends LilToonMaterial {
+  constructor(parameters = {}) {
+    super({ ...parameters, renderMode: "fur" });
   }
 };
 
@@ -5460,6 +6539,550 @@ var LILTOON_PROPERTIES = [
     "displayName": "Shadow Caster Bias",
     "type": "Float",
     "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_RefractionStrength",
+    "displayName": "sStrength",
+    "type": "Range",
+    "range": [
+      -1,
+      1
+    ],
+    "defaultValue": 0.5,
+    "attributes": []
+  },
+  {
+    "name": "_RefractionFresnelPower",
+    "displayName": "sRefractionFresnel",
+    "type": "Range",
+    "range": [
+      0.01,
+      10
+    ],
+    "defaultValue": 1,
+    "attributes": [
+      "PowerSlider(3.0)"
+    ]
+  },
+  {
+    "name": "_RefractionColorFromMain",
+    "displayName": "sColorFromMain",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "lilToggle"
+    ]
+  },
+  {
+    "name": "_RefractionColor",
+    "displayName": "sColor",
+    "type": "Color",
+    "defaultValue": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "attributes": []
+  },
+  {
+    "name": "_FurNoiseMask",
+    "displayName": "Noise",
+    "type": "2D",
+    "defaultValue": {
+      "texture": "white"
+    },
+    "attributes": []
+  },
+  {
+    "name": "_FurMask",
+    "displayName": "Mask",
+    "type": "2D",
+    "defaultValue": {
+      "texture": "white"
+    },
+    "attributes": [
+      "NoScaleOffset"
+    ]
+  },
+  {
+    "name": "_FurLengthMask",
+    "displayName": "Length Mask",
+    "type": "2D",
+    "defaultValue": {
+      "texture": "white"
+    },
+    "attributes": [
+      "NoScaleOffset"
+    ]
+  },
+  {
+    "name": "_FurVectorTex",
+    "displayName": "Vector",
+    "type": "2D",
+    "defaultValue": {
+      "texture": "bump"
+    },
+    "attributes": [
+      "NoScaleOffset",
+      "Normal"
+    ]
+  },
+  {
+    "name": "_FurVectorScale",
+    "displayName": "Vector scale",
+    "type": "Range",
+    "range": [
+      -10,
+      10
+    ],
+    "defaultValue": 1,
+    "attributes": []
+  },
+  {
+    "name": "_FurVector",
+    "displayName": "sFurVectors",
+    "type": "Vector",
+    "defaultValue": [
+      0,
+      0,
+      1,
+      0.02
+    ],
+    "attributes": [
+      "lilVec3Float"
+    ]
+  },
+  {
+    "name": "_VertexColor2FurVector",
+    "displayName": "sVertexColor2Vector",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "lilToggle"
+    ]
+  },
+  {
+    "name": "_FurGravity",
+    "displayName": "sGravity",
+    "type": "Range",
+    "range": [
+      0,
+      1
+    ],
+    "defaultValue": 0.25,
+    "attributes": []
+  },
+  {
+    "name": "_FurRandomize",
+    "displayName": "sRandomize",
+    "type": "Float",
+    "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_FurAO",
+    "displayName": "sAO",
+    "type": "Range",
+    "range": [
+      0,
+      1
+    ],
+    "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_FurLayerNum",
+    "displayName": "sLayerNum",
+    "type": "Range",
+    "range": [
+      1,
+      3
+    ],
+    "defaultValue": 2,
+    "attributes": [
+      "IntRange"
+    ]
+  },
+  {
+    "name": "_FurRootOffset",
+    "displayName": "sRootWidth",
+    "type": "Range",
+    "range": [
+      -1,
+      0
+    ],
+    "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_FurCutoutLength",
+    "displayName": "sLength+ (Cutout)",
+    "type": "Float",
+    "defaultValue": 0.8,
+    "attributes": []
+  },
+  {
+    "name": "_FurTouchStrength",
+    "displayName": "sTouchStrength",
+    "type": "Range",
+    "range": [
+      0,
+      1
+    ],
+    "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_FurRimColor",
+    "displayName": "sColor",
+    "type": "Color",
+    "defaultValue": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "attributes": []
+  },
+  {
+    "name": "_FurRimFresnelPower",
+    "displayName": "sFresnelPower",
+    "type": "Range",
+    "range": [
+      0.01,
+      50
+    ],
+    "defaultValue": 3,
+    "attributes": [
+      "PowerSlider(3.0)"
+    ]
+  },
+  {
+    "name": "_FurRimAntiLight",
+    "displayName": "sAntiLight",
+    "type": "Range",
+    "range": [
+      0,
+      1
+    ],
+    "defaultValue": 0.5,
+    "attributes": []
+  },
+  {
+    "name": "_FurCull",
+    "displayName": "sCullModes",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "lilEnum"
+    ]
+  },
+  {
+    "name": "_FurSrcBlend",
+    "displayName": "sSrcBlendRGB",
+    "type": "Int",
+    "defaultValue": 5,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurDstBlend",
+    "displayName": "sDstBlendRGB",
+    "type": "Int",
+    "defaultValue": 10,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurSrcBlendAlpha",
+    "displayName": "sSrcBlendAlpha",
+    "type": "Int",
+    "defaultValue": 1,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurDstBlendAlpha",
+    "displayName": "sDstBlendAlpha",
+    "type": "Int",
+    "defaultValue": 10,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurBlendOp",
+    "displayName": "sBlendOpRGB",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendOp)"
+    ]
+  },
+  {
+    "name": "_FurBlendOpAlpha",
+    "displayName": "sBlendOpAlpha",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendOp)"
+    ]
+  },
+  {
+    "name": "_FurSrcBlendFA",
+    "displayName": "sSrcBlendRGB",
+    "type": "Int",
+    "defaultValue": 1,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurDstBlendFA",
+    "displayName": "sDstBlendRGB",
+    "type": "Int",
+    "defaultValue": 1,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurSrcBlendAlphaFA",
+    "displayName": "sSrcBlendAlpha",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurDstBlendAlphaFA",
+    "displayName": "sDstBlendAlpha",
+    "type": "Int",
+    "defaultValue": 1,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendMode)"
+    ]
+  },
+  {
+    "name": "_FurBlendOpFA",
+    "displayName": "sBlendOpRGB",
+    "type": "Int",
+    "defaultValue": 4,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendOp)"
+    ]
+  },
+  {
+    "name": "_FurBlendOpAlphaFA",
+    "displayName": "sBlendOpAlpha",
+    "type": "Int",
+    "defaultValue": 4,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.BlendOp)"
+    ]
+  },
+  {
+    "name": "_FurZClip",
+    "displayName": "sZClip",
+    "type": "Int",
+    "defaultValue": 1,
+    "attributes": [
+      "lilToggle"
+    ]
+  },
+  {
+    "name": "_FurZWrite",
+    "displayName": "sZWrite",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "lilToggle"
+    ]
+  },
+  {
+    "name": "_FurZTest",
+    "displayName": "sZTest",
+    "type": "Int",
+    "defaultValue": 4,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.CompareFunction)"
+    ]
+  },
+  {
+    "name": "_FurStencilRef",
+    "displayName": "Ref",
+    "type": "Range",
+    "range": [
+      0,
+      255
+    ],
+    "defaultValue": 0,
+    "attributes": [
+      "IntRange"
+    ]
+  },
+  {
+    "name": "_FurStencilReadMask",
+    "displayName": "ReadMask",
+    "type": "Range",
+    "range": [
+      0,
+      255
+    ],
+    "defaultValue": 255,
+    "attributes": [
+      "IntRange"
+    ]
+  },
+  {
+    "name": "_FurStencilWriteMask",
+    "displayName": "WriteMask",
+    "type": "Range",
+    "range": [
+      0,
+      255
+    ],
+    "defaultValue": 255,
+    "attributes": [
+      "IntRange"
+    ]
+  },
+  {
+    "name": "_FurStencilComp",
+    "displayName": "Comp",
+    "type": "Float",
+    "defaultValue": 8,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.CompareFunction)"
+    ]
+  },
+  {
+    "name": "_FurStencilPass",
+    "displayName": "Pass",
+    "type": "Float",
+    "defaultValue": 0,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.StencilOp)"
+    ]
+  },
+  {
+    "name": "_FurStencilFail",
+    "displayName": "Fail",
+    "type": "Float",
+    "defaultValue": 0,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.StencilOp)"
+    ]
+  },
+  {
+    "name": "_FurStencilZFail",
+    "displayName": "ZFail",
+    "type": "Float",
+    "defaultValue": 0,
+    "attributes": [
+      "Enum(UnityEngine.Rendering.StencilOp)"
+    ]
+  },
+  {
+    "name": "_FurOffsetFactor",
+    "displayName": "sOffsetFactor",
+    "type": "Float",
+    "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_FurOffsetUnits",
+    "displayName": "sOffsetUnits",
+    "type": "Float",
+    "defaultValue": 0,
+    "attributes": []
+  },
+  {
+    "name": "_FurColorMask",
+    "displayName": "sColorMask",
+    "type": "Int",
+    "defaultValue": 15,
+    "attributes": [
+      "lilColorMask"
+    ]
+  },
+  {
+    "name": "_FurAlphaToMask",
+    "displayName": "sAlphaToMask",
+    "type": "Int",
+    "defaultValue": 0,
+    "attributes": [
+      "lilToggle"
+    ]
+  },
+  {
+    "name": "_GemChromaticAberration",
+    "displayName": "sChromaticAberration",
+    "type": "Range",
+    "range": [
+      0,
+      1
+    ],
+    "defaultValue": 0.02,
+    "attributes": []
+  },
+  {
+    "name": "_GemEnvContrast",
+    "displayName": "sContrast",
+    "type": "Float",
+    "defaultValue": 2,
+    "attributes": []
+  },
+  {
+    "name": "_GemEnvColor",
+    "displayName": "sEnvironmentColor",
+    "type": "Color",
+    "defaultValue": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "attributes": [
+      "lilHDR"
+    ]
+  },
+  {
+    "name": "_GemParticleLoop",
+    "displayName": "sParticleLoop",
+    "type": "Float",
+    "defaultValue": 8,
+    "attributes": []
+  },
+  {
+    "name": "_GemParticleColor",
+    "displayName": "sColor",
+    "type": "Color",
+    "defaultValue": [
+      4,
+      4,
+      4,
+      1
+    ],
+    "attributes": [
+      "lilHDR"
+    ]
+  },
+  {
+    "name": "_GemVRParallaxStrength",
+    "displayName": "sVRParallaxStrength",
+    "type": "Range",
+    "range": [
+      0,
+      1
+    ],
+    "defaultValue": 1,
     "attributes": []
   },
   {

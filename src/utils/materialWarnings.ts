@@ -1,3 +1,4 @@
+import { textureIsUsed } from "../shader/features.js";
 import type { Texture } from "three";
 
 export type LilToonWarningCode =
@@ -19,6 +20,8 @@ export interface LilToonWarning {
 }
 
 interface WarningContext {
+	renderMode?: string;
+	representedTextures?: ReadonlySet<string>;
 	materialName: string;
 	shaderKey: string;
 	properties: Record<string, unknown>;
@@ -165,6 +168,11 @@ export function collectMaterialWarnings(
 
 	for (const [property, parent] of Object.entries(FEATURE_GATES)) {
 		if (
+			context.renderMode === "opaque" &&
+			["_AlphaMaskMode", "_DissolveParams", "_UseDither"].includes(property)
+		)
+			continue;
+		if (
 			!enabled(property) ||
 			(parent && (!enabled(parent) || unsupported.has(parent)))
 		)
@@ -172,7 +180,11 @@ export function collectMaterialWarnings(
 		// These facilities are ABI fallbacks even if a future shader retains a member access.
 		const unavailable =
 			property === "_TessellationMode" || property === "_UseVRCLightVolumes";
-		if (!unavailable && usedProperties.has(property)) continue;
+		if (
+			!unavailable &&
+			(usedProperties.has(property) || property === "_MainGradationStrength")
+		)
+			continue;
 		unsupported.add(property);
 		add(
 			"unsupported-feature",
@@ -181,11 +193,16 @@ export function collectMaterialWarnings(
 		);
 	}
 
-	const boundProperties = new Set(samplerBindings.values());
+	const boundProperties =
+		context.representedTextures ?? new Set(samplerBindings.values());
 	for (const [property, texture] of Object.entries(textures).sort(([a], [b]) =>
 		a.localeCompare(b),
 	)) {
-		if (!texture) continue;
+		if (
+			!texture ||
+			!textureIsUsed(property, properties, context.renderMode ?? "opaque")
+		)
+			continue;
 		const gates = textureGates(property);
 		if (
 			gates === null ||

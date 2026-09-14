@@ -9,6 +9,7 @@ export class LilToonMaterialFactory {
 	): LilToonMaterial {
 		return new LilToonMaterial({
 			renderMode: source.renderMode,
+			transparencyMode: source.transparencyMode,
 			properties: source.properties,
 			textures,
 		});

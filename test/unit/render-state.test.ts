@@ -5,7 +5,7 @@ import {
 	FrontSide,
 	LessEqualDepth,
 	OneMinusSrcAlphaFactor,
-	SrcAlphaFactor,
+	OneFactor,
 } from "three";
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
 
@@ -22,9 +22,9 @@ describe("Unity render-state conversion", () => {
 	it("maps transparent blending and depth state", () => {
 		const material = new LilToonMaterial({ renderMode: "transparent" });
 		expect(material.transparent).toBe(true);
-		expect(material.depthWrite).toBe(false);
+		expect(material.depthWrite).toBe(true);
 		expect(material.depthFunc).toBe(LessEqualDepth);
-		expect(material.blendSrc).toBe(SrcAlphaFactor);
+		expect(material.blendSrc).toBe(OneFactor);
 		expect(material.blendDst).toBe(OneMinusSrcAlphaFactor);
 	});
 });

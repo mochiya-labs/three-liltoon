@@ -12,4 +12,4 @@ Use identical mesh, textures, material values, camera, light, resolution, and co
 }
 ```
 
-Run `npm run test:parity` while authoring fixtures. Release CI uses `npm run test:parity:required`, which also fails when no approved Unity references are installed. Reference images must use assets with redistribution permission.
+Run `npm run test:parity` while authoring fixtures. `npm run test:parity:required` additionally fails when no Unity references are installed. The repository currently has no approved Unity reference images; the ordinary command can therefore finish without performing a comparison. Reference images must use assets with redistribution permission.

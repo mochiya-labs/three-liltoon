@@ -15,14 +15,24 @@
 #include "../compat/lil_pipeline_web.hlsl"
 #include "lil_common.hlsl"
 
-// Some optimized web profiles are selected only when lilToon's MatCap custom
-// normals reference the same texture as the primary normal map. Alias those
-// texture objects after their declarations but before the fragment functions
-// are included, preserving each feature's independent scale and strength while
-// consuming one WebGL texture unit instead of three.
-#if defined(LIL_WEB_SHARE_MATCAP_BUMP_WITH_MAIN)
-    #define _MatCapBumpMap _BumpMap
-    #define _MatCap2ndBumpMap _BumpMap
+#if defined(LIL_REFRACTION) || defined(LIL_GEM)
+uint uBackgroundIsSRGB;
+float4 lilWebBackground(float2 uv) {
+    float4 col = LIL_SAMPLE_SCREEN(_lilBackgroundTexture, lil_sampler_linear_clamp, uv);
+    if (uBackgroundIsSRGB != 0) col.rgb = col.rgb <= 0.04045 ? col.rgb / 12.92 : pow((col.rgb + 0.055) / 1.055, 2.4);
+    return max(col, 0);
+}
+#undef LIL_GET_BG_TEX
+#define LIL_GET_BG_TEX(uv,lod) lilWebBackground(uv)
+#if defined(LIL_REFRACTION_BLUR2)
+float4 lilWebGrab(float2 uv) {
+    float4 col = LIL_SAMPLE_SCREEN(_GrabTexture, lil_sampler_linear_clamp, uv);
+    if (uBackgroundIsSRGB != 0) col.rgb = col.rgb <= 0.04045 ? col.rgb / 12.92 : pow((col.rgb + 0.055) / 1.055, 2.4);
+    return max(col, 0);
+}
+#undef LIL_GET_GRAB_TEX
+#define LIL_GET_GRAB_TEX(uv,lod) lilWebGrab(uv)
+#endif
 #endif
 
 #if defined(LIL_WEB_DEFORMATION)
@@ -44,4 +54,10 @@
     #define LIL_LIGHT_ATTENUATION(atten,i) atten = lilWebSampleShadow(i._ShadowCoord)
 #endif
 
-#include "lil_pass_forward.hlsl"
+#if defined(LIL_WEB_REFBLUR_PRE)
+    #include "lil_pass_forward_refblur.hlsl"
+#elif defined(LIL_GEM)
+    #include "lil_pass_forward_gem.hlsl"
+#else
+    #include "lil_pass_forward.hlsl"
+#endif

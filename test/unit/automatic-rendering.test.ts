@@ -25,6 +25,7 @@ function harness(draw: (scene: Scene) => void) {
 	const renderer = {
 		info: { render: { frame: 0 } },
 		shadowMap: { enabled: false },
+		getContext: () => ({ getParameter: () => 32 }),
 		getRenderTarget: () => null,
 		getDrawingBufferSize: (v: Vector2) => v.set(32, 32),
 		render(scene: Scene, camera: PerspectiveCamera) {
@@ -48,6 +49,46 @@ const outlined = () =>
 	new LilToonMaterial({ properties: { _UseOutline: 1, _OutlineWidth: 0.1 } });
 
 describe("automatic material inputs", () => {
+	it("retains shared scene resources through other scenes and cleans up removed owners", () => {
+		const first = new Scene(),
+			second = new Scene(),
+			fullscreen = new Scene();
+		const source = outlined();
+		const a = new Mesh(new BoxGeometry(), source),
+			b = new Mesh(new BoxGeometry(), source);
+		first.add(a);
+		second.add(b);
+		let outline: Material | undefined;
+		const renderer = harness((scene) => {
+			const mesh = scene === first ? a : scene === second ? b : undefined;
+			if (mesh?.parent) {
+				const current = (mesh.children[0] as Mesh).material as Material;
+				if (outline) expect(current).toBe(outline);
+				outline = current;
+			}
+		});
+		const release = enableLilToon(renderer),
+			camera = new PerspectiveCamera();
+		renderer.render(first, camera);
+		const disposed = vi.spyOn(outline!, "dispose");
+		renderer.render(fullscreen, camera);
+		renderer.render(second, camera);
+		a.visible = false;
+		first.overrideMaterial = new MeshBasicMaterial();
+		renderer.render(first, camera);
+		first.remove(a);
+		renderer.render(fullscreen, camera);
+		expect(disposed).not.toHaveBeenCalled();
+		second.remove(b);
+		renderer.render(fullscreen, camera);
+		expect(disposed).toHaveBeenCalledOnce();
+		release();
+		expect(disposed).toHaveBeenCalledOnce();
+		source.dispose();
+		a.geometry.dispose();
+		b.geometry.dispose();
+		first.overrideMaterial.dispose();
+	});
 	it("binds a shared material to the renderer and scene performing each draw", () => {
 		const material = outlined(),
 			mesh = new Mesh(new BoxGeometry(), material),
@@ -96,11 +137,12 @@ describe("automatic material inputs", () => {
 		expect(m.opacity).toBe(0.5);
 		m.setProperty("_Cutoff", 0.7);
 		expect(m.alphaTest).toBe(0.7);
+		m.setProperty("_UseEmission", 1);
 		m.setTexture("_EmissionBlendMask", new DataTexture());
-		expect(m.shaderKey).toContain("emission-mask");
+		expect(m.fragmentShader).toContain("Combined_EmissionBlendMask");
 		expect(m.map).toBe(texture);
 		m.setTexture("_EmissionBlendMask", null);
-		expect(m.shaderKey).toBe("standard-cutout");
+		expect(m.shaderKey).toMatch(/^standard-cutout:/);
 		const transparent = new LilToonMaterial({
 			renderMode: "transparent",
 			alphaTest: 0,
@@ -108,7 +150,7 @@ describe("automatic material inputs", () => {
 		expect(transparent.transparent).toBe(true);
 		transparent.alphaTest = 0.5;
 		expect(transparent.transparent).toBe(false);
-		expect(transparent.shaderKey).toBe("standard-cutout");
+		expect(transparent.shaderKey).toMatch(/^standard-cutout:/);
 	});
 });
 

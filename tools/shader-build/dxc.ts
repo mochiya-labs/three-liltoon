@@ -31,6 +31,8 @@ export function compileHlsl(options: DxcCompileOptions): void {
 		"-D",
 		`SHADER_STAGE_${options.stage.toUpperCase()}=1`,
 		"-I",
+		resolve(PROJECT_ROOT, "shader/generated/hlsl"),
+		"-I",
 		resolve(PROJECT_ROOT, "shader/compat"),
 		"-I",
 		LILTOON_SHADER,
