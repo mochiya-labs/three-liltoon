@@ -1,2 +1,2 @@
-export { LilToonMaterialLoader } from './chunk-UMXNL3SB.js';
-export { GLTFLilToonExtension, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION } from './chunk-DHSQY7C7.js';
+export { LilToonMaterialLoader } from './chunk-H5RC4N2I.js';
+export { GLTFLilToonExtension, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION } from './chunk-IWYLF5IE.js';

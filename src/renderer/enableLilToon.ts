@@ -16,7 +16,34 @@ import { SceneColorPasses } from "./SceneColorPasses.js";
 import { FurPasses } from "./FurPasses.js";
 import { TransparencyPasses } from "./TransparencyPasses.js";
 import { applyLilToonPassState } from "../utils/renderState.js";
+import type { LilToonScalarOrVector } from "../material/LilToonMaterialParameters.js";
 import { ownsPassSource } from "./passOwnership.js";
+
+function sameProperty(
+	value: LilToonScalarOrVector,
+	before: LilToonScalarOrVector | undefined,
+): boolean {
+	if (Array.isArray(value))
+		return (
+			Array.isArray(before) &&
+			value.length === before.length &&
+			value.every((v, i) => v === before[i])
+		);
+	if (typeof value === "object")
+		return (
+			before !== undefined &&
+			value.constructor === before.constructor &&
+			value.equals(before as never)
+		);
+	return value === before;
+}
+function copyProperty(value: LilToonScalarOrVector): LilToonScalarOrVector {
+	return Array.isArray(value)
+		? [...value]
+		: typeof value === "object"
+			? value.clone()
+			: value;
+}
 
 type Recipe = {
 	owners: Map<Mesh, Object3D>;
@@ -86,22 +113,28 @@ class AutomaticPasses {
 		recipe.owners.set(mesh, scene);
 		// Read mutable standard Color edits as well as original property setters.
 		source.getProperty("_Color");
+		let changed = recipe.outline.renderMode !== source.renderMode;
 		for (const [name, value] of Object.entries(source.lilToonProperties)) {
-			recipe.outline.lilToonProperties[name] = value;
+			if (sameProperty(value, recipe.outline.lilToonProperties[name])) continue;
+			recipe.outline.lilToonProperties[name] = copyProperty(value);
 			setGlobalProperty(recipe.outline.globalUniforms, name, value);
+			changed = true;
 		}
-		recipe.outline.setProperty("_Color", source.getProperty("_Color")!);
 		for (const [name, texture] of Object.entries(source.lilToonTextures)) {
 			if (recipe.outline.lilToonTextures[name] !== texture)
 				recipe.outline.setTexture(name, texture);
 		}
-		recipe.outline.renderMode = source.renderMode;
-		applyLilToonPassState(
-			recipe.outline,
-			source.renderMode,
-			source.lilToonProperties,
-			"outline",
-		);
+		if (changed) {
+			recipe.outline.renderMode = source.renderMode;
+			// Refresh feature/program selection only when inputs actually change.
+			recipe.outline.setProperty("_Color", source.getProperty("_Color")!);
+			applyLilToonPassState(
+				recipe.outline,
+				source.renderMode,
+				source.lilToonProperties,
+				"outline",
+			);
+		}
 		recipe.outline.visible = source.visible;
 		if (recipe.input !== source.map) {
 			recipe.map?.dispose();
@@ -131,7 +164,7 @@ class AutomaticPasses {
 	prepare(scene: Object3D): () => void {
 		const undo: (() => void)[] = [];
 		const meshes: Mesh[] = [];
-		scene.traverse((node) => {
+		scene.traverseVisible((node) => {
 			if ((node as Mesh).isMesh && !helpers.has(node))
 				meshes.push(node as Mesh);
 		});

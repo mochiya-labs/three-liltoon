@@ -1,6 +1,6 @@
-export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-UMXNL3SB.js';
-import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-DHSQY7C7.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-DHSQY7C7.js';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-H5RC4N2I.js';
+import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-IWYLF5IE.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-IWYLF5IE.js';
 import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, BufferGeometry, Scene, Vector4, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
 
 // src/renderer/passOwnership.ts
@@ -1053,6 +1053,16 @@ var TransparencyPasses = class {
 };
 
 // src/renderer/enableLilToon.ts
+function sameProperty2(value, before) {
+  if (Array.isArray(value))
+    return Array.isArray(before) && value.length === before.length && value.every((v, i) => v === before[i]);
+  if (typeof value === "object")
+    return before !== void 0 && value.constructor === before.constructor && value.equals(before);
+  return value === before;
+}
+function copyProperty(value) {
+  return Array.isArray(value) ? [...value] : typeof value === "object" ? value.clone() : value;
+}
 var helpers = /* @__PURE__ */ new WeakSet();
 var originalHooks = /* @__PURE__ */ new WeakMap();
 var AutomaticPasses = class {
@@ -1104,22 +1114,27 @@ var AutomaticPasses = class {
     }
     recipe.owners.set(mesh, scene);
     source.getProperty("_Color");
+    let changed = recipe.outline.renderMode !== source.renderMode;
     for (const [name, value] of Object.entries(source.lilToonProperties)) {
-      recipe.outline.lilToonProperties[name] = value;
+      if (sameProperty2(value, recipe.outline.lilToonProperties[name])) continue;
+      recipe.outline.lilToonProperties[name] = copyProperty(value);
       setGlobalProperty(recipe.outline.globalUniforms, name, value);
+      changed = true;
     }
-    recipe.outline.setProperty("_Color", source.getProperty("_Color"));
     for (const [name, texture] of Object.entries(source.lilToonTextures)) {
       if (recipe.outline.lilToonTextures[name] !== texture)
         recipe.outline.setTexture(name, texture);
     }
-    recipe.outline.renderMode = source.renderMode;
-    applyLilToonPassState(
-      recipe.outline,
-      source.renderMode,
-      source.lilToonProperties,
-      "outline"
-    );
+    if (changed) {
+      recipe.outline.renderMode = source.renderMode;
+      recipe.outline.setProperty("_Color", source.getProperty("_Color"));
+      applyLilToonPassState(
+        recipe.outline,
+        source.renderMode,
+        source.lilToonProperties,
+        "outline"
+      );
+    }
     recipe.outline.visible = source.visible;
     if (recipe.input !== source.map) {
       recipe.map?.dispose();
@@ -1145,7 +1160,7 @@ var AutomaticPasses = class {
   prepare(scene) {
     const undo = [];
     const meshes = [];
-    scene.traverse((node) => {
+    scene.traverseVisible((node) => {
       if (node.isMesh && !helpers.has(node))
         meshes.push(node);
     });
