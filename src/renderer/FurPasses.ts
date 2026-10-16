@@ -181,6 +181,7 @@ export class FurPasses {
 				);
 				source.getProperty("_Color");
 				for (const material of materials) {
+					material.toneMapped = source.toneMapped;
 					let changed = false;
 					for (const key in source.lilToonProperties) {
 						const value = source.lilToonProperties[key]!;

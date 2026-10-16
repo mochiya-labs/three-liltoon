@@ -136,6 +136,7 @@ class AutomaticPasses {
 			);
 		}
 		recipe.outline.visible = source.visible;
+		recipe.outline.toneMapped = source.toneMapped;
 		if (recipe.input !== source.map) {
 			recipe.map?.dispose();
 			recipe.input = source.map;

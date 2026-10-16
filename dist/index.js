@@ -1,6 +1,6 @@
-export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-H5RC4N2I.js';
-import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-IWYLF5IE.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-IWYLF5IE.js';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-242U32WG.js';
+import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-Q3MJXFYD.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-Q3MJXFYD.js';
 import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, BufferGeometry, Scene, Vector4, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
 
 // src/renderer/passOwnership.ts
@@ -16,6 +16,7 @@ function ownsPassSource(root, mesh, source) {
 // src/renderer/AuxiliaryPassDraw.ts
 function syncPassMaterial(source, target) {
   source.getProperty("_Color");
+  target.toneMapped = source.toneMapped;
   target.renderMode = source.renderMode;
   target.transparencyMode = source.transparencyMode;
   for (const [key, value] of Object.entries(source.lilToonProperties)) {
@@ -883,6 +884,7 @@ var FurPasses = class {
         );
         source.getProperty("_Color");
         for (const material of materials2) {
+          material.toneMapped = source.toneMapped;
           let changed = false;
           for (const key2 in source.lilToonProperties) {
             const value = source.lilToonProperties[key2];
@@ -1136,6 +1138,7 @@ var AutomaticPasses = class {
       );
     }
     recipe.outline.visible = source.visible;
+    recipe.outline.toneMapped = source.toneMapped;
     if (recipe.input !== source.map) {
       recipe.map?.dispose();
       recipe.input = source.map;

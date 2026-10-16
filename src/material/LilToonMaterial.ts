@@ -1,3 +1,8 @@
+import {
+	outputUniforms,
+	withOutputTransform,
+	updateOutputTransform,
+} from "../renderer/outputTransform.js";
 import { TextureViews } from "../utils/TextureViews.js";
 import {
 	checkTextureLimits,
@@ -9,7 +14,6 @@ import {
 	GLSL3,
 	Matrix4,
 	RawShaderMaterial,
-	SRGBColorSpace,
 	Vector2,
 	Vector3,
 	Vector4,
@@ -100,32 +104,6 @@ function textureDefault(property: string): string {
 	return "white";
 }
 
-const OUTPUT_SRGB_UNIFORM = "uLilToonOutputSrgb";
-
-function addOutputColorSpaceConversion(fragmentShader: string): string {
-	const globalsIndex = fragmentShader.indexOf("struct type_Globals");
-	const mainEnd = fragmentShader.lastIndexOf("\n}");
-	if (globalsIndex < 0 || mainEnd < 0) return fragmentShader;
-
-	const withUniform =
-		`${fragmentShader.slice(0, globalsIndex)}uniform uint ${OUTPUT_SRGB_UNIFORM};\n\n` +
-		fragmentShader.slice(globalsIndex);
-	const adjustedMainEnd =
-		mainEnd + `uniform uint ${OUTPUT_SRGB_UNIFORM};\n\n`.length;
-	const conversion = `
-    if (${OUTPUT_SRGB_UNIFORM} != 0u)
-    {
-        highp vec3 linearColor = max(out_var_SV_Target.rgb, vec3(0.0));
-        out_var_SV_Target.rgb = mix(
-            pow(linearColor, vec3(0.41666)) * 1.055 - vec3(0.055),
-            linearColor * 12.92,
-            lessThanEqual(linearColor, vec3(0.0031308))
-        );
-    }
-`;
-	return `${withUniform.slice(0, adjustedMainEnd)}${conversion}${withUniform.slice(adjustedMainEnd)}`;
-}
-
 export class LilToonMaterial extends RawShaderMaterial {
 	color = new Color(1, 1, 1);
 	readonly isLilToonMaterial = true;
@@ -167,7 +145,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		);
 		const uniforms: Record<string, IUniform> = {
 			_Globals: { value: globalUniforms },
-			[OUTPUT_SRGB_UNIFORM]: { value: 1 },
+			...outputUniforms(),
 		};
 		const cubeSamplers = new Set(
 			[
@@ -195,9 +173,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 				? program.vertexShader
 				: withThreeMorphTargets(program.vertexShader)
 			).replace(/^#version 300 es\s*/, ""),
-			fragmentShader: addOutputColorSpaceConversion(
-				program.fragmentShader,
-			).replace(/^#version 300 es\s*/, ""),
+			fragmentShader: withOutputTransform(program.fragmentShader).replace(
+				/^#version 300 es\s*/,
+				"",
+			),
 			glslVersion: GLSL3,
 			uniforms,
 			lights: false,
@@ -326,11 +305,14 @@ export class LilToonMaterial extends RawShaderMaterial {
 					this.defines.USE_MORPHTARGETS && this.defines.MORPHTARGETS_COUNT,
 				),
 			);
-			const outputColorSpace =
-				renderer.getRenderTarget()?.texture.colorSpace ??
-				renderer.outputColorSpace;
-			this.uniforms[OUTPUT_SRGB_UNIFORM]!.value = Number(
-				outputColorSpace === SRGBColorSpace,
+			updateOutputTransform(
+				this,
+				renderer,
+				this.renderMode === "transparent" &&
+					!(
+						this.pass === "transparent-pre" &&
+						Number(this.lilToonProperties._PreOutType ?? 0) !== 0
+					),
 			);
 
 			// The glTF loader intentionally shares one material instance between meshes.
@@ -561,9 +543,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 				? program.vertexShader
 				: withThreeMorphTargets(program.vertexShader)
 		).replace(/^#version 300 es\s*/, "");
-		this.fragmentShader = addOutputColorSpaceConversion(
-			program.fragmentShader,
-		).replace(/^#version 300 es\s*/, "");
+		this.fragmentShader = withOutputTransform(program.fragmentShader).replace(
+			/^#version 300 es\s*/,
+			"",
+		);
 		this.globalUniforms = createGlobalUniforms(
 			program.vertexShader,
 			program.fragmentShader,
@@ -572,7 +555,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		// Preserve its identity when revisiting a previously compiled variant.
 		for (const name of Object.keys(this.uniforms)) delete this.uniforms[name];
 		this.uniforms._Globals = { value: this.globalUniforms };
-		this.uniforms[OUTPUT_SRGB_UNIFORM] = { value: 1 };
+		Object.assign(this.uniforms, outputUniforms());
 		this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
 		this.#samplerBindings.clear();
 		this.#cubeSamplers.clear();

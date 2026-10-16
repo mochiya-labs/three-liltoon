@@ -47,6 +47,18 @@ Exported models already carry their authored properties. The README's illustrati
 
 For standalone JSON, `LilToonMaterialLoader` loads properties but does not resolve texture identifiers. Resolve textures yourself and pass a property-name-to-Texture map to `new LilToonMaterialFactory().create(serialized, textures)`. Prefer GLTFLoader for exported GLB/VRM models. See [material format](MATERIAL_FORMAT.md).
 
+## Tone mapping and output color
+
+`LilToonMaterial` honors `renderer.toneMapping`, `renderer.toneMappingExposure`, `renderer.outputColorSpace` and `material.toneMapped` during direct rendering. Supported display spaces are `SRGBColorSpace` and `LinearSRGBColorSpace`. Built-in tone curves come from the installed Three.js peer. These settings update on each draw without a lilToon-specific output API; generated outlines and auxiliary materials inherit the source material's `toneMapped` setting.
+
+Ordinary render targets receive linear shading output without material tone mapping, matching standard Three materials. Floating-point targets preserve HDR values; an sRGB attachment uses framebuffer storage encoding. For post-processing, use the composer's normal final tone-mapping/output stage, such as Three's `OutputPass`, exactly once. A global final tone mapper affects the composed scene, including materials with `toneMapped = false`; that flag cannot exclude individual objects after composition. This limitation also applies to standard Three materials.
+
+Ordinary transparent shaders handle output conversion before the final premultiplication used for blending. Direct framebuffer blending can still differ from linear offscreen blending, as it does for standard materials. Applications requiring stable colors when toggling optional effects should retain the same linear scene buffer and final output stage in both cases.
+
+Refraction and Gem sample the current framebuffer. Use linear scene composition with a final display transform for these modes when tone mapping is enabled: a direct-screen capture cannot recover linear HDR values from a background that has already been tone-mapped.
+
+The material remains a `RawShaderMaterial`: this integration does not automatically enable arbitrary Three shader chunks, physical-material properties, WebGPU, Display-P3 output or XR compatibility. Custom tone-mapping chunk replacement is not a supported configuration API. Bloom, blur and other screen effects remain host/composer operations. Existing lilToon properties, loaders and `enableLilToon(renderer)` usage are unchanged.
+
 ## Renderer lifetime and React Three Fiber
 
 Call `enableLilToon(renderer)` for automatic outlines, shadow casters and special-mode passes. Each call returns an independent, idempotent release function; the integration remains installed while any lease is active. Renderer disposal also releases it. No adapter or frame-boundary API is required.

@@ -48,8 +48,9 @@ describe("LilToonMaterial", () => {
 		expect(material.fragmentShader).toContain(
 			"uniform uint uLilToonOutputSrgb",
 		);
-		expect(material.fragmentShader).toContain("out_var_SV_Target.rgb = mix(");
-		expect(material.uniforms.uLilToonOutputSrgb?.value).toBe(1);
+		expect(material.fragmentShader).toContain("sRGBTransferOETF");
+		expect(material.fragmentShader).toContain("lilToonFragmentMain();");
+		expect(material.uniforms.uLilToonOutputSrgb?.value).toBe(0);
 	});
 
 	it("uses the MatCap-mask shader profile and preserves independent normal transforms", () => {
