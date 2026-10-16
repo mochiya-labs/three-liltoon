@@ -28,6 +28,12 @@
           "type": "string",
           "description": "Original Unity shader name; does not imply renderer support for that shader."
         },
+        "renderQueue": {
+          "type": "integer",
+          "description": "Effective Unity material queue. Does not change blending or depth state.",
+          "minimum": 0,
+          "maximum": 5000
+        },
         "renderMode": {
           "$ref": "#/definitions/LilToonRenderMode",
           "description": "When omitted, inferred from the original supported shader family."

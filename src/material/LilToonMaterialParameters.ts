@@ -34,6 +34,8 @@ export interface LilToonMaterialParameters {
 	map?: Texture | null;
 	alphaTest?: number;
 	name?: string;
+	/** Effective Unity queue (0–5000). Requires materialRenderQueue sorting opt-in. */
+	renderQueue?: number;
 	renderMode?: LilToonRenderMode;
 	/** Unity transparent pass configuration; additional-light passes remain deferred. */
 	transparencyMode?: LilToonTransparencyMode;

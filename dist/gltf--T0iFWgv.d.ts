@@ -11,6 +11,8 @@ interface LilToonMaterialParameters {
     map?: Texture | null;
     alphaTest?: number;
     name?: string;
+    /** Effective Unity queue (0–5000). Requires materialRenderQueue sorting opt-in. */
+    renderQueue?: number;
     renderMode?: LilToonRenderMode;
     /** Unity transparent pass configuration; additional-light passes remain deferred. */
     transparencyMode?: LilToonTransparencyMode;
@@ -48,6 +50,12 @@ declare function detectLilToonFeatures(properties: Record<string, LilToonScalarO
 interface SerializedLilToonMaterial {
     specVersion?: string;
     lilToonVersion?: string | number;
+    /** Effective Unity material queue. Does not change blending or depth state.
+     * @asType integer
+     * @minimum 0
+     * @maximum 5000
+     */
+    renderQueue?: number;
     renderMode: LilToonRenderMode;
     transparencyMode?: LilToonTransparencyMode;
     properties: Record<string, LilToonScalarOrVector>;
@@ -61,6 +69,8 @@ declare class LilToonMaterial extends RawShaderMaterial {
     readonly lilToonProperties: Record<string, LilToonScalarOrVector>;
     readonly lilToonTextures: Record<string, Texture | null>;
     globalUniforms: LilToonGlobalUniforms;
+    get renderQueue(): number | undefined;
+    set renderQueue(value: number | undefined);
     renderMode: LilToonRenderMode;
     pass: LilToonPass;
     transparencyMode: LilToonTransparencyMode;
@@ -134,6 +144,12 @@ interface GLTFLilToonMaterialDefinition {
     lilToonVersion?: string | number;
     /** Original Unity shader name; does not imply renderer support for that shader. */
     shaderVariant?: string;
+    /** Effective Unity material queue. Does not change blending or depth state.
+     * @asType integer
+     * @minimum 0
+     * @maximum 5000
+     */
+    renderQueue?: number;
     /** When omitted, inferred from the original supported shader family. */
     renderMode?: LilToonRenderMode;
     /** Transparent family pass configuration. Defaults to normal or is inferred from shaderVariant. */

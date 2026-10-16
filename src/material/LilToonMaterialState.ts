@@ -7,6 +7,12 @@ import type {
 export interface SerializedLilToonMaterial {
 	specVersion?: string;
 	lilToonVersion?: string | number;
+	/** Effective Unity material queue. Does not change blending or depth state.
+	 * @asType integer
+	 * @minimum 0
+	 * @maximum 5000
+	 */
+	renderQueue?: number;
 	renderMode: LilToonRenderMode;
 	transparencyMode?: LilToonTransparencyMode;
 	properties: Record<string, LilToonScalarOrVector>;

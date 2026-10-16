@@ -110,6 +110,20 @@ export class LilToonMaterial extends RawShaderMaterial {
 	readonly lilToonProperties: Record<string, LilToonScalarOrVector>;
 	readonly lilToonTextures: Record<string, Texture | null> = {};
 	globalUniforms: LilToonGlobalUniforms;
+	#renderQueue: number | undefined;
+	get renderQueue(): number | undefined {
+		return this.#renderQueue;
+	}
+	set renderQueue(value: number | undefined) {
+		if (
+			value !== undefined &&
+			(!Number.isInteger(value) || value < 0 || value > 5000)
+		)
+			throw new RangeError(
+				"renderQueue must be an integer from 0 to 5000, or undefined",
+			);
+		this.#renderQueue = value;
+	}
 	renderMode: LilToonRenderMode;
 	pass: LilToonPass;
 	transparencyMode: LilToonTransparencyMode;
@@ -183,6 +197,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 			fog: false,
 		});
 		this.renderMode = renderMode;
+		this.renderQueue = parameters.renderQueue;
 		this.pass = pass;
 		this.transparencyMode = parameters.transparencyMode ?? "normal";
 		this.forceSinglePass = true;
@@ -406,6 +421,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		);
 		return {
 			specVersion: LILTOON_GLTF_SPEC_VERSION,
+			renderQueue: this.renderQueue,
 			lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
 			renderMode: this.renderMode,
 			properties,
@@ -452,6 +468,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		this.#morphWeights.dispose();
 		this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
 		this.renderMode = source.renderMode;
+		this.renderQueue = source.renderQueue;
 		this.pass = source.pass;
 		this.transparencyMode = source.transparencyMode;
 		this.#shaderKey = source.#shaderKey;

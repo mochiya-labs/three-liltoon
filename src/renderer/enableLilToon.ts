@@ -1,3 +1,4 @@
+import { installMaterialRenderQueue } from "./materialRenderQueue.js";
 import {
 	BackSide,
 	Mesh,
@@ -137,6 +138,7 @@ class AutomaticPasses {
 		}
 		recipe.outline.visible = source.visible;
 		recipe.outline.toneMapped = source.toneMapped;
+		recipe.outline.renderQueue = source.renderQueue;
 		if (recipe.input !== source.map) {
 			recipe.map?.dispose();
 			recipe.input = source.map;
@@ -294,13 +296,35 @@ class AutomaticPasses {
 	}
 }
 
-type Installation = { release(): void; acquire(): () => void };
+type Installation = {
+	materialRenderQueue: boolean;
+	release(): void;
+	acquire(): () => void;
+};
+
+export interface EnableLilToonOptions {
+	/** Own the renderer sort callbacks until final release; requires default sorters. */
+	materialRenderQueue?: boolean;
+}
 const installations = new WeakMap<WebGLRenderer, Installation>();
 
 /** Install automatic passes on an existing renderer. Release the returned lease on teardown. */
-export function enableLilToon(renderer: WebGLRenderer): () => void {
+export function enableLilToon(
+	renderer: WebGLRenderer,
+	options: EnableLilToonOptions = {},
+): () => void {
 	const existing = installations.get(renderer);
-	if (existing) return existing.acquire();
+	if (existing) {
+		if (
+			options.materialRenderQueue !== undefined &&
+			options.materialRenderQueue !== existing.materialRenderQueue
+		)
+			throw new Error("enableLilToon leases must agree on materialRenderQueue");
+		return existing.acquire();
+	}
+	const sorting = options.materialRenderQueue
+		? installMaterialRenderQueue(renderer)
+		: undefined;
 	const passes = new AutomaticPasses();
 	const sceneColors = new SceneColorPasses();
 	const fur = new FurPasses();
@@ -310,6 +334,7 @@ export function enableLilToon(renderer: WebGLRenderer): () => void {
 	let users = 0,
 		disposed = false;
 	const wrapped: WebGLRenderer["render"] = function (scene, camera) {
+		const restoreSortCamera = sorting?.enter(camera);
 		passes.begin();
 		const previous = scene.onBeforeRender;
 		const original = originalHooks.get(previous) ?? previous;
@@ -345,6 +370,7 @@ export function enableLilToon(renderer: WebGLRenderer): () => void {
 			restore?.();
 			if (scene.onBeforeRender === hook) scene.onBeforeRender = previous;
 			passes.end();
+			restoreSortCamera?.();
 		}
 	};
 	const wrappedDispose = () => {
@@ -352,11 +378,13 @@ export function enableLilToon(renderer: WebGLRenderer): () => void {
 		dispose.call(renderer);
 	};
 	const installation: Installation = {
+		materialRenderQueue: options.materialRenderQueue ?? false,
 		release: () => {
 			if (disposed) return;
 			disposed = true;
 			if (renderer.render === wrapped) renderer.render = render;
 			if (renderer.dispose === wrappedDispose) renderer.dispose = dispose;
+			sorting?.dispose();
 			passes.dispose();
 			sceneColors.dispose();
 			fur.dispose();

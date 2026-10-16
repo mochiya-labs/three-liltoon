@@ -17,7 +17,7 @@ The root entry also exports `LILTOON_TEXTURE_SEMANTICS` and `LilToonTextureSeman
 
 ## Materials
 
-`LilToonMaterial` extends Three.js `RawShaderMaterial`. Constructor inputs include `name`, `color`, `opacity`, `map`, `alphaTest`, `renderMode`, `transparencyMode`, `properties` and `textures`. Original property names are case-sensitive. Render mode defaults to opaque; transparent configuration defaults to normal. See [rendering modes](RENDERING_MODES.md) for valid values and authored render-state defaults.
+`LilToonMaterial` extends Three.js `RawShaderMaterial`. Constructor inputs include `name`, `color`, `opacity`, `map`, `alphaTest`, `renderQueue`, `renderMode`, `transparencyMode`, `properties` and `textures`. Original property names are case-sensitive. Render mode defaults to opaque; transparent configuration defaults to normal. See [rendering modes](RENDERING_MODES.md) for valid values and authored render-state defaults.
 
 | Familiar property               | Original lilToon value                                         |
 | ------------------------------- | -------------------------------------------------------------- |
@@ -124,3 +124,29 @@ Texture-unit capacity is checked against vertex, fragment and combined context l
 ## Compatibility exports
 
 Low-level light/shadow/environment adapters remain exported, but ordinary applications need only the renderer and loader helpers. `RefractionPass`, `FurPass` and `GemPass` are deprecated material conveniences; use `LilToonMaterial({ renderMode })` with `enableLilToon` instead. Internal pass identifiers are not additional user-facing rendering modes.
+
+## Material render queue sorting
+
+`LilToonMaterial.renderQueue` and its optional constructor option accept integers 0–5000 or `undefined`. The value survives copy, clone, standalone JSON and glTF loading. Changing it affects the next render without shader recompilation. It does not alter blending, transparency classification or depth writes.
+
+```ts
+const release = enableLilToon(renderer, { materialRenderQueue: true });
+const inner = new LilToonMaterial({
+	renderMode: "transparent",
+	renderQueue: 2450,
+});
+const outer = new LilToonMaterial({
+	renderMode: "transparent",
+	renderQueue: 3000,
+});
+// Release when this renderer integration is no longer needed.
+release();
+```
+
+Keep `renderer.sortObjects` enabled. The opt-in owns `setOpaqueSort` and `setTransparentSort` until the final renderer lease is released; renderer disposal releases it too. Use it only with the renderer's default sort callbacks, and do not replace those callbacks while it is active. Teardown restores Three's default sorting. Three exposes no public sorter getters, so unknown pre-existing custom callbacks cannot be captured/restored automatically. Calls sharing an installation inherit its sorting setting when omitted; explicitly conflicting settings throw. The one-argument enable call does not install queue sorting.
+
+Ordering is groupOrder, object renderOrder, material queue, then Three's ordinary within-list material/depth/stable-ID ordering. Material groups are compared individually. Missing queue values use 2000 for opaque draws and 3000 for transparent/transmissive draws. Automatic outlines inherit the queue; pre/surface/post auxiliary passes retain their existing scheduling. Queues stay ascending with supported reversed-depth rendering; Three's own group/object precedence remains peer-defined.
+
+Hosts owning custom sorting can leave this opt-in disabled and call `compareLilToonRenderQueue(a.material, b.material, defaultQueue)` inside their own comparator, after host group/renderOrder priorities and before depth comparison. This helper compares only queues, treats ordinary materials as the supplied default and installs no callbacks. Hosts must account for their peer's reversed-depth list reversal themselves.
+
+Opaque, transmissive and transparent lists remain separate. Queue values do not move materials between them. This is not arbitrary Unity cross-list ordering, Unity's queue-dependent within-queue sorting, triangle sorting or order-independent transparency. Preserve appropriate authoring/pass strategies for intersecting transparent surfaces.

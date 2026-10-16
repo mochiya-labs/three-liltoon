@@ -6912,6 +6912,17 @@ var LilToonMaterial = class extends RawShaderMaterial {
   lilToonProperties;
   lilToonTextures = {};
   globalUniforms;
+  #renderQueue;
+  get renderQueue() {
+    return this.#renderQueue;
+  }
+  set renderQueue(value) {
+    if (value !== void 0 && (!Number.isInteger(value) || value < 0 || value > 5e3))
+      throw new RangeError(
+        "renderQueue must be an integer from 0 to 5000, or undefined"
+      );
+    this.#renderQueue = value;
+  }
   renderMode;
   pass;
   transparencyMode;
@@ -6974,6 +6985,7 @@ ${program.fragmentShader}`.matchAll(
       fog: false
     });
     this.renderMode = renderMode;
+    this.renderQueue = parameters.renderQueue;
     this.pass = pass;
     this.transparencyMode = parameters.transparencyMode ?? "normal";
     this.forceSinglePass = true;
@@ -7151,6 +7163,7 @@ ${program.fragmentShader}`.matchAll(
     );
     return {
       specVersion: LILTOON_GLTF_SPEC_VERSION,
+      renderQueue: this.renderQueue,
       lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
       renderMode: this.renderMode,
       properties,
@@ -7191,6 +7204,7 @@ ${program.fragmentShader}`.matchAll(
     this.#morphWeights.dispose();
     this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
     this.renderMode = source.renderMode;
+    this.renderQueue = source.renderQueue;
     this.pass = source.pass;
     this.transparencyMode = source.transparencyMode;
     this.#shaderKey = source.#shaderKey;
@@ -7587,6 +7601,7 @@ var GLTFLilToonExtension = class {
       );
       const material = new LilToonMaterial({
         name: materialDefinition.name,
+        renderQueue: definition.renderQueue,
         renderMode: renderModeFromDefinition(definition),
         transparencyMode: definition.transparencyMode ?? (/TwoPassTransparent/i.test(definition.shaderVariant ?? "") ? "two-pass" : /OnePassTransparent/i.test(definition.shaderVariant ?? "") ? "one-pass" : "normal"),
         properties: definition.cubeTextures?._ReflectionCubeTex ? { ...definition.properties, _ReflectionCubeTex_HDR: [1, 1, 0, 0] } : definition.properties,

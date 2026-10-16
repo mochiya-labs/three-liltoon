@@ -9,6 +9,8 @@ New to the package? Start with the [overview, installation and tutorials](../REA
 - [Feature matrix](FEATURE_MATRIX.md): supported features, known differences and verification scope.
 - [Material and glTF format](MATERIAL_FORMAT.md): the `MOCHIYA_materials_liltoon` contract, standalone JSON and validation.
 - [Model viewer](../examples/mochiya-liltoon-viewer/README.md): inspect local GLB/VRM files and their textures/settings.
+- [Package changelog](../CHANGELOG.md): released and unreleased package changes.
+- [Specification changelog](SPEC_CHANGELOG.md): material format history and compatibility.
 
 ## Understanding and extending the renderer
 

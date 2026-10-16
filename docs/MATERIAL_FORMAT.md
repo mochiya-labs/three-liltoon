@@ -130,3 +130,9 @@ Directions use glTF coordinates. Producers must convert their source coordinate 
 The loader creates a half-float `THREE.CubeTexture` in `LinearSRGBColorSpace` and uses identity `_ReflectionCubeTex_HDR` decoding. `_ReflectionCubeColor`, override and lighting controls retain their upstream meaning. Identical descriptors share one source cube within a file. The source appears in `parser.associations` for model resource inventory; the model owner must dispose it when unloading. Materials own their sampler views, not the shared source. Pixel arrays are independent of parser binary caches and remain available for context restoration.
 
 Standalone material JSON does not resolve these glTF buffer references: standalone callers provide a resolved `CubeTexture` through the normal material texture input. Generic glTF viewers can use the standard fallback material but do not reproduce these authored reflections. Cube RenderTextures, Unity probe blending and PMREM/equirectangular conversion are outside this transport contract.
+
+## Material render queues
+
+Optional `renderQueue` is an integer from 0 through 5000 containing the effective Unity material queue (including the shader default). It is independent of `renderMode`, blending and `_ZWrite`: a transparent shader can have queue 2450. The loader preserves the value without changing those states. Standalone material JSON uses the same field.
+
+Enable queue-aware sorting with `enableLilToon(renderer, { materialRenderQueue: true })`; see [sorter ownership and limitations](API.md#material-render-queue-sorting). Lower queues draw earlier within each Three render list, after group/object ordering. Missing queues use 2000 in the opaque list and 3000 in transparent/transmissive lists, including ordinary Three materials. Legacy files without queue information retain the existing relative ordering. Queue metadata requires a compatible reader and renderer opt-in; it cannot be reconstructed from older exports.
