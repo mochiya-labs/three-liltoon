@@ -8,6 +8,7 @@ export class LilToonMaterialFactory {
 		textures: Record<string, Texture | null> = {},
 	): LilToonMaterial {
 		return new LilToonMaterial({
+			shaderVariant: source.shaderVariant,
 			renderMode: source.renderMode,
 			renderQueue: source.renderQueue,
 			transparencyMode: source.transparencyMode,

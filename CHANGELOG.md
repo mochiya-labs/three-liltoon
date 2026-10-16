@@ -2,6 +2,15 @@
 
 User-facing changes to `@mochiya/three-liltoon`. Package versions and [material specification versions](docs/SPEC_CHANGELOG.md) are independent. Publication dates below are UTC, verified against the [npm registry](https://registry.npmjs.org/@mochiya%2fthree-liltoon). Historical entries are reconstructed from repository history and published package contents; they summarize meaningful changes rather than every commit.
 
+## 0.1.7
+
+- Reduce automatic pass CPU overhead by preparing ordinary outlines only when needed and synchronizing shared outline materials once per render preparation. Shadow casting and live material updates remain supported.
+
+- Restore outlines for exported regular Unity outline shaders, including materials with `_UseOutline: 0`. Existing files retain their authored shader selection without re-export.
+- Add `shaderVariant` selection to direct materials and preserve it through cloning, copying and standalone serialization. Regular outlines follow Unity shader selection; `_UseOutline` remains preserved Multi-family data and no longer acts as a web outline toggle. Direct callers select an outline shader such as `Hidden/lilToonOutline`.
+- Keep static and skinned outlines stable across repeated frames and mixed-material draws by isolating missing vertex inputs from shared GPU attribute state.
+- Use the mesh normal for outline expansion when no outline vector texture is assigned.
+
 ## 0.1.6
 
 - Add optional `LilToonMaterial.renderQueue`, including constructor, clone/copy, serialization and loading support.
@@ -74,7 +83,3 @@ Initial published scoped package:
 - Pre-release corrections for material masks, per-object uniforms, texture transforms, color conversion, shadow fallback and resource ownership.
 
 The original repository scaffold's `1.0.0` manifest was not a published package release. Pre-release refactors and removed experimental APIs are consolidated here rather than presented as public migrations.
-
-## Historical evidence limits
-
-There are no release tags in the inspected repository history. Registry `gitHead` values can precede the commit containing the release's final version/build, so they are not treated as exact source snapshots. Publication dates and format support were checked against all six published tarballs; source links identify implementation commits. The intermediate specification 1.1 has no separately published package in this history. These records do not claim complete Unity visual parity.

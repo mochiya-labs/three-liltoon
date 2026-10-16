@@ -1,5 +1,5 @@
-import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf--T0iFWgv.js';
-export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonTransparencyMode, j as detectLilToonFeatures } from './gltf--T0iFWgv.js';
+import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf-E_9UGVqQ.js';
+export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonShaderVariant, j as LilToonTransparencyMode, k as detectLilToonFeatures } from './gltf-E_9UGVqQ.js';
 import { WebGLRenderer, Texture, Scene, DirectionalLight, Vector3, Color, Material } from 'three';
 export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-2SkJrHyN.js';
 import 'three/examples/jsm/loaders/GLTFLoader.js';

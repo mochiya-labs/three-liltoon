@@ -93,7 +93,7 @@ export async function verifyRenderQueues(reversedDepthBuffer = false) {
 	// Transparent pre/surface/outline remain adjacent inside their material's queue slot.
 	underwear.transparencyMode = "two-pass";
 	underwear.setProperty("_PreZWrite", 1);
-	underwear.setProperty("_UseOutline", 1);
+	underwear.shaderVariant = "Hidden/lilToonTransparentOutline";
 	underwear.setProperty("_OutlineWidth", 0.01);
 	const passes = draw();
 	release();

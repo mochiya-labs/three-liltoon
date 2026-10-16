@@ -78,6 +78,7 @@ export function getLilToonShaderProgram(
 			firstComponent(properties[p]) !== 0 &&
 			(!requiredTexture[p] || Boolean(textures[requiredTexture[p]!])),
 	);
+	flags.push(Boolean(textures._OutlineVectorTex));
 	const active = template.resources.filter((r) => {
 		if (r.property === "__environment" && mode !== "gem")
 			return (

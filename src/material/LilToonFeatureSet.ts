@@ -1,3 +1,4 @@
+import { shaderVariants, type LilToonShaderVariant } from "./shaderVariants.js";
 import type { LilToonScalarOrVector } from "./LilToonMaterialParameters.js";
 
 export interface LilToonFeatureSet {
@@ -36,6 +37,7 @@ function colorVisible(value: LilToonScalarOrVector | undefined): boolean {
 
 export function detectLilToonFeatures(
 	properties: Record<string, LilToonScalarOrVector>,
+	shaderVariant: LilToonShaderVariant = "lilToon",
 ): LilToonFeatureSet {
 	return {
 		main2nd: enabled(properties, "_UseMain2ndTex"),
@@ -54,7 +56,7 @@ export function detectLilToonFeatures(
 		reflection: enabled(properties, "_UseReflection"),
 		anisotropy: enabled(properties, "_UseAnisotropy"),
 		backlight: enabled(properties, "_UseBacklight"),
-		outline: enabled(properties, "_UseOutline"),
+		outline: shaderVariants[shaderVariant][2],
 		dissolve:
 			Array.isArray(properties._DissolveParams) &&
 			Number(properties._DissolveParams[0]) !== 0,

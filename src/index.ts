@@ -43,3 +43,5 @@ export {
 
 export type { EnableLilToonOptions } from "./renderer/enableLilToon.js";
 export { compareLilToonRenderQueue } from "./renderer/materialRenderQueue.js";
+
+export type { LilToonShaderVariant } from "./material/shaderVariants.js";

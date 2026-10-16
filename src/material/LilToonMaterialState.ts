@@ -5,6 +5,7 @@ import type {
 } from "./LilToonMaterialParameters.js";
 
 export interface SerializedLilToonMaterial {
+	shaderVariant?: import("./shaderVariants.js").LilToonShaderVariant;
 	specVersion?: string;
 	lilToonVersion?: string | number;
 	/** Effective Unity material queue. Does not change blending or depth state.

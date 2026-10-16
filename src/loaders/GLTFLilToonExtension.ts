@@ -4,6 +4,7 @@ import type {
 	GLTFLoaderPlugin,
 	GLTFParser,
 } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { isShaderVariant } from "../material/shaderVariants.js";
 import { LilToonMaterial } from "../material/LilToonMaterial.js";
 import {
 	LILTOON_GLTF_EXTENSION,
@@ -79,14 +80,13 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
 			const material = new LilToonMaterial({
 				name: materialDefinition.name,
 				renderQueue: definition.renderQueue,
-				renderMode: renderModeFromDefinition(definition),
-				transparencyMode:
-					definition.transparencyMode ??
-					(/TwoPassTransparent/i.test(definition.shaderVariant ?? "")
-						? "two-pass"
-						: /OnePassTransparent/i.test(definition.shaderVariant ?? "")
-							? "one-pass"
-							: "normal"),
+				shaderVariant: isShaderVariant(definition.shaderVariant)
+					? definition.shaderVariant
+					: undefined,
+				renderMode: isShaderVariant(definition.shaderVariant)
+					? definition.renderMode
+					: renderModeFromDefinition(definition),
+				transparencyMode: definition.transparencyMode,
 				properties: definition.cubeTextures?._ReflectionCubeTex
 					? { ...definition.properties, _ReflectionCubeTex_HDR: [1, 1, 0, 0] }
 					: definition.properties,
@@ -112,9 +112,8 @@ export class GLTFLilToonExtension implements GLTFLoaderPlugin {
 				});
 			}
 			if (
-				/furonly|tessellation|liltoonlite|liltoonmulti/i.test(
-					definition.shaderVariant ?? "",
-				)
+				definition.shaderVariant !== undefined &&
+				!isShaderVariant(definition.shaderVariant)
 			) {
 				warnings.push({
 					severity: "warning",

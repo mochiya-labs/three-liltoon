@@ -329,12 +329,15 @@ describe("LilToonMaterial", () => {
 		]);
 	});
 
-	it("enables the outline only when lilToon's outline toggle is enabled", () => {
+	it("selects regular outlines by Unity shader name, independently of the Multi property", () => {
 		const material = new LilToonMaterial({
 			properties: { _UseOutline: 0, _OutlineWidth: 0.08 },
 		});
 		expect(material.featureSet.outline).toBe(false);
 		material.setProperty("_UseOutline", 1);
+		expect(material.featureSet.outline).toBe(false);
+		material.shaderVariant = "Hidden/lilToonOutline";
+		material.setProperty("_UseOutline", 0);
 		expect(material.featureSet.outline).toBe(true);
 	});
 
@@ -369,3 +372,60 @@ describe("LilToonMaterial", () => {
 		expect(material.uniformsNeedUpdate).toBe(true);
 	});
 });
+
+it.each([
+	"opaque",
+	"cutout",
+	"transparent",
+	"fur",
+	"gem",
+	"refraction",
+] as const)(
+	"preserves native state and aliases when copying %s materials",
+	(renderMode) => {
+		const source = new LilToonMaterial({
+			renderMode,
+			properties: {
+				_Cull: 0,
+				_ZWrite: 0,
+				_SrcBlend: 1,
+				_DstBlend: 10,
+				_Color: [0.2, 0.3, 0.4, 0.35],
+				_Cutoff: 0.27,
+			},
+		});
+		const target = new LilToonMaterial({ renderMode: "cutout" });
+		const keys = [
+			"side",
+			"transparent",
+			"blending",
+			"blendSrc",
+			"blendDst",
+			"blendEquation",
+			"depthWrite",
+			"depthTest",
+			"depthFunc",
+			"stencilWrite",
+			"renderMode",
+			"shaderVariant",
+			"opacity",
+			"alphaTest",
+		] as const;
+		for (const copy of [source.clone(), target.copy(source)]) {
+			for (const key of keys) expect(copy[key], key).toEqual(source[key]);
+			expect(copy.getProperty("_Color")).toEqual(source.getProperty("_Color"));
+			expect(copy.getProperty("_Cull")).toBe(0);
+			copy.opacity = 0.6;
+			expect(copy.getProperty("_Color")).toEqual([0.2, 0.3, 0.4, 0.6]);
+			copy.dispose();
+		}
+		// Host overrides also survive; copying must not derive native state again.
+		source.side = 1;
+		source.depthTest = false;
+		const overridden = source.clone();
+		expect(overridden.side).toBe(1);
+		expect(overridden.depthTest).toBe(false);
+		overridden.dispose();
+		source.dispose();
+	},
+);

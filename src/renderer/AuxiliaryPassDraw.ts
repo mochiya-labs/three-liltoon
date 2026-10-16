@@ -21,8 +21,7 @@ export function syncPassMaterial(
 	source.getProperty("_Color");
 	target.toneMapped = source.toneMapped;
 	target.renderQueue = source.renderQueue;
-	target.renderMode = source.renderMode;
-	target.transparencyMode = source.transparencyMode;
+	target.shaderVariant = source.shaderVariant;
 	for (const [key, value] of Object.entries(source.lilToonProperties)) {
 		target.lilToonProperties[key] = value;
 		setGlobalProperty(target.globalUniforms, key, value);
@@ -97,7 +96,7 @@ export class AuxiliaryPassDraw {
 			const geometry = mesh.geometry,
 				sourceGeometry = mesh.geometry;
 			const material = new LilToonMaterial({
-				renderMode: source.renderMode,
+				shaderVariant: source.shaderVariant,
 				pass,
 				properties: source.lilToonProperties,
 				textures: source.lilToonTextures,

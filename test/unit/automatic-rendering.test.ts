@@ -46,7 +46,10 @@ function harness(draw: (scene: Scene) => void) {
 	return renderer;
 }
 const outlined = () =>
-	new LilToonMaterial({ properties: { _UseOutline: 1, _OutlineWidth: 0.1 } });
+	new LilToonMaterial({
+		shaderVariant: "Hidden/lilToonOutline",
+		properties: { _UseOutline: 0, _OutlineWidth: 0.1 },
+	});
 
 describe("automatic material inputs", () => {
 	it("retains shared scene resources through other scenes and cleans up removed owners", () => {
@@ -199,10 +202,10 @@ describe("renderer-owned automatic passes", () => {
 		mesh.material = source;
 		expected = 1;
 		renderer.render(scene, camera);
-		source.setProperty("_UseOutline", 0);
+		source.shaderVariant = "lilToon";
 		expected = 0;
 		renderer.render(scene, camera);
-		source.setProperty("_UseOutline", 1);
+		source.shaderVariant = "Hidden/lilToonOutline";
 		scene.remove(mesh);
 		renderer.render(scene, camera);
 		release();
@@ -267,48 +270,56 @@ describe("renderer-owned automatic passes", () => {
 		expect(mesh.onBeforeShadow).toBe(callback);
 		release();
 	});
-	it("uses independent alpha UV transforms without disposing the input texture", () => {
-		const texture = new DataTexture(),
-			source = outlined();
-		source.map = texture;
-		source.alphaTest = 0.5;
-		source.opacity = 0.25;
-		source.setProperty("_MainTex_ST", [2, 3, 0.2, 0.4]);
-		const scene = new Scene(),
-			mesh = new Mesh(new BoxGeometry(), source);
-		scene.add(mesh);
-		const textureDispose = vi.spyOn(texture, "dispose");
-		let shadowMap: DataTexture;
-		const renderer = harness(() => {
-			const material = mesh.customDepthMaterial as MeshDepthMaterial;
-			mesh.onBeforeShadow(
-				renderer,
-				mesh as unknown as Scene,
-				new PerspectiveCamera(),
-				new PerspectiveCamera(),
-				mesh.geometry,
-				material,
-				null!,
-			);
-			expect(material.map).not.toBe(texture);
-			expect(material.alphaTest).toBe(0.5);
-			expect(material.opacity).toBe(0.25);
-			expect(material.alphaMap).toBeNull();
-			shadowMap = material.map as DataTexture;
-			expect(shadowMap.matrix.elements).toEqual([
-				2, -0, 0, 0, 3, 0, 0.2, 0.4, 1,
-			]);
-		});
-		const original = texture.matrix.clone(),
-			release = enableLilToon(renderer);
-		renderer.render(scene, new PerspectiveCamera());
-		const shadowDispose = vi.spyOn(shadowMap!, "dispose");
-		source.dispose();
-		expect(shadowDispose).toHaveBeenCalledOnce();
-		expect(textureDispose).not.toHaveBeenCalled();
-		expect(texture.matrix).toEqual(original);
-		release();
-	});
+	it.each([
+		[false, "customDepthMaterial"],
+		[true, "customDepthMaterial"],
+		[false, "customDistanceMaterial"],
+		[true, "customDistanceMaterial"],
+	] as const)(
+		"preserves alpha UVs and texture ownership (outline=%s, caster=%s)",
+		(hasOutline, caster) => {
+			const texture = new DataTexture(),
+				source = hasOutline ? outlined() : new LilToonMaterial();
+			source.map = texture;
+			source.alphaTest = 0.5;
+			source.opacity = 0.25;
+			source.setProperty("_MainTex_ST", [2, 3, 0.2, 0.4]);
+			const scene = new Scene(),
+				mesh = new Mesh(new BoxGeometry(), source);
+			scene.add(mesh);
+			const textureDispose = vi.spyOn(texture, "dispose");
+			let shadowMap: DataTexture;
+			const renderer = harness(() => {
+				const material = mesh[caster] as MeshDepthMaterial;
+				mesh.onBeforeShadow(
+					renderer,
+					mesh as unknown as Scene,
+					new PerspectiveCamera(),
+					new PerspectiveCamera(),
+					mesh.geometry,
+					material,
+					null!,
+				);
+				expect(material.map).not.toBe(texture);
+				expect(material.alphaTest).toBe(0.5);
+				expect(material.opacity).toBe(0.25);
+				expect(material.alphaMap).toBeNull();
+				shadowMap = material.map as DataTexture;
+				expect(shadowMap.matrix.elements).toEqual([
+					2, -0, 0, 0, 3, 0, 0.2, 0.4, 1,
+				]);
+			});
+			const original = texture.matrix.clone(),
+				release = enableLilToon(renderer);
+			renderer.render(scene, new PerspectiveCamera());
+			const shadowDispose = vi.spyOn(shadowMap!, "dispose");
+			source.dispose();
+			expect(shadowDispose).toHaveBeenCalledOnce();
+			expect(textureDispose).not.toHaveBeenCalled();
+			expect(texture.matrix).toEqual(original);
+			release();
+		},
+	);
 	it("supports nested rendering and reference-counted renderer ownership", () => {
 		const scene = new Scene(),
 			other = new Scene(),
@@ -370,4 +381,97 @@ it("reuses unchanged outline state and detects in-place properties and aliases a
 	release();
 	source.dispose();
 	mesh.geometry.dispose();
+});
+
+it("defers outline preparation for disabled and manually supplied outlines", () => {
+	const source = new LilToonMaterial(),
+		scene = new Scene(),
+		camera = new PerspectiveCamera();
+	const mesh = new Mesh(new BoxGeometry(), source);
+	scene.add(mesh);
+	const read = vi.fn(() => [0.2, 0.3, 0.4, 1]);
+	Object.defineProperty(source.lilToonProperties, "_OutlineColor", {
+		enumerable: true,
+		configurable: true,
+		get: read,
+	});
+	let expected = 0;
+	const renderer = harness(() => {
+		expect(mesh.children).toHaveLength(expected);
+		expect(mesh.customDepthMaterial).toBeInstanceOf(MeshDepthMaterial);
+	});
+	const release = enableLilToon(renderer);
+	renderer.render(scene, camera);
+	expect(read).not.toHaveBeenCalled();
+	source.shaderVariant = "Hidden/lilToonOutline";
+	const manual = new Mesh(
+		mesh.geometry,
+		new LilToonMaterial({
+			pass: "outline",
+			shaderVariant: "Hidden/lilToonOutline",
+		}),
+	);
+	mesh.add(manual);
+	expected = 1;
+	read.mockClear();
+	renderer.render(scene, camera);
+	expect(read).not.toHaveBeenCalled();
+	mesh.remove(manual);
+	renderer.render(scene, camera);
+	expect(read).toHaveBeenCalled();
+	release();
+	source.dispose();
+	manual.material.dispose();
+	mesh.geometry.dispose();
+});
+
+it("synchronizes shared outlines once per preparation and refreshes after re-enabling", () => {
+	const source = outlined(),
+		scene = new Scene(),
+		camera = new PerspectiveCamera();
+	const geometry = new BoxGeometry(),
+		a = new Mesh(geometry, source),
+		b = new Mesh(geometry, source);
+	scene.add(a);
+	let outline!: LilToonMaterial;
+	const renderer = harness(() => {
+		if (a.children.length)
+			outline = (a.children[0] as Mesh).material as LilToonMaterial;
+		if (b.parent && b.children.length)
+			expect((b.children[0] as Mesh).material).toBe(outline);
+	});
+	const release = enableLilToon(renderer);
+	renderer.render(scene, camera);
+	const color = source.lilToonProperties._OutlineColor as number[];
+	const read = vi.fn(() => color);
+	Object.defineProperty(source.lilToonProperties, "_OutlineColor", {
+		enumerable: true,
+		configurable: true,
+		get: read,
+	});
+	renderer.render(scene, camera);
+	const once = read.mock.calls.length;
+	expect(once).toBeGreaterThan(0);
+	scene.add(b);
+	read.mockClear();
+	renderer.render(scene, camera);
+	expect(read).toHaveBeenCalledTimes(once);
+	source.shaderVariant = "lilToon";
+	color[0] = 0.73;
+	source.color.setRGB(0.1, 0.2, 0.3);
+	const texture = new DataTexture();
+	source.setTexture("_OutlineTex", texture);
+	renderer.render(scene, camera);
+	expect(a.children).toHaveLength(0);
+	source.shaderVariant = "Hidden/lilToonOutline";
+	renderer.render(scene, camera);
+	expect(outline.getProperty("_OutlineColor")).toEqual(color);
+	expect(outline.getProperty("_Color")).toEqual(source.getProperty("_Color"));
+	expect(outline.lilToonTextures._OutlineTex).toBe(texture);
+	const dispose = vi.spyOn(outline, "dispose");
+	release();
+	expect(dispose).toHaveBeenCalledOnce();
+	source.dispose();
+	texture.dispose();
+	geometry.dispose();
 });

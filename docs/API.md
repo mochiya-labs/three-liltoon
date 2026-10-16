@@ -17,7 +17,7 @@ The root entry also exports `LILTOON_TEXTURE_SEMANTICS` and `LilToonTextureSeman
 
 ## Materials
 
-`LilToonMaterial` extends Three.js `RawShaderMaterial`. Constructor inputs include `name`, `color`, `opacity`, `map`, `alphaTest`, `renderQueue`, `renderMode`, `transparencyMode`, `properties` and `textures`. Original property names are case-sensitive. Render mode defaults to opaque; transparent configuration defaults to normal. See [rendering modes](RENDERING_MODES.md) for valid values and authored render-state defaults.
+`LilToonMaterial` extends Three.js `RawShaderMaterial`. Constructor inputs include `name`, `color`, `opacity`, `map`, `alphaTest`, `renderQueue`, `shaderVariant`, `renderMode`, `transparencyMode`, `properties` and `textures`. Original property names are case-sensitive. Shader selection defaults to `lilToon` (opaque, without outlines). Mode-only construction selects the corresponding regular non-outline shader; transparent configuration defaults to normal. See [rendering modes](RENDERING_MODES.md) for valid values and authored render-state defaults.
 
 | Familiar property               | Original lilToon value                                         |
 | ------------------------------- | -------------------------------------------------------------- |
@@ -58,6 +58,27 @@ Ordinary transparent shaders handle output conversion before the final premultip
 Refraction and Gem sample the current framebuffer. Use linear scene composition with a final display transform for these modes when tone mapping is enabled: a direct-screen capture cannot recover linear HDR values from a background that has already been tone-mapped.
 
 The material remains a `RawShaderMaterial`: this integration does not automatically enable arbitrary Three shader chunks, physical-material properties, WebGPU, Display-P3 output or XR compatibility. Custom tone-mapping chunk replacement is not a supported configuration API. Bloom, blur and other screen effects remain host/composer operations. Existing lilToon properties, loaders and `enableLilToon(renderer)` usage are unchanged.
+
+## Shader selection and outlines
+
+`shaderVariant` uses the original Unity shader name. When supplying `shaderVariant`, you can omit `renderMode` and `transparencyMode`; both are determined by the selected shader. If you also supply either mode field, it must agree with that shader. The same selection controls surface mode, transparent pass configuration and outline presence when constructing a material, loading glTF/VRM, or restoring standalone JSON. Supported names are listed in [rendering modes](RENDERING_MODES.md#unity-shader-selection).
+
+```ts
+const material = new LilToonMaterial({
+	shaderVariant: "Hidden/lilToonOutline",
+	properties: { _OutlineWidth: 0.03, _OutlineColor: [0, 0, 0, 1] },
+});
+// Select the corresponding Unity shader without outlines.
+material.shaderVariant = "lilToon";
+```
+
+Call `enableLilToon(renderer)` to draw the selected shader's additional passes. Ordinary and skinned meshes use the same outline implementation; morph targets and skinning follow the source mesh. `_Outline*` properties control the authored pass.
+
+Select an outline `shaderVariant`, such as `Hidden/lilToonOutline`, and configure its appearance with `_Outline*` properties. `_OutlineWidth` alone does not enable an outline. `_UseOutline` applies to lilToon’s Multi shader family, which three-liltoon does not currently support; the property is preserved as material data but has no rendering effect.
+
+`renderMode` and `transparencyMode` reflect the selected shader. Changing these convenience properties selects the corresponding Unity variant, retaining outlines where that variant supports them. Selecting Fur, Refraction or Gem removes outline selection. `alphaTest` switches ordinary opaque/cutout/transparent variants while retaining outline presence. Constructor fields that contradict an explicit `shaderVariant` throw an error; unsupported direct shader names also throw. The glTF loader reports unsupported shader families through its warning callback and loads a non-outline fallback.
+
+Cloning, copying and `toLilToonJSON()` preserve `shaderVariant`. `detectLilToonFeatures(properties, shaderVariant)` accepts the same selection; omitting its second argument uses `lilToon`.
 
 ## Renderer lifetime and React Three Fiber
 

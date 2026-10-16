@@ -8,6 +8,7 @@
 {
 	"specVersion": "1.3",
 	"lilToonVersion": "2.3.4-3-g72fc096",
+	"shaderVariant": "Hidden/lilToonOutline",
 	"renderMode": "opaque",
 	"properties": {
 		"_Color": [0.91, 0.35, 0.48, 1],
@@ -21,7 +22,7 @@
 }
 ```
 
-`renderMode` is `opaque`, `cutout`, `transparent`, `refraction`, `refraction-blur`, `fur`, `fur-cutout`, `fur-two-pass`, or `gem`. Use `enableLilToon(renderer)` for automatic passes. Transparent also accepts `transparencyMode: "normal" | "one-pass" | "two-pass"`, defaulting to normal for standalone materials. Cloning and standalone JSON preserve this setting. Unknown properties remain available for round-tripping; active generated uniforms determine rendering.
+`renderMode` is `opaque`, `cutout`, `transparent`, `refraction`, `refraction-blur`, `fur`, `fur-cutout`, `fur-two-pass`, or `gem`. Use `enableLilToon(renderer)` for automatic passes. Transparent also accepts `transparencyMode: "normal" | "one-pass" | "two-pass"`, defaulting to normal when no shader variant selects another configuration. Cloning and standalone JSON preserve this setting. Unknown properties remain available for round-tripping; active generated uniforms determine rendering. Outline presence comes from `shaderVariant`; see [shader selection and outlines](API.md#shader-selection-and-outlines).
 
 ## glTF extension
 
@@ -36,7 +37,7 @@ Extension name: `MOCHIYA_materials_liltoon`.
 				"MOCHIYA_materials_liltoon": {
 					"specVersion": "1.3",
 					"lilToonVersion": "2.3.4-3-g72fc096",
-					"shaderVariant": "lilToon",
+					"shaderVariant": "Hidden/lilToonOutline",
 					"renderMode": "opaque",
 					"properties": {
 						"_Color": [1, 1, 1, 1],
@@ -55,7 +56,7 @@ Extension name: `MOCHIYA_materials_liltoon`.
 }
 ```
 
-Each texture value may be a glTF texture index or an object with `index` and optional `texCoord`. The loader resolves `index`; it does not implement UV-channel remapping from `texCoord`. With `renderMode` omitted, it infers the mode from the Unity `shaderVariant` name, falling back to opaque. Explicit `renderMode` takes precedence. `transparencyMode` similarly uses the explicit value, a OnePass/TwoPass shader-name match, or normal. These shader-name fallbacks apply to glTF loading, not the standalone material factory.
+Each texture value may be a glTF texture index or an object with `index` and optional `texCoord`. The loader resolves `index`; it does not implement UV-channel remapping from `texCoord`. A supported `shaderVariant` selects the corresponding Unity surface mode, transparent configuration and outline pass. Explicit mode fields must agree with that selection; contradictory configurations are rejected. Standalone material JSON follows the same rule. Without `shaderVariant`, mode fields select a regular non-outline variant, defaulting to opaque/normal. Unsupported shader names emit a compatibility warning and use a non-outline fallback, with explicit modes preferred over best-effort name inference. See [supported shader names](RENDERING_MODES.md#unity-shader-selection).
 
 Current extension version is `1.3`. Versions `1.0`, `1.1` and `1.2` remain readable. Embedded cubemaps require a reader supporting `cubeTextures`. Other versions warn and load best-effort.
 
@@ -69,7 +70,7 @@ This guide defines the extension's meaning; the annotated [TypeScript wire types
 | ------------------ | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | `specVersion`      | `"1.0"`, `"1.1"`, `"1.2"`, `"1.3"`                                                                                | Current version; reads 1.0/1.1/1.2                              |
 | `lilToonVersion`   | String or number; source metadata                                                                                 | Unspecified                                                     |
-| `shaderVariant`    | Original Unity shader name                                                                                        | Unspecified                                                     |
+| `shaderVariant`    | Original Unity shader name; selects regular outline/pass configuration                                            | Unspecified                                                     |
 | `renderMode`       | `opaque`, `cutout`, `transparent`, `refraction`, `refraction-blur`, `fur`, `fur-cutout`, `fur-two-pass`, or `gem` | Inferred from shader name                                       |
 | `transparencyMode` | `normal`, `one-pass`, `two-pass`                                                                                  | Transparent only; defaults to normal or inferred shader variant |
 | `properties`       | Original names mapped to numbers, booleans or numeric arrays                                                      | Shader defaults                                                 |
@@ -78,6 +79,8 @@ This guide defines the extension's meaning; the annotated [TypeScript wire types
 | `cubeTextures` | `_ReflectionCubeTex` mapped to a cubemap descriptor below | No authored cube |
 
 Colors and vectors use arrays; Three.js `Color`/`Vector` instances are constructor inputs only. Colors and gamma-adjusted scalar values are linear; HDR values may exceed 1. Texture transforms belong to each property's `<name>_ST` value. Texture indices address the enclosing glTF `textures` array; `texCoord` is a nonnegative integer and defaults to 0. The extension texture-info field does not select alternate UV channels; upstream material UV-mode properties are a separate shader mechanism.
+
+Resolved 2D textures must follow the [texture-orientation convention](ARCHITECTURE.md): material-owned views use `flipY = false`, regardless of the supplied texture flag.
 
 Property and texture names are open dictionaries, including names unsupported by the current renderer. Unknown fields outside those dictionaries are rejected by the authoring schema. The loader does not enforce this schema at runtime: version mismatches still warn and load on a best-effort basis. Structural validation cannot verify referenced textures exist, shader feature support, or visual parity. Keep standard glTF material fallback data and list the extension in `extensionsUsed` for unaware viewers.
 

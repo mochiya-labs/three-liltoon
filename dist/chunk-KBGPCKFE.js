@@ -1,10 +1,11 @@
-import { LilToonMaterial, warnLilToon } from './chunk-TRIHUEDK.js';
+import { LilToonMaterial, warnLilToon } from './chunk-H4OBNJE7.js';
 import { Loader, FileLoader } from 'three';
 
 // src/material/LilToonMaterialFactory.ts
 var LilToonMaterialFactory = class {
   create(source, textures = {}) {
     return new LilToonMaterial({
+      shaderVariant: source.shaderVariant,
       renderMode: source.renderMode,
       renderQueue: source.renderQueue,
       transparencyMode: source.transparencyMode,

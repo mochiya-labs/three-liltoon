@@ -8,7 +8,9 @@ function materialNeedsTangents(material: LilToonMaterial): boolean {
 		features.normal1st ||
 		features.normal2nd ||
 		features.anisotropy ||
-		features.outline ||
+		(features.outline &&
+			(material.lilToonTextures._OutlineVectorTex != null ||
+				Number(material.lilToonProperties._OutlineVertexR2Width) === 2)) ||
 		material.lilToonTextures._MatCapBumpMap != null ||
 		material.lilToonTextures._MatCap2ndBumpMap != null
 	);

@@ -4,6 +4,10 @@ History of `MOCHIYA_materials_liltoon`, independently of the [npm package versio
 
 ## 1.3 — current
 
+### Shader selection clarification
+
+- Supported regular `shaderVariant` names determine outline presence and transparent pass configuration. Explicit mode fields must agree with the selected shader; absent shader names do not imply outline support. This clarifies existing fields without adding fields or changing the specification version.
+
 ### Embedded cubemaps — shipped in package 0.1.5
 
 - Add `cubeTextures` separately from ordinary glTF 2D `textures`.

@@ -214,7 +214,10 @@ describe("lilToon VRM expression bindings", () => {
 	});
 
 	it("keeps generated outline properties synchronized without an attachment bridge", () => {
-		const material = new LilToonMaterial({ properties: { _UseOutline: 1 } });
+		const material = new LilToonMaterial({
+			shaderVariant: "Hidden/lilToonOutline",
+			properties: { _UseOutline: 0 },
+		});
 		const mesh = new Mesh(new BufferGeometry(), material);
 		const scene = new Scene();
 		scene.add(mesh);

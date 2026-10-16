@@ -70,6 +70,18 @@ import type {
 import type { SerializedLilToonMaterial } from "./LilToonMaterialState.js";
 import { LILTOON_GLTF_SPEC_VERSION } from "../loaders/types.js";
 
+import {
+	resolveShaderVariant,
+	shaderVariants,
+	variantForModes,
+	isShaderVariant,
+	type LilToonShaderVariant,
+} from "./shaderVariants.js";
+import {
+	withVertexInputs,
+	updateVertexInputs,
+} from "../renderer/vertexInputs.js";
+
 function copyValue(value: LilToonScalarOrVector): LilToonScalarOrVector {
 	if (Array.isArray(value)) return [...value];
 	if (
@@ -124,9 +136,48 @@ export class LilToonMaterial extends RawShaderMaterial {
 			);
 		this.#renderQueue = value;
 	}
-	renderMode: LilToonRenderMode;
+	#copying = false;
+	#shaderVariant: LilToonShaderVariant = "lilToon";
+	get shaderVariant(): LilToonShaderVariant {
+		return this.#shaderVariant;
+	}
+	set shaderVariant(value: LilToonShaderVariant) {
+		if (!isShaderVariant(value))
+			throw new Error(`Unsupported lilToon shader: ${value}`);
+		if (value === this.#shaderVariant) return;
+		this.#shaderVariant = value;
+		if (this.lilToonProperties) {
+			this.featureSet = detectLilToonFeatures(this.lilToonProperties, value);
+			this.refreshProgram();
+			applyLilToonPassState(
+				this,
+				this.renderMode,
+				this.lilToonProperties,
+				this.pass,
+			);
+		}
+	}
+	get renderMode(): LilToonRenderMode {
+		return shaderVariants[this.#shaderVariant][0];
+	}
+	set renderMode(value: LilToonRenderMode) {
+		this.shaderVariant = variantForModes(
+			value,
+			value === "transparent" ? this.transparencyMode : "normal",
+			shaderVariants[this.#shaderVariant][2],
+		);
+	}
+	get transparencyMode(): LilToonTransparencyMode {
+		return shaderVariants[this.#shaderVariant][1];
+	}
+	set transparencyMode(value: LilToonTransparencyMode) {
+		this.shaderVariant = variantForModes(
+			this.renderMode,
+			value,
+			shaderVariants[this.#shaderVariant][2],
+		);
+	}
 	pass: LilToonPass;
-	transparencyMode: LilToonTransparencyMode;
 	featureSet: LilToonFeatureSet;
 	readonly #samplerBindings: Map<string, string>;
 	readonly #cubeSamplers: Set<string>;
@@ -138,7 +189,8 @@ export class LilToonMaterial extends RawShaderMaterial {
 	readonly #startedAt = performance.now();
 
 	constructor(parameters: LilToonMaterialParameters = {}) {
-		const renderMode = parameters.renderMode ?? "opaque";
+		const shaderVariant = resolveShaderVariant(parameters);
+		const renderMode = shaderVariants[shaderVariant][0];
 		const pass = parameters.pass ?? "forward";
 		const program =
 			pass === "outline"
@@ -183,9 +235,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 			// Three owns the final #version placement because it prepends material
 			// defines even for RawShaderMaterial. Generated artifacts retain their
 			// standalone directive for offline validation.
-			vertexShader: (pass === "fur" || pass === "fur-pre"
-				? program.vertexShader
-				: withThreeMorphTargets(program.vertexShader)
+			vertexShader: withVertexInputs(
+				pass === "fur" || pass === "fur-pre"
+					? program.vertexShader
+					: withThreeMorphTargets(program.vertexShader),
 			).replace(/^#version 300 es\s*/, ""),
 			fragmentShader: withOutputTransform(program.fragmentShader).replace(
 				/^#version 300 es\s*/,
@@ -196,10 +249,9 @@ export class LilToonMaterial extends RawShaderMaterial {
 			lights: false,
 			fog: false,
 		});
-		this.renderMode = renderMode;
+		this.#shaderVariant = shaderVariant;
 		this.renderQueue = parameters.renderQueue;
 		this.pass = pass;
-		this.transparencyMode = parameters.transparencyMode ?? "normal";
 		this.forceSinglePass = true;
 		this.globalUniforms = globalUniforms;
 		this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
@@ -220,6 +272,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 				return Array.isArray(c) ? (c[3] ?? 1) : c instanceof Vector4 ? c.w : 1;
 			},
 			set: (alpha: number) => {
+				if (this.#copying) return;
 				this.syncColor();
 				const c = this.lilToonProperties._Color as number[];
 				this.setProperty("_Color", [c[0]!, c[1]!, c[2]!, alpha]);
@@ -233,6 +286,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 					? Number(this.lilToonProperties._Cutoff ?? 0.5)
 					: 0,
 			set: (cutoff: number) => {
+				if (this.#copying) return;
 				if (!["opaque", "cutout", "transparent"].includes(this.renderMode)) {
 					this.setProperty("_Cutoff", cutoff);
 					return;
@@ -249,13 +303,6 @@ export class LilToonMaterial extends RawShaderMaterial {
 			},
 		});
 
-		if (
-			renderMode.startsWith("refraction") ||
-			renderMode === "gem" ||
-			renderMode.startsWith("fur")
-		) {
-			this.lilToonProperties._UseOutline = 0;
-		}
 		for (const [name, value] of Object.entries({
 			...this.lilToonProperties,
 			...parameters.properties,
@@ -274,7 +321,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 		if (parameters.map !== undefined) this.map = parameters.map;
 		if (parameters.alphaTest !== undefined)
 			this.alphaTest = parameters.alphaTest;
-		this.featureSet = detectLilToonFeatures(this.lilToonProperties);
+		this.featureSet = detectLilToonFeatures(
+			this.lilToonProperties,
+			this.shaderVariant,
+		);
 		applyLilToonPassState(
 			this,
 			this.renderMode,
@@ -299,6 +349,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 			_group: Group,
 		) => {
 			this.refreshProgram();
+			updateVertexInputs(this, _geometry);
 			this.bindTextureViews();
 			const elapsed = (performance.now() - this.#startedAt) / 1000;
 			updateObjectCameraUniforms(
@@ -376,7 +427,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 		this.lilToonProperties[name] = copyValue(value);
 		setGlobalProperty(this.globalUniforms, name, value);
 		if (name === "_Color") this.readColor();
-		this.featureSet = detectLilToonFeatures(this.lilToonProperties);
+		this.featureSet = detectLilToonFeatures(
+			this.lilToonProperties,
+			this.shaderVariant,
+		);
 		if (
 			/(_Cull|_ZWrite|_ZTest|_Blend|_Stencil|_Offset|_ColorMask|_AlphaToMask)/.test(
 				name,
@@ -421,6 +475,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		);
 		return {
 			specVersion: LILTOON_GLTF_SPEC_VERSION,
+			shaderVariant: this.shaderVariant,
 			renderQueue: this.renderQueue,
 			lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
 			renderMode: this.renderMode,
@@ -460,17 +515,23 @@ export class LilToonMaterial extends RawShaderMaterial {
 	override copy(source: LilToonMaterial): this {
 		source.syncColor();
 		const uniforms = this.uniforms;
-		super.copy(source);
+		// Base copy writes aliases before our shader selection/properties are copied.
+		// Their setters must not reapply destination defaults over source render state.
+		this.#copying = true;
+		try {
+			super.copy(source);
+		} finally {
+			this.#copying = false;
+		}
 		const copiedUniforms = this.uniforms;
 		for (const key of Object.keys(uniforms)) delete uniforms[key];
 		Object.assign(uniforms, copiedUniforms);
 		this.uniforms = uniforms;
 		this.#morphWeights.dispose();
 		this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
-		this.renderMode = source.renderMode;
+		this.#shaderVariant = source.shaderVariant;
 		this.renderQueue = source.renderQueue;
 		this.pass = source.pass;
-		this.transparencyMode = source.transparencyMode;
 		this.#shaderKey = source.#shaderKey;
 		this.#program = source.#program;
 		this.#textureViews.dispose();
@@ -555,10 +616,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 			program.vertexShader,
 			program.fragmentShader,
 		);
-		this.vertexShader = (
+		this.vertexShader = withVertexInputs(
 			this.pass === "fur" || this.pass === "fur-pre"
 				? program.vertexShader
-				: withThreeMorphTargets(program.vertexShader)
+				: withThreeMorphTargets(program.vertexShader),
 		).replace(/^#version 300 es\s*/, "");
 		this.fragmentShader = withOutputTransform(program.fragmentShader).replace(
 			/^#version 300 es\s*/,

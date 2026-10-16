@@ -36,7 +36,7 @@ All nine regular selector modes have implementations; their pass sequences and d
 | Refraction / Refraction Blur      | Limited     | Named scene-color capture; blur adds horizontal blur, a second capture and vertical blur/refraction. Three sorting differs from Unity queues                                           |
 | Fur / Fur (Cutout) / Fur (2 pass) | Limited     | Upstream ribbon equations and shading; GPU skinning preparation where supported, cached CPU morphs and CPU fallback. No fur shadow silhouette or collision/light interaction           |
 | Gem                               | Limited     | Scene capture, black prepass and upstream gem shading; Unity fog/probe behavior is not reproduced                                                                                      |
-| Outline                           | Limited     | Additional draw following source skinning/morphs; mode-specific alpha and transparent outline state. Not a separate rendering mode                                                     |
+| Outline                           | Limited     | Selected by regular Unity shader name; follows static/skinned/morphed geometry and mode-specific alpha/state.                                                                          |
 
 Optional families such as Lite, Multi, FurOnly, tessellation, overlay and FakeShadow do not have dedicated equivalent implementations. A supported regular mode does not imply support for every upstream shader family with a similar name.
 

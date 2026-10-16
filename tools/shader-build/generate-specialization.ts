@@ -18,8 +18,24 @@ export function generateSpecialization(): void {
 		(property, id) =>
 			`[[vk::constant_id(${id})]] const bool lilWebFeature${id} = true;\n#define ${property} (lilWebFeature${id} && ${property})`,
 	).join("\n");
+	const vectorGate = `[[vk::constant_id(${SPECIALIZATION_PROPERTIES.length})]] const bool lilWebOutlineVectorTexture = true;`;
+	const functions = readFileSync(
+		resolve(LILTOON_INCLUDES, "lil_common_functions.hlsl"),
+		"utf8",
+	);
+	const vectorCall =
+		"outlineN = lilGetOutlineVector(tbnOS, uvs[outlineVectorUVMode], outlineVectorScale, outlineVectorTex LIL_SAMP_IN(samp));";
+	if (functions.split(vectorCall).length !== 2)
+		throw new Error("Upstream outline vector call changed");
+	writeFileSync(
+		resolve(directory, "lil_common_functions.hlsl"),
+		functions.replace(
+			vectorCall,
+			`if(lilWebOutlineVectorTexture) ${vectorCall}`,
+		),
+	);
 	writeFileSync(
 		resolve(directory, "lil_common.hlsl"),
-		`// Generated upstream include with specialization gates.\n${source.replace(anchor, `${anchor}\n${gates}`)}`,
+		`// Generated upstream include with specialization gates.\n${source.replace(anchor, `${anchor}\n${gates}\n${vectorGate}`)}`,
 	);
 }

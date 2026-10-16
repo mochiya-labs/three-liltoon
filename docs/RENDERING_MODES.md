@@ -29,9 +29,25 @@ const release = enableLilToon(renderer);
 
 `transparencyMode` applies only to transparent. Normal and OnePass share the base/outline sequence while ForwardAdd is deferred; their identities remain distinct. TwoPass draws upstream `LIL_TRANSPARENT_PRE` with `_Pre*` state before the surface. All three draw their optional transparent outline afterward using `_Outline*` state. Three's implicit double-sided split is disabled. These sequences apply per material group and follow source deformation.
 
-Direct transparent materials use upstream ShaderLab defaults, including `_ZWrite: 1` and `_SrcBlend: 1`. Exported/explicit properties override defaults. The upstream pass named FORWARD_BACK uses configurable `_PreCull`; it does not unconditionally cull front faces. Outline remains a setting/pass, not a rendering mode.
+Direct transparent materials use upstream ShaderLab defaults, including `_ZWrite: 1` and `_SrcBlend: 1`. Exported/explicit properties override defaults. The upstream pass named FORWARD_BACK uses configurable `_PreCull`; it does not unconditionally cull front faces. Outline presence follows the selected Unity shader variant; it is not an additional rendering mode.
 
 The [material extension](MATERIAL_FORMAT.md) version 1.2 represents these modes and `transparencyMode`; versions 1.0/1.1 remain readable. Missing fields are inferred from supported Unity shader names. Cloning and standalone serialization preserve the setting. Unity accepts corresponding regular shader names and transparent outline forms; Lite, Multi, FurOnly, tessellation, overlay and other unsupported families remain rejected. Fur Cutout exports MASK as the non-extension glTF fallback. Update the runtime before consuming newly exported modes.
+
+## Unity shader selection
+
+Use `shaderVariant` to select a regular Unity shader, including its outline pass. `shaderVariant` alone is sufficient for shader selection: omit `renderMode` and `transparencyMode` to use the selected shader’s modes. If either mode field is also supplied, it must agree with that shader. Without a shader name, mode-based construction selects a non-outline variant.
+
+| Surface configuration | Without outline                    | With outline                              |
+| --------------------- | ---------------------------------- | ----------------------------------------- |
+| Opaque                | `lilToon`                          | `Hidden/lilToonOutline`                   |
+| Cutout                | `Hidden/lilToonCutout`             | `Hidden/lilToonCutoutOutline`             |
+| Transparent Normal    | `Hidden/lilToonTransparent`        | `Hidden/lilToonTransparentOutline`        |
+| Transparent OnePass   | `Hidden/lilToonOnePassTransparent` | `Hidden/lilToonOnePassTransparentOutline` |
+| Transparent TwoPass   | `Hidden/lilToonTwoPassTransparent` | `Hidden/lilToonTwoPassTransparentOutline` |
+
+The remaining supported names are `Hidden/lilToonRefraction`, `Hidden/lilToonRefractionBlur`, `Hidden/lilToonFur`, `Hidden/lilToonFurCutout`, `Hidden/lilToonFurTwoPass` and `Hidden/lilToonGem`. These variants have no regular outline pass.
+
+Select an outline variant through `shaderVariant`, then call `enableLilToon(renderer)` to draw its additional pass. Width, color, textures and other `_Outline*` properties retain their upstream meanings. Materials exported with a supported outline shader name require no property rewrite or re-export to select that pass. See [shader selection and outlines](API.md#shader-selection-and-outlines) for outline-property behavior.
 
 ## Implementation
 

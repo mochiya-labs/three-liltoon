@@ -62,7 +62,8 @@ scene.add(light);
 const geometry = new THREE.SphereGeometry(1, 32, 24);
 const material = new LilToonMaterial({
 	color: "#e85a7a",
-	properties: { _UseShadow: 1, _UseOutline: 1, _OutlineWidth: 0.03 },
+	shaderVariant: "Hidden/lilToonOutline",
+	properties: { _UseShadow: 1, _OutlineWidth: 0.03 },
 });
 scene.add(new THREE.Mesh(geometry, material));
 renderer.setAnimationLoop(() => renderer.render(scene, camera));
@@ -91,6 +92,8 @@ material.setProperty("_RimColor", [1, 0.5, 0.6, 1]);
 ```
 
 Feature toggles and texture assignments specialize the shader automatically. Ordinary numeric animation updates uniforms. Dispose shared input textures separately when your application no longer needs them. [Material API and lifecycle](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/API.md)
+
+`shaderVariant` selects the original lilToon shader, including whether it has an outline pass. See [shader selection and outlines](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/API.md#shader-selection-and-outlines) for usage and supported behavior.
 
 ## Bring a model from Unity
 

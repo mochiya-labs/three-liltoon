@@ -17,7 +17,8 @@ describe("auxiliary pass lifetime", () => {
 			const source = new LilToonMaterial({
 				renderMode:
 					pass === "refraction-blur-pre" ? "refraction-blur" : "transparent",
-				transparencyMode: "two-pass",
+				transparencyMode:
+					pass === "refraction-blur-pre" ? "normal" : "two-pass",
 			});
 			const scene = new Scene(),
 				mesh = new Mesh(new PlaneGeometry(), source),

@@ -136,7 +136,9 @@ export function verifyMorphRendering() {
 				reference.morphTargetInfluences = [];
 				// The clone shares the original skeleton, whose posed bone is kept current by the source draw.
 				for (const outline of [false, true]) {
-					material.setProperty("_UseOutline", Number(outline));
+					material.shaderVariant = outline
+						? "Hidden/lilToonOutline"
+						: "lilToon";
 					material.setProperty("_OutlineWidth", 0.07);
 					checks[[relative, manyActive, skinned, outline].join("/")] =
 						difference(pixels(mesh), pixels(reference));
@@ -151,7 +153,7 @@ export function verifyMorphRendering() {
 			}
 	// Shared geometry/material must still receive each mesh's final expression
 	// weights. Compare against independent materials across changing frames.
-	material.setProperty("_UseOutline", 0);
+	material.shaderVariant = "lilToon";
 	const sharedGeometry = new PlaneGeometry(0.4, 0.4);
 	sharedGeometry.morphTargetsRelative = true;
 	sharedGeometry.morphAttributes.position = Array.from(

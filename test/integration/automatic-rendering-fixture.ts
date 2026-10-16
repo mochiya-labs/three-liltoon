@@ -28,7 +28,8 @@ export function verifyAutomaticRendering() {
 	scene.add(light, new AmbientLight(0xffffff, 0.3));
 	const material = new LilToonMaterial({
 		color: new Color(0.6, 0.1, 0.2),
-		properties: { _UseOutline: 1, _OutlineWidth: 0.1 },
+		shaderVariant: "Hidden/lilToonOutline",
+		properties: { _UseOutline: 0, _OutlineWidth: 0.1 },
 	});
 	const mesh = new Mesh(new BoxGeometry(), material);
 	mesh.castShadow = true;
@@ -57,9 +58,9 @@ export function verifyAutomaticRendering() {
 	checks.standardReplacement = render() === 1 && outlineDraws === 0;
 	mesh.material = material;
 	checks.restore = render() === 2 && outlineDraws === 1;
-	material.setProperty("_UseOutline", 0);
+	material.shaderVariant = "lilToon";
 	checks.disable = render() === 1;
-	material.setProperty("_UseOutline", 1);
+	material.shaderVariant = "Hidden/lilToonOutline";
 	const originalCallback = scene.onBeforeRender;
 	scene.onBeforeRender = () => {
 		mesh.material = standard as unknown as LilToonMaterial;
@@ -105,7 +106,7 @@ export function verifyAutomaticRendering() {
 	stock.render(world, camera);
 	checks.stockForward = stock.info.render.calls === 1;
 	const release = enableLilToon(stock);
-	plain.setProperty("_UseOutline", 1);
+	plain.shaderVariant = "Hidden/lilToonOutline";
 	stock.render(world, camera);
 	checks.existingRenderer = stock.info.render.calls === 2;
 	release();

@@ -49,7 +49,7 @@ function copyProperty(value: LilToonScalarOrVector): LilToonScalarOrVector {
 type Recipe = {
 	owners: Map<Mesh, Object3D>;
 	source: LilToonMaterial;
-	outline: LilToonMaterial;
+	outline: LilToonMaterial | null;
 	depth: MeshDepthMaterial;
 	distance: MeshDistanceMaterial;
 	input: Texture | null;
@@ -83,25 +83,19 @@ class AutomaticPasses {
 	private recipe(source: LilToonMaterial, mesh: Mesh, scene: Object3D): Recipe {
 		let recipe = this.recipes.get(source);
 		if (!recipe) {
-			const outline = new LilToonMaterial({
-				pass: "outline",
-				renderMode: source.renderMode,
-				properties: source.lilToonProperties,
-				textures: source.lilToonTextures,
-			});
 			const depth = new MeshDepthMaterial({ depthPacking: RGBADepthPacking });
 			const distance = new MeshDistanceMaterial();
 			recipe = {
 				owners: new Map(),
 				source,
-				outline,
+				outline: null,
 				depth,
 				distance,
 				input: null,
 				map: null,
 				release: () => {
 					source.removeEventListener("dispose", recipe!.release);
-					outline.dispose();
+					recipe!.outline?.dispose();
 					depth.dispose();
 					distance.dispose();
 					recipe!.map?.dispose();
@@ -112,33 +106,6 @@ class AutomaticPasses {
 			source.addEventListener("dispose", recipe.release);
 		}
 		recipe.owners.set(mesh, scene);
-		// Read mutable standard Color edits as well as original property setters.
-		source.getProperty("_Color");
-		let changed = recipe.outline.renderMode !== source.renderMode;
-		for (const [name, value] of Object.entries(source.lilToonProperties)) {
-			if (sameProperty(value, recipe.outline.lilToonProperties[name])) continue;
-			recipe.outline.lilToonProperties[name] = copyProperty(value);
-			setGlobalProperty(recipe.outline.globalUniforms, name, value);
-			changed = true;
-		}
-		for (const [name, texture] of Object.entries(source.lilToonTextures)) {
-			if (recipe.outline.lilToonTextures[name] !== texture)
-				recipe.outline.setTexture(name, texture);
-		}
-		if (changed) {
-			recipe.outline.renderMode = source.renderMode;
-			// Refresh feature/program selection only when inputs actually change.
-			recipe.outline.setProperty("_Color", source.getProperty("_Color")!);
-			applyLilToonPassState(
-				recipe.outline,
-				source.renderMode,
-				source.lilToonProperties,
-				"outline",
-			);
-		}
-		recipe.outline.visible = source.visible;
-		recipe.outline.toneMapped = source.toneMapped;
-		recipe.outline.renderQueue = source.renderQueue;
 		if (recipe.input !== source.map) {
 			recipe.map?.dispose();
 			recipe.input = source.map;
@@ -164,9 +131,48 @@ class AutomaticPasses {
 		}
 		return recipe;
 	}
+	private prepareOutline(recipe: Recipe): LilToonMaterial {
+		const source = recipe.source;
+		// Capture mutable aliases before constructing the first outline.
+		source.getProperty("_Color");
+		const outline = (recipe.outline ??= new LilToonMaterial({
+			pass: "outline",
+			shaderVariant: source.shaderVariant,
+			properties: source.lilToonProperties,
+			textures: source.lilToonTextures,
+		}));
+		let changed = outline.shaderVariant !== source.shaderVariant;
+		for (const [name, value] of Object.entries(source.lilToonProperties)) {
+			if (sameProperty(value, outline.lilToonProperties[name])) continue;
+			outline.lilToonProperties[name] = copyProperty(value);
+			setGlobalProperty(outline.globalUniforms, name, value);
+			changed = true;
+		}
+		for (const [name, texture] of Object.entries(source.lilToonTextures)) {
+			if (outline.lilToonTextures[name] !== texture)
+				outline.setTexture(name, texture);
+		}
+		if (changed) {
+			outline.shaderVariant = source.shaderVariant;
+			// Refresh feature/program selection only when inputs actually change.
+			outline.setProperty("_Color", source.getProperty("_Color")!);
+			applyLilToonPassState(
+				outline,
+				source.renderMode,
+				source.lilToonProperties,
+				"outline",
+			);
+		}
+		outline.visible = source.visible;
+		outline.toneMapped = source.toneMapped;
+		outline.renderQueue = source.renderQueue;
+		return outline;
+	}
 	prepare(scene: Object3D): () => void {
 		const undo: (() => void)[] = [];
 		const meshes: Mesh[] = [];
+		// Invocation-local: nested renders and later scene edits must synchronize again.
+		const outlinesPrepared = new Set<Recipe>();
 		scene.traverseVisible((node) => {
 			if ((node as Mesh).isMesh && !helpers.has(node))
 				meshes.push(node as Mesh);
@@ -183,14 +189,6 @@ class AutomaticPasses {
 				);
 				const first = recipes.find((recipe) => recipe !== undefined);
 				if (!first) continue;
-				const outlines = recipes.map((recipe) =>
-					recipe &&
-					recipe.source.renderMode !== "transparent" &&
-					Number(recipe.source.lilToonProperties._UseOutline ?? 1) !== 0 &&
-					Number(recipe.source.lilToonProperties._OutlineWidth ?? 0) > 0
-						? recipe.outline
-						: this.hidden,
-				);
 				// Legacy manually attached outlines are honored without generating a duplicate.
 				const manualOutline = mesh.children.some(
 					(child) =>
@@ -198,6 +196,20 @@ class AutomaticPasses {
 						(child as Mesh).isMesh &&
 						((child as Mesh).material as LilToonMaterial)?.pass === "outline",
 				);
+				const outlines = recipes.map((recipe) => {
+					if (
+						manualOutline ||
+						!recipe ||
+						recipe.source.renderMode === "transparent" ||
+						!recipe.source.featureSet.outline
+					)
+						return this.hidden;
+					if (!outlinesPrepared.has(recipe)) {
+						this.prepareOutline(recipe);
+						outlinesPrepared.add(recipe);
+					}
+					return recipe.outline!;
+				});
 				if (
 					!manualOutline &&
 					outlines.some((material) => material !== this.hidden)
@@ -205,8 +217,8 @@ class AutomaticPasses {
 					let proxy = this.proxies.get(mesh);
 					if (!proxy) {
 						proxy = (mesh as SkinnedMesh).isSkinnedMesh
-							? new SkinnedMesh(mesh.geometry, first.outline)
-							: new Mesh(mesh.geometry, first.outline);
+							? new SkinnedMesh(mesh.geometry, this.hidden)
+							: new Mesh(mesh.geometry, this.hidden);
 						proxy.name = `${mesh.name}:lilToon-outline`;
 						proxy.matrixAutoUpdate = false;
 						proxy.raycast = () => {};

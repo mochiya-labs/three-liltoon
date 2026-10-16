@@ -61,12 +61,7 @@ export class TransparencyPasses {
 						(c as Mesh).isMesh &&
 						((c as Mesh).material as LilToonMaterial)?.pass === "outline",
 				);
-				if (
-					isSurface(source) &&
-					!manual &&
-					Number(source.lilToonProperties._UseOutline ?? 1) !== 0 &&
-					Number(source.lilToonProperties._OutlineWidth ?? 0) > 0
-				)
+				if (isSurface(source) && !manual && source.featureSet.outline)
 					this.draws.draw(
 						renderer,
 						render,

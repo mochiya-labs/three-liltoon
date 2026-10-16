@@ -26,7 +26,7 @@
         },
         "shaderVariant": {
           "type": "string",
-          "description": "Original Unity shader name; does not imply renderer support for that shader."
+          "description": "Original Unity shader name. Supported regular names select surface, transparency and outline passes; unsupported names warn and use fallback."
         },
         "renderQueue": {
           "type": "integer",
@@ -36,11 +36,11 @@
         },
         "renderMode": {
           "$ref": "#/definitions/LilToonRenderMode",
-          "description": "When omitted, inferred from the original supported shader family."
+          "description": "When omitted, inferred from the shader family. Must agree with a supported shaderVariant."
         },
         "transparencyMode": {
           "$ref": "#/definitions/LilToonTransparencyMode",
-          "description": "Transparent family pass configuration. Defaults to normal or is inferred from shaderVariant."
+          "description": "Transparent family pass configuration. Inferred from shaderVariant when present; explicit values must agree with supported variants."
         },
         "properties": {
           "type": "object",

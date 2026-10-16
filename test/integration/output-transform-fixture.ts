@@ -151,7 +151,7 @@ export function verifyOutputTransform() {
 		);
 	}
 	// Auxiliary draws must inherit toneMapped independently of authored properties.
-	translucent.setProperty("_UseOutline", 1);
+	translucent.shaderVariant = "Hidden/lilToonTransparentOutline";
 	translucent.setProperty("_OutlineWidth", 0.04);
 	translucent.transparencyMode = "two-pass";
 	translucent.toneMapped = false;

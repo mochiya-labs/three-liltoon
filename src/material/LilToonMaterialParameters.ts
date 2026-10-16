@@ -29,6 +29,8 @@ export type LilToonScalarOrVector =
 	number | boolean | number[] | Color | Vector2 | Vector3 | Vector4;
 
 export interface LilToonMaterialParameters {
+	/** Unity shader selection, including outline pass presence. Defaults to the non-outline variant for the selected modes. */
+	shaderVariant?: import("./shaderVariants.js").LilToonShaderVariant;
 	color?: ColorRepresentation;
 	opacity?: number;
 	map?: Texture | null;

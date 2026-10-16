@@ -30,6 +30,16 @@ function postprocessGlsl(source: string, stage: ShaderStage): string {
 		for (const [generated, three] of Object.entries(attributes)) {
 			output = output.replace(new RegExp(`\\b${generated}\\b`, "g"), three);
 		}
+		const locations = Object.values(attributes);
+		output = output.replace(
+			/layout\(location = \d+\) in (vec[234]) (\w+);/g,
+			(declaration, type: string, name: string) => {
+				const location = locations.indexOf(name);
+				return location < 0
+					? declaration
+					: `layout(location = ${location}) in ${type} ${name};`;
+			},
+		);
 	} else {
 		// SPIRV-Cross names stage outputs and inputs independently. WebGL2 links
 		// varyings by name (location qualifiers are not available until later
