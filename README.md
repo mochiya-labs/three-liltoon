@@ -9,7 +9,7 @@ It is an unofficial, MIT-licensed port maintained by [Mochiya](https://mochiya.o
 - Render opaque, cutout, transparent, refraction, fur and gem materials, with outlines and animated meshes.
 - Keep standard glTF/VRM loading for materials without the lilToon extension.
 
-[Documentation](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/README.md) · [Feature matrix](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/FEATURE_MATRIX.md) · [Report an issue](https://github.com/mochiya-labs/three-liltoon/issues)
+[Documentation](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/README.md) · [Feature matrix](https://github.com/mochiya-labs/three-liltoon/blob/main/docs/FEATURE_MATRIX.md) · [Changelog](https://github.com/mochiya-labs/three-liltoon/blob/main/CHANGELOG.md) · [Report an issue](https://github.com/mochiya-labs/three-liltoon/issues)
 
 ## Install
 

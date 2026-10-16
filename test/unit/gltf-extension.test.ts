@@ -19,6 +19,43 @@ import {
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
 
 describe("GLTFLilToonExtension", () => {
+	it.each(["1.0", "1.1", "1.2", "1.3"])(
+		"loads queue metadata and legacy files for %s",
+		async (specVersion) => {
+			for (const renderQueue of [undefined, 2450]) {
+				const parser = {
+					json: {
+						materials: [
+							{
+								extensions: {
+									[LILTOON_GLTF_EXTENSION]: {
+										specVersion,
+										renderQueue,
+										shaderVariant: "Hidden/lilToonTransparent",
+										properties: { _ZWrite: 1 },
+									},
+								},
+							},
+						],
+					},
+					associations: new Map(),
+				} as unknown as GLTFParser;
+				const warnings: unknown[] = [];
+				const material = (await new GLTFLilToonExtension(parser, {
+					onWarning: (w) => warnings.push(w),
+				}).loadMaterial(0)) as LilToonMaterial;
+				expect(material.renderQueue).toBe(renderQueue);
+				expect(material.transparent).toBe(true);
+				expect(material.depthWrite).toBe(true);
+				expect(
+					material
+						.getWarnings()
+						.some((w) => w.code === "spec-version-mismatch"),
+				).toBe(false);
+				material.dispose();
+			}
+		},
+	);
 	it("associates a custom material with its glTF material index", async () => {
 		const associations = new Map();
 		const parser = {

@@ -5,6 +5,7 @@ export default defineConfig({
 	fullyParallel: true,
 	reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
 	use: {
+		channel: process.env.PLAYWRIGHT_CHANNEL,
 		baseURL: "http://127.0.0.1:5173",
 		screenshot: "only-on-failure",
 		trace: "retain-on-failure",

@@ -63,7 +63,10 @@ function ModelLoader({
 	onStatusChange,
 }: ModelLoaderProps) {
 	const renderer = useThree((state) => state.gl);
-	useEffect(() => enableLilToon(renderer), [renderer]);
+	useEffect(
+		() => enableLilToon(renderer, { materialRenderQueue: true }),
+		[renderer],
+	);
 	const [model, setModel] = useState<LoadedModel | null>(null);
 
 	useEffect(() => {

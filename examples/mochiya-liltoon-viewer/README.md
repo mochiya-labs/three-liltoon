@@ -46,7 +46,7 @@ Local File
   -> React Three Fiber scene
 ```
 
-The viewport installs `enableLilToon(renderer)` through a renderer-lifetime effect. Rendering prepares outlines and casters automatically; the loader has no renderer or pass setup. The same loader handles both file types. `three-liltoon/vrm` delegates standard VRM loading and installs lilToon material expressions automatically. A GLB without the Mochiya extension keeps its normal Three.js glTF materials. A VRM additionally exposes its `VRM` runtime and receives `vrm.update(delta)` each frame. The first embedded glTF animation clip, when present, is played automatically.
+The viewport installs `enableLilToon(renderer, { materialRenderQueue: true })` through a renderer-lifetime effect, preserving exported lilToon material queue priorities within Three.js render lists. Older files without queue metadata retain fallback sorting. Rendering prepares outlines and casters automatically; the loader has no renderer or pass setup. The same loader handles both file types. `three-liltoon/vrm` delegates standard VRM loading and installs lilToon material expressions automatically. A GLB without the Mochiya extension keeps its normal Three.js glTF materials. A VRM additionally exposes its `VRM` runtime and receives `vrm.update(delta)` each frame. The first embedded glTF animation clip, when present, is played automatically.
 
 The **Textures** tab displays exported reflection cubemaps as six labeled faces, with face dimensions and a mip-level selector. **Preview exposure** adjusts only these tone-mapped thumbnails, leaving the model unchanged. Embedded half-float, float and RGBA byte pixel faces are supported; other cube representations show “Preview unavailable”. Ordinary 2D texture thumbnails remain available.
 

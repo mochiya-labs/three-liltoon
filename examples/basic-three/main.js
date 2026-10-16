@@ -27,7 +27,7 @@ const context = canvas.getContext("webgl2", { antialias: true, alpha: false });
 if (!context) throw new Error("This example requires WebGL2.");
 
 const renderer = new WebGLRenderer({ canvas, context, antialias: true });
-enableLilToon(renderer);
+enableLilToon(renderer, { materialRenderQueue: true });
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFShadowMap;

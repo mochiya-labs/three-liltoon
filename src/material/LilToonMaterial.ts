@@ -1,3 +1,8 @@
+import {
+	outputUniforms,
+	withOutputTransform,
+	updateOutputTransform,
+} from "../renderer/outputTransform.js";
 import { TextureViews } from "../utils/TextureViews.js";
 import {
 	checkTextureLimits,
@@ -9,7 +14,6 @@ import {
 	GLSL3,
 	Matrix4,
 	RawShaderMaterial,
-	SRGBColorSpace,
 	Vector2,
 	Vector3,
 	Vector4,
@@ -100,38 +104,26 @@ function textureDefault(property: string): string {
 	return "white";
 }
 
-const OUTPUT_SRGB_UNIFORM = "uLilToonOutputSrgb";
-
-function addOutputColorSpaceConversion(fragmentShader: string): string {
-	const globalsIndex = fragmentShader.indexOf("struct type_Globals");
-	const mainEnd = fragmentShader.lastIndexOf("\n}");
-	if (globalsIndex < 0 || mainEnd < 0) return fragmentShader;
-
-	const withUniform =
-		`${fragmentShader.slice(0, globalsIndex)}uniform uint ${OUTPUT_SRGB_UNIFORM};\n\n` +
-		fragmentShader.slice(globalsIndex);
-	const adjustedMainEnd =
-		mainEnd + `uniform uint ${OUTPUT_SRGB_UNIFORM};\n\n`.length;
-	const conversion = `
-    if (${OUTPUT_SRGB_UNIFORM} != 0u)
-    {
-        highp vec3 linearColor = max(out_var_SV_Target.rgb, vec3(0.0));
-        out_var_SV_Target.rgb = mix(
-            pow(linearColor, vec3(0.41666)) * 1.055 - vec3(0.055),
-            linearColor * 12.92,
-            lessThanEqual(linearColor, vec3(0.0031308))
-        );
-    }
-`;
-	return `${withUniform.slice(0, adjustedMainEnd)}${conversion}${withUniform.slice(adjustedMainEnd)}`;
-}
-
 export class LilToonMaterial extends RawShaderMaterial {
 	color = new Color(1, 1, 1);
 	readonly isLilToonMaterial = true;
 	readonly lilToonProperties: Record<string, LilToonScalarOrVector>;
 	readonly lilToonTextures: Record<string, Texture | null> = {};
 	globalUniforms: LilToonGlobalUniforms;
+	#renderQueue: number | undefined;
+	get renderQueue(): number | undefined {
+		return this.#renderQueue;
+	}
+	set renderQueue(value: number | undefined) {
+		if (
+			value !== undefined &&
+			(!Number.isInteger(value) || value < 0 || value > 5000)
+		)
+			throw new RangeError(
+				"renderQueue must be an integer from 0 to 5000, or undefined",
+			);
+		this.#renderQueue = value;
+	}
 	renderMode: LilToonRenderMode;
 	pass: LilToonPass;
 	transparencyMode: LilToonTransparencyMode;
@@ -167,7 +159,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		);
 		const uniforms: Record<string, IUniform> = {
 			_Globals: { value: globalUniforms },
-			[OUTPUT_SRGB_UNIFORM]: { value: 1 },
+			...outputUniforms(),
 		};
 		const cubeSamplers = new Set(
 			[
@@ -195,15 +187,17 @@ export class LilToonMaterial extends RawShaderMaterial {
 				? program.vertexShader
 				: withThreeMorphTargets(program.vertexShader)
 			).replace(/^#version 300 es\s*/, ""),
-			fragmentShader: addOutputColorSpaceConversion(
-				program.fragmentShader,
-			).replace(/^#version 300 es\s*/, ""),
+			fragmentShader: withOutputTransform(program.fragmentShader).replace(
+				/^#version 300 es\s*/,
+				"",
+			),
 			glslVersion: GLSL3,
 			uniforms,
 			lights: false,
 			fog: false,
 		});
 		this.renderMode = renderMode;
+		this.renderQueue = parameters.renderQueue;
 		this.pass = pass;
 		this.transparencyMode = parameters.transparencyMode ?? "normal";
 		this.forceSinglePass = true;
@@ -326,11 +320,14 @@ export class LilToonMaterial extends RawShaderMaterial {
 					this.defines.USE_MORPHTARGETS && this.defines.MORPHTARGETS_COUNT,
 				),
 			);
-			const outputColorSpace =
-				renderer.getRenderTarget()?.texture.colorSpace ??
-				renderer.outputColorSpace;
-			this.uniforms[OUTPUT_SRGB_UNIFORM]!.value = Number(
-				outputColorSpace === SRGBColorSpace,
+			updateOutputTransform(
+				this,
+				renderer,
+				this.renderMode === "transparent" &&
+					!(
+						this.pass === "transparent-pre" &&
+						Number(this.lilToonProperties._PreOutType ?? 0) !== 0
+					),
 			);
 
 			// The glTF loader intentionally shares one material instance between meshes.
@@ -424,6 +421,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		);
 		return {
 			specVersion: LILTOON_GLTF_SPEC_VERSION,
+			renderQueue: this.renderQueue,
 			lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
 			renderMode: this.renderMode,
 			properties,
@@ -470,6 +468,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		this.#morphWeights.dispose();
 		this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
 		this.renderMode = source.renderMode;
+		this.renderQueue = source.renderQueue;
 		this.pass = source.pass;
 		this.transparencyMode = source.transparencyMode;
 		this.#shaderKey = source.#shaderKey;
@@ -561,9 +560,10 @@ export class LilToonMaterial extends RawShaderMaterial {
 				? program.vertexShader
 				: withThreeMorphTargets(program.vertexShader)
 		).replace(/^#version 300 es\s*/, "");
-		this.fragmentShader = addOutputColorSpaceConversion(
-			program.fragmentShader,
-		).replace(/^#version 300 es\s*/, "");
+		this.fragmentShader = withOutputTransform(program.fragmentShader).replace(
+			/^#version 300 es\s*/,
+			"",
+		);
 		this.globalUniforms = createGlobalUniforms(
 			program.vertexShader,
 			program.fragmentShader,
@@ -572,7 +572,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		// Preserve its identity when revisiting a previously compiled variant.
 		for (const name of Object.keys(this.uniforms)) delete this.uniforms[name];
 		this.uniforms._Globals = { value: this.globalUniforms };
-		this.uniforms[OUTPUT_SRGB_UNIFORM] = { value: 1 };
+		Object.assign(this.uniforms, outputUniforms());
 		this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
 		this.#samplerBindings.clear();
 		this.#cubeSamplers.clear();

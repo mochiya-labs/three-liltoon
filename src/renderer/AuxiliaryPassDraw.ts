@@ -19,6 +19,8 @@ export function syncPassMaterial(
 	target: LilToonMaterial,
 ) {
 	source.getProperty("_Color");
+	target.toneMapped = source.toneMapped;
+	target.renderQueue = source.renderQueue;
 	target.renderMode = source.renderMode;
 	target.transparencyMode = source.transparencyMode;
 	for (const [key, value] of Object.entries(source.lilToonProperties)) {

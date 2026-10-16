@@ -1,7 +1,38 @@
-export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-UMXNL3SB.js';
-import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-DHSQY7C7.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-DHSQY7C7.js';
-import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, BufferGeometry, Scene, Vector4, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-HPHJWLMD.js';
+import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-TRIHUEDK.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-TRIHUEDK.js';
+import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, BufferGeometry, Scene, Vector4, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, REVISION, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
+
+function queue(material, defaultQueue) {
+  return material.isLilToonMaterial ? material.renderQueue ?? defaultQueue : defaultQueue;
+}
+function compareLilToonRenderQueue(a, b, defaultQueue) {
+  return queue(a, defaultQueue) - queue(b, defaultQueue);
+}
+function installMaterialRenderQueue(renderer) {
+  let camera;
+  const reversed = () => Number(REVISION) >= 185 && camera?.reversedDepth === true;
+  const priority = (a, b, fallback) => a.groupOrder - b.groupOrder || a.renderOrder - b.renderOrder || (reversed() ? -1 : 1) * compareLilToonRenderQueue(a.material, b.material, fallback);
+  renderer.setOpaqueSort(
+    (a, b) => priority(a, b, 2e3) || a.material.id - b.material.id || (a.materialVariant ?? 0) - (b.materialVariant ?? 0) || a.z - b.z || a.id - b.id
+  );
+  renderer.setTransparentSort(
+    (a, b) => priority(a, b, 3e3) || b.z - a.z || a.id - b.id
+  );
+  return {
+    enter(next) {
+      const previous = camera;
+      camera = next;
+      return () => {
+        camera = previous;
+      };
+    },
+    dispose() {
+      renderer.setOpaqueSort(null);
+      renderer.setTransparentSort(null);
+    }
+  };
+}
 
 // src/renderer/passOwnership.ts
 function ownsPassSource(root, mesh, source) {
@@ -16,6 +47,8 @@ function ownsPassSource(root, mesh, source) {
 // src/renderer/AuxiliaryPassDraw.ts
 function syncPassMaterial(source, target) {
   source.getProperty("_Color");
+  target.toneMapped = source.toneMapped;
+  target.renderQueue = source.renderQueue;
   target.renderMode = source.renderMode;
   target.transparencyMode = source.transparencyMode;
   for (const [key, value] of Object.entries(source.lilToonProperties)) {
@@ -883,6 +916,7 @@ var FurPasses = class {
         );
         source.getProperty("_Color");
         for (const material of materials2) {
+          material.toneMapped = source.toneMapped;
           let changed = false;
           for (const key2 in source.lilToonProperties) {
             const value = source.lilToonProperties[key2];
@@ -1053,6 +1087,16 @@ var TransparencyPasses = class {
 };
 
 // src/renderer/enableLilToon.ts
+function sameProperty2(value, before) {
+  if (Array.isArray(value))
+    return Array.isArray(before) && value.length === before.length && value.every((v, i) => v === before[i]);
+  if (typeof value === "object")
+    return before !== void 0 && value.constructor === before.constructor && value.equals(before);
+  return value === before;
+}
+function copyProperty(value) {
+  return Array.isArray(value) ? [...value] : typeof value === "object" ? value.clone() : value;
+}
 var helpers = /* @__PURE__ */ new WeakSet();
 var originalHooks = /* @__PURE__ */ new WeakMap();
 var AutomaticPasses = class {
@@ -1104,23 +1148,30 @@ var AutomaticPasses = class {
     }
     recipe.owners.set(mesh, scene);
     source.getProperty("_Color");
+    let changed = recipe.outline.renderMode !== source.renderMode;
     for (const [name, value] of Object.entries(source.lilToonProperties)) {
-      recipe.outline.lilToonProperties[name] = value;
+      if (sameProperty2(value, recipe.outline.lilToonProperties[name])) continue;
+      recipe.outline.lilToonProperties[name] = copyProperty(value);
       setGlobalProperty(recipe.outline.globalUniforms, name, value);
+      changed = true;
     }
-    recipe.outline.setProperty("_Color", source.getProperty("_Color"));
     for (const [name, texture] of Object.entries(source.lilToonTextures)) {
       if (recipe.outline.lilToonTextures[name] !== texture)
         recipe.outline.setTexture(name, texture);
     }
-    recipe.outline.renderMode = source.renderMode;
-    applyLilToonPassState(
-      recipe.outline,
-      source.renderMode,
-      source.lilToonProperties,
-      "outline"
-    );
+    if (changed) {
+      recipe.outline.renderMode = source.renderMode;
+      recipe.outline.setProperty("_Color", source.getProperty("_Color"));
+      applyLilToonPassState(
+        recipe.outline,
+        source.renderMode,
+        source.lilToonProperties,
+        "outline"
+      );
+    }
     recipe.outline.visible = source.visible;
+    recipe.outline.toneMapped = source.toneMapped;
+    recipe.outline.renderQueue = source.renderQueue;
     if (recipe.input !== source.map) {
       recipe.map?.dispose();
       recipe.input = source.map;
@@ -1145,7 +1196,7 @@ var AutomaticPasses = class {
   prepare(scene) {
     const undo = [];
     const meshes = [];
-    scene.traverse((node) => {
+    scene.traverseVisible((node) => {
       if (node.isMesh && !helpers.has(node))
         meshes.push(node);
     });
@@ -1238,9 +1289,14 @@ var AutomaticPasses = class {
   }
 };
 var installations = /* @__PURE__ */ new WeakMap();
-function enableLilToon(renderer) {
+function enableLilToon(renderer, options = {}) {
   const existing = installations.get(renderer);
-  if (existing) return existing.acquire();
+  if (existing) {
+    if (options.materialRenderQueue !== void 0 && options.materialRenderQueue !== existing.materialRenderQueue)
+      throw new Error("enableLilToon leases must agree on materialRenderQueue");
+    return existing.acquire();
+  }
+  const sorting = options.materialRenderQueue ? installMaterialRenderQueue(renderer) : void 0;
   const passes = new AutomaticPasses();
   const sceneColors = new SceneColorPasses();
   const fur = new FurPasses();
@@ -1248,6 +1304,7 @@ function enableLilToon(renderer) {
   const render = renderer.render, dispose = renderer.dispose;
   let users = 0, disposed = false;
   const wrapped = function(scene, camera) {
+    const restoreSortCamera = sorting?.enter(camera);
     passes.begin();
     const previous = scene.onBeforeRender;
     const original = originalHooks.get(previous) ?? previous;
@@ -1279,6 +1336,7 @@ function enableLilToon(renderer) {
       restore?.();
       if (scene.onBeforeRender === hook) scene.onBeforeRender = previous;
       passes.end();
+      restoreSortCamera?.();
     }
   };
   const wrappedDispose = () => {
@@ -1286,11 +1344,13 @@ function enableLilToon(renderer) {
     dispose.call(renderer);
   };
   const installation = {
+    materialRenderQueue: options.materialRenderQueue ?? false,
     release: () => {
       if (disposed) return;
       disposed = true;
       if (renderer.render === wrapped) renderer.render = render;
       if (renderer.dispose === wrappedDispose) renderer.dispose = dispose;
+      sorting?.dispose();
       passes.dispose();
       sceneColors.dispose();
       fur.dispose();
@@ -11314,4 +11374,4 @@ var LILTOON_RENDER_RECIPES = {
   }
 };
 
-export { FurPass, GemPass, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, RefractionPass, enableLilToon };
+export { FurPass, GemPass, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, RefractionPass, compareLilToonRenderQueue, enableLilToon };

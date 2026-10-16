@@ -1,4 +1,4 @@
-import { Vector3, Matrix4, Vector2, CubeTexture, Vector4, Color, AmbientLight, HemisphereLight, RawShaderMaterial, GLSL3, SRGBColorSpace, DirectionalLight, DataTexture, RGBAFormat, UnsignedByteType, RepeatWrapping, LinearFilter, CustomBlending, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, RedFormat, FloatType, HalfFloatType, LinearSRGBColorSpace, LinearMipmapLinearFilter, ClampToEdgeWrapping, LinearMipmapNearestFilter, ShaderChunk, BufferAttribute, FrontSide, BackSide, DoubleSide, LessEqualDepth, AlwaysDepth, GreaterEqualDepth, NotEqualDepth, GreaterDepth, EqualDepth, LessDepth, NeverDepth, SrcAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaSaturateFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusDstColorFactor, SrcColorFactor, DstColorFactor, OneFactor, ZeroFactor, AddEquation, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, AlwaysStencilFunc, GreaterEqualStencilFunc, NotEqualStencilFunc, GreaterStencilFunc, LessEqualStencilFunc, EqualStencilFunc, LessStencilFunc, NeverStencilFunc, KeepStencilOp, DecrementWrapStencilOp, IncrementWrapStencilOp, InvertStencilOp, DecrementStencilOp, IncrementStencilOp, ReplaceStencilOp, ZeroStencilOp } from 'three';
+import { Vector3, Matrix4, Vector2, CubeTexture, Vector4, Color, AmbientLight, HemisphereLight, RawShaderMaterial, GLSL3, DirectionalLight, DataTexture, RGBAFormat, UnsignedByteType, RepeatWrapping, LinearFilter, CustomBlending, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, RedFormat, FloatType, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping, CustomToneMapping, ShaderChunk, NoToneMapping, SRGBColorSpace, HalfFloatType, LinearSRGBColorSpace, LinearMipmapLinearFilter, ClampToEdgeWrapping, LinearMipmapNearestFilter, BufferAttribute, FrontSide, BackSide, DoubleSide, LessEqualDepth, AlwaysDepth, GreaterEqualDepth, NotEqualDepth, GreaterDepth, EqualDepth, LessDepth, NeverDepth, SrcAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaSaturateFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusDstColorFactor, SrcColorFactor, DstColorFactor, OneFactor, ZeroFactor, AddEquation, MaxEquation, MinEquation, ReverseSubtractEquation, SubtractEquation, AlwaysStencilFunc, GreaterEqualStencilFunc, NotEqualStencilFunc, GreaterStencilFunc, LessEqualStencilFunc, EqualStencilFunc, LessStencilFunc, NeverStencilFunc, KeepStencilOp, DecrementWrapStencilOp, IncrementWrapStencilOp, InvertStencilOp, DecrementStencilOp, IncrementStencilOp, ReplaceStencilOp, ZeroStencilOp } from 'three';
 
 // src/generated/textureSemantics.ts
 var LILTOON_TEXTURE_SEMANTICS = {
@@ -1541,6 +1541,77 @@ function detectLilToonFeatures(properties) {
 // src/loaders/types.ts
 var LILTOON_GLTF_EXTENSION = "MOCHIYA_materials_liltoon";
 var LILTOON_GLTF_SPEC_VERSION = "1.3";
+var toneFunctions = [
+  [LinearToneMapping, "LinearToneMapping"],
+  [ReinhardToneMapping, "ReinhardToneMapping"],
+  [CineonToneMapping, "CineonToneMapping"],
+  [ACESFilmicToneMapping, "ACESFilmicToneMapping"],
+  [AgXToneMapping, "AgXToneMapping"],
+  [NeutralToneMapping, "NeutralToneMapping"],
+  [CustomToneMapping, "CustomToneMapping"]
+];
+function outputUniforms() {
+  return {
+    uLilToonOutputSrgb: { value: 0 },
+    uLilToonToneMapping: { value: NoToneMapping },
+    toneMappingExposure: { value: 1 },
+    uLilToonPremultipliedOutput: { value: 0 }
+  };
+}
+function withOutputTransform(source) {
+  const globals = source.indexOf("struct type_Globals");
+  if (globals < 0 || !source.includes("void main()"))
+    throw new Error(
+      "[three-liltoon] Missing fragment output integration point."
+    );
+  const helpers = `
+uniform uint uLilToonOutputSrgb;
+uniform int uLilToonToneMapping;
+uniform uint uLilToonPremultipliedOutput;
+#include <tonemapping_pars_fragment>
+#include <colorspace_pars_fragment>
+vec3 lilToonToneMap(vec3 color) {
+${toneFunctions.map(([mode, fn]) => `    if (uLilToonToneMapping == ${mode}) return ${fn}(color);`).join("\n")}
+    return color;
+}
+`;
+  const prefix = helpers.replace(
+    "#include <tonemapping_pars_fragment>",
+    ShaderChunk.tonemapping_pars_fragment
+  ).replace(
+    "#include <colorspace_pars_fragment>",
+    ShaderChunk.colorspace_pars_fragment
+  );
+  return (source.slice(0, globals) + prefix + source.slice(globals)).replace(
+    "void main()",
+    "void lilToonFragmentMain()"
+  ) + `
+void main() {
+    lilToonFragmentMain();
+    if (uLilToonToneMapping == ${NoToneMapping} && uLilToonOutputSrgb == 0u) return;
+    vec3 color = out_var_SV_Target.rgb;
+    float alpha = out_var_SV_Target.a;
+    // Ordinary lilToon transparency already premultiplies in its upstream shader.
+    // Transform straight RGB, then restore the blend representation exactly once.
+    bool premultiplied = uLilToonPremultipliedOutput != 0u && alpha > 0.0;
+    if (premultiplied) color /= alpha;
+    color = lilToonToneMap(color);
+    if (uLilToonOutputSrgb != 0u) color = sRGBTransferOETF(vec4(color, alpha)).rgb;
+    if (premultiplied) color *= alpha;
+    out_var_SV_Target.rgb = color;
+}
+`;
+}
+function updateOutputTransform(material, renderer, premultiplied) {
+  const target = renderer.getRenderTarget();
+  const display = target === null || "isXRRenderTarget" in target && target.isXRRenderTarget === true;
+  material.uniforms.uLilToonOutputSrgb.value = Number(
+    display && (target?.texture.colorSpace ?? renderer.outputColorSpace) === SRGBColorSpace
+  );
+  material.uniforms.uLilToonToneMapping.value = display && material.toneMapped ? renderer.toneMapping ?? NoToneMapping : NoToneMapping;
+  material.uniforms.toneMappingExposure.value = renderer.toneMappingExposure ?? 1;
+  material.uniforms.uLilToonPremultipliedOutput.value = Number(premultiplied);
+}
 var TextureViews = class {
   views = /* @__PURE__ */ new Map();
   get(resource, textures) {
@@ -6835,36 +6906,23 @@ function textureDefault(property) {
     return String(value.texture);
   return "white";
 }
-var OUTPUT_SRGB_UNIFORM = "uLilToonOutputSrgb";
-function addOutputColorSpaceConversion(fragmentShader) {
-  const globalsIndex = fragmentShader.indexOf("struct type_Globals");
-  const mainEnd = fragmentShader.lastIndexOf("\n}");
-  if (globalsIndex < 0 || mainEnd < 0) return fragmentShader;
-  const withUniform = `${fragmentShader.slice(0, globalsIndex)}uniform uint ${OUTPUT_SRGB_UNIFORM};
-
-` + fragmentShader.slice(globalsIndex);
-  const adjustedMainEnd = mainEnd + `uniform uint ${OUTPUT_SRGB_UNIFORM};
-
-`.length;
-  const conversion = `
-    if (${OUTPUT_SRGB_UNIFORM} != 0u)
-    {
-        highp vec3 linearColor = max(out_var_SV_Target.rgb, vec3(0.0));
-        out_var_SV_Target.rgb = mix(
-            pow(linearColor, vec3(0.41666)) * 1.055 - vec3(0.055),
-            linearColor * 12.92,
-            lessThanEqual(linearColor, vec3(0.0031308))
-        );
-    }
-`;
-  return `${withUniform.slice(0, adjustedMainEnd)}${conversion}${withUniform.slice(adjustedMainEnd)}`;
-}
 var LilToonMaterial = class extends RawShaderMaterial {
   color = new Color(1, 1, 1);
   isLilToonMaterial = true;
   lilToonProperties;
   lilToonTextures = {};
   globalUniforms;
+  #renderQueue;
+  get renderQueue() {
+    return this.#renderQueue;
+  }
+  set renderQueue(value) {
+    if (value !== void 0 && (!Number.isInteger(value) || value < 0 || value > 5e3))
+      throw new RangeError(
+        "renderQueue must be an integer from 0 to 5000, or undefined"
+      );
+    this.#renderQueue = value;
+  }
   renderMode;
   pass;
   transparencyMode;
@@ -6896,7 +6954,7 @@ var LilToonMaterial = class extends RawShaderMaterial {
     );
     const uniforms = {
       _Globals: { value: globalUniforms },
-      [OUTPUT_SRGB_UNIFORM]: { value: 1 }
+      ...outputUniforms()
     };
     const cubeSamplers = new Set(
       [
@@ -6917,15 +6975,17 @@ ${program.fragmentShader}`.matchAll(
       // defines even for RawShaderMaterial. Generated artifacts retain their
       // standalone directive for offline validation.
       vertexShader: (pass === "fur" || pass === "fur-pre" ? program.vertexShader : withThreeMorphTargets(program.vertexShader)).replace(/^#version 300 es\s*/, ""),
-      fragmentShader: addOutputColorSpaceConversion(
-        program.fragmentShader
-      ).replace(/^#version 300 es\s*/, ""),
+      fragmentShader: withOutputTransform(program.fragmentShader).replace(
+        /^#version 300 es\s*/,
+        ""
+      ),
       glslVersion: GLSL3,
       uniforms,
       lights: false,
       fog: false
     });
     this.renderMode = renderMode;
+    this.renderQueue = parameters.renderQueue;
     this.pass = pass;
     this.transparencyMode = parameters.transparencyMode ?? "normal";
     this.forceSinglePass = true;
@@ -7028,9 +7088,10 @@ ${program.fragmentShader}`.matchAll(
           this.defines.USE_MORPHTARGETS && this.defines.MORPHTARGETS_COUNT
         )
       );
-      const outputColorSpace = renderer.getRenderTarget()?.texture.colorSpace ?? renderer.outputColorSpace;
-      this.uniforms[OUTPUT_SRGB_UNIFORM].value = Number(
-        outputColorSpace === SRGBColorSpace
+      updateOutputTransform(
+        this,
+        renderer,
+        this.renderMode === "transparent" && !(this.pass === "transparent-pre" && Number(this.lilToonProperties._PreOutType ?? 0) !== 0)
       );
       this.uniformsNeedUpdate = true;
     };
@@ -7102,6 +7163,7 @@ ${program.fragmentShader}`.matchAll(
     );
     return {
       specVersion: LILTOON_GLTF_SPEC_VERSION,
+      renderQueue: this.renderQueue,
       lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
       renderMode: this.renderMode,
       properties,
@@ -7142,6 +7204,7 @@ ${program.fragmentShader}`.matchAll(
     this.#morphWeights.dispose();
     this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
     this.renderMode = source.renderMode;
+    this.renderQueue = source.renderQueue;
     this.pass = source.pass;
     this.transparencyMode = source.transparencyMode;
     this.#shaderKey = source.#shaderKey;
@@ -7215,16 +7278,17 @@ ${program.fragmentShader}`.matchAll(
       program.fragmentShader
     );
     this.vertexShader = (this.pass === "fur" || this.pass === "fur-pre" ? program.vertexShader : withThreeMorphTargets(program.vertexShader)).replace(/^#version 300 es\s*/, "");
-    this.fragmentShader = addOutputColorSpaceConversion(
-      program.fragmentShader
-    ).replace(/^#version 300 es\s*/, "");
+    this.fragmentShader = withOutputTransform(program.fragmentShader).replace(
+      /^#version 300 es\s*/,
+      ""
+    );
     this.globalUniforms = createGlobalUniforms(
       program.vertexShader,
       program.fragmentShader
     );
     for (const name of Object.keys(this.uniforms)) delete this.uniforms[name];
     this.uniforms._Globals = { value: this.globalUniforms };
-    this.uniforms[OUTPUT_SRGB_UNIFORM] = { value: 1 };
+    Object.assign(this.uniforms, outputUniforms());
     this.uniforms.mochiyaMorphWeights = this.#morphWeights.uniform;
     this.#samplerBindings.clear();
     this.#cubeSamplers.clear();
@@ -7537,6 +7601,7 @@ var GLTFLilToonExtension = class {
       );
       const material = new LilToonMaterial({
         name: materialDefinition.name,
+        renderQueue: definition.renderQueue,
         renderMode: renderModeFromDefinition(definition),
         transparencyMode: definition.transparencyMode ?? (/TwoPassTransparent/i.test(definition.shaderVariant ?? "") ? "two-pass" : /OnePassTransparent/i.test(definition.shaderVariant ?? "") ? "one-pass" : "normal"),
         properties: definition.cubeTextures?._ReflectionCubeTex ? { ...definition.properties, _ReflectionCubeTex_HDR: [1, 1, 0, 0] } : definition.properties,

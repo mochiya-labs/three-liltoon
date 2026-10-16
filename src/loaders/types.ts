@@ -47,6 +47,12 @@ export interface GLTFLilToonMaterialDefinition {
 	lilToonVersion?: string | number;
 	/** Original Unity shader name; does not imply renderer support for that shader. */
 	shaderVariant?: string;
+	/** Effective Unity material queue. Does not change blending or depth state.
+	 * @asType integer
+	 * @minimum 0
+	 * @maximum 5000
+	 */
+	renderQueue?: number;
 	/** When omitted, inferred from the original supported shader family. */
 	renderMode?: LilToonRenderMode;
 	/** Transparent family pass configuration. Defaults to normal or is inferred from shaderVariant. */

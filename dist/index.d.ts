@@ -1,11 +1,15 @@
-import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf-DX6LhSiy.js';
-export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonTransparencyMode, j as detectLilToonFeatures } from './gltf-DX6LhSiy.js';
-import { WebGLRenderer, Texture, Scene, DirectionalLight, Vector3, Color } from 'three';
+import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf--T0iFWgv.js';
+export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonTransparencyMode, j as detectLilToonFeatures } from './gltf--T0iFWgv.js';
+import { WebGLRenderer, Texture, Scene, DirectionalLight, Vector3, Color, Material } from 'three';
 export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-2SkJrHyN.js';
 import 'three/examples/jsm/loaders/GLTFLoader.js';
 
+interface EnableLilToonOptions {
+    /** Own the renderer sort callbacks until final release; requires default sorters. */
+    materialRenderQueue?: boolean;
+}
 /** Install automatic passes on an existing renderer. Release the returned lease on teardown. */
-declare function enableLilToon(renderer: WebGLRenderer): () => void;
+declare function enableLilToon(renderer: WebGLRenderer, options?: EnableLilToonOptions): () => void;
 
 declare class LilToonMaterialFactory {
     create(source: SerializedLilToonMaterial, textures?: Record<string, Texture | null>): LilToonMaterial;
@@ -5625,4 +5629,7 @@ declare const LILTOON_TEXTURE_SEMANTICS: {
     readonly _FurVectorTex: "normal";
 };
 
-export { FurPass, GemPass, LILTOON_DEFAULTS, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialParameters, LilToonShadowAdapter, type LilToonTextureSemantic, RefractionPass, SerializedLilToonMaterial, THREE_VERSION_RANGE, UnsupportedFeatureError, enableLilToon };
+/** Compare authored queues only. Apply host group/renderOrder precedence first. */
+declare function compareLilToonRenderQueue(a: Material, b: Material, defaultQueue: number): number;
+
+export { type EnableLilToonOptions, FurPass, GemPass, LILTOON_DEFAULTS, LILTOON_PROPERTIES, LILTOON_RENDER_RECIPES, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonMaterialFactory, LilToonMaterialParameters, LilToonShadowAdapter, type LilToonTextureSemantic, RefractionPass, SerializedLilToonMaterial, THREE_VERSION_RANGE, UnsupportedFeatureError, compareLilToonRenderQueue, enableLilToon };

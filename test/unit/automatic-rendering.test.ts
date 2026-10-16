@@ -61,7 +61,7 @@ describe("automatic material inputs", () => {
 		let outline: Material | undefined;
 		const renderer = harness((scene) => {
 			const mesh = scene === first ? a : scene === second ? b : undefined;
-			if (mesh?.parent) {
+			if (mesh?.parent && mesh.visible) {
 				const current = (mesh.children[0] as Mesh).material as Material;
 				if (outline) expect(current).toBe(outline);
 				outline = current;
@@ -333,4 +333,41 @@ describe("renderer-owned automatic passes", () => {
 		second();
 		expect(renderer.render).toBe(original);
 	});
+});
+
+it("reuses unchanged outline state and detects in-place properties and aliases after hiding", () => {
+	const source = outlined(),
+		mesh = new Mesh(new BoxGeometry(), source),
+		scene = new Scene(),
+		camera = new PerspectiveCamera();
+	scene.add(mesh);
+	let outline!: LilToonMaterial;
+	const renderer = harness(() => {
+		if (mesh.visible)
+			outline = (mesh.children[0] as Mesh).material as LilToonMaterial;
+	});
+	const release = enableLilToon(renderer);
+	renderer.render(scene, camera);
+	const update = vi.spyOn(outline, "setProperty"),
+		disposed = vi.spyOn(outline, "dispose");
+	for (let i = 0; i < 4; i++) renderer.render(scene, camera);
+	expect(update).not.toHaveBeenCalled();
+	const color = source.lilToonProperties._OutlineColor as number[];
+	color[0] = 0.4;
+	renderer.render(scene, camera);
+	expect(outline.getProperty("_OutlineColor")).toEqual(color);
+	expect(outline.lilToonProperties._OutlineColor).not.toBe(color);
+	mesh.visible = false;
+	source.color.setRGB(0.2, 0.3, 0.4);
+	renderer.render(scene, camera);
+	expect(disposed).not.toHaveBeenCalled();
+	mesh.visible = true;
+	renderer.render(scene, camera);
+	expect(outline.getProperty("_Color")).toEqual(source.getProperty("_Color"));
+	source.setProperty("_Cull", 1);
+	renderer.render(scene, camera);
+	expect(outline.getProperty("_Cull")).toBe(1);
+	release();
+	source.dispose();
+	mesh.geometry.dispose();
 });
