@@ -2,7 +2,7 @@
 
 User-facing changes to `@mochiya/three-liltoon`. Package versions and [material specification versions](docs/SPEC_CHANGELOG.md) are independent. Publication dates below are UTC, verified against the [npm registry](https://registry.npmjs.org/@mochiya%2fthree-liltoon). Historical entries are reconstructed from repository history and published package contents; they summarize meaningful changes rather than every commit.
 
-## Unreleased
+## 0.1.6
 
 - Add optional `LilToonMaterial.renderQueue`, including constructor, clone/copy, serialization and loading support.
 - Add opt-in `enableLilToon(renderer, { materialRenderQueue: true })` sorting and the `compareLilToonRenderQueue` helper for applications owning custom sorting. Queue priority applies within Three.js render lists after group/object order; it does not change blending or depth writes. Older assets without queues remain supported.
@@ -10,6 +10,7 @@ User-facing changes to `@mochiya/three-liltoon`. Package versions and [material 
 - Honor Three.js renderer tone mapping/exposure, material `toneMapped`, target/output color space and ordinary transparent premultiplication through the raw-shader output adapter. Auxiliary materials inherit the source output policy. See [output API behavior](docs/API.md).
 - Avoid repeated outline property/program updates when inputs have not changed, and skip hidden scene branches during automatic pass preparation.
 - Add separate package and specification changelogs.
+- Fix the example viewer build using an outdated runtime API.
 
 Source references: [outline optimization](https://github.com/mochiya-labs/three-liltoon/commit/244fa42902a564ed2ca691a6a64e3103e0e371a0), [output adapter](https://github.com/mochiya-labs/three-liltoon/commit/43e805a604066da42274f777d8368b8d9c9c680c). These changes are not included merely by installing 0.1.5.
 

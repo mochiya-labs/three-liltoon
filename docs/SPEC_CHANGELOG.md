@@ -10,7 +10,7 @@ History of `MOCHIYA_materials_liltoon`, independently of the [npm package versio
 - Support `_ReflectionCubeTex` with `encoding: "rgba16f-linear"`, a power-of-two `size`, and `mipmaps` referencing glTF bufferViews.
 - Each level contains six little-endian linear RGBA16F faces in +X, -X, +Y, -Y, +Z, -Z order. A base level or complete authored mip chain preserves HDR reflection values.
 
-### Material queue metadata — not yet in a published runtime
+### Material queue metadata — package 0.1.6
 
 - Add optional integer `renderQueue` from 0 through 5000, containing the effective Unity material queue, including shader fallback resolution.
 - Preserve shader mode, alpha, blending and depth-write settings independently of queue metadata.
