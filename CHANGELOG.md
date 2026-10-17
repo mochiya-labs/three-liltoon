@@ -2,7 +2,7 @@
 
 User-facing changes to `@mochiya/three-liltoon`. Package versions and [material specification versions](docs/SPEC_CHANGELOG.md) are independent. Publication dates below are UTC, verified against the [npm registry](https://registry.npmjs.org/@mochiya%2fthree-liltoon). Historical entries are reconstructed from repository history and published package contents; they summarize meaningful changes rather than every commit.
 
-## Unreleased
+## 0.1.9
 
 - Reduce GPU overhead with multisampled render targets by submitting transparent auxiliary passes, fur ribbons, refraction blur and gem preparation within the active render, without lowering antialiasing quality.
 - Capture the active scene framebuffer for refraction and gem effects after auxiliary renders, and recreate capture buffers after WebGL context restoration.

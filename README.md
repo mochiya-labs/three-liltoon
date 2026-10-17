@@ -143,7 +143,7 @@ Use the following versions together for GLB/VRM materials exported from Unity:
 | Component                                                                                | Compatible version |
 | ---------------------------------------------------------------------------------------- | ------------------ |
 | `MOCHIYA_materials_liltoon` specification                                                | 1.3                |
-| `@mochiya/three-liltoon` runtime                                                         | 0.1.8              |
+| `@mochiya/three-liltoon` runtime                                                         | 0.1.9              |
 | [Mochiya Avatar Tools](https://github.com/mochiya-labs/unity-avatar-tools) Unity package | 0.1.4              |
 
 The runtime supports older material exports using specification versions 1.0–1.3 without re-exporting. Older runtimes may not fully support newer exports. Package and specification versions are independent; use the matching versions above for current support.
