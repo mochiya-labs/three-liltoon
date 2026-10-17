@@ -1,7 +1,7 @@
 import { Material } from 'three';
 import { GLTFLoaderPlugin, GLTFParser, GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-type LilToonWarningCode = "unsupported-feature" | "unused-texture" | "texture-type-mismatch" | "spec-version-mismatch" | "unsupported-shader-variant";
+type LilToonWarningCode = "unsupported-feature" | "unused-texture" | "texture-type-mismatch" | "spec-version-mismatch" | "unsupported-shader-variant" | "shader-mode-conflict";
 /** Serializable, non-fatal compatibility diagnostic. */
 interface LilToonWarning {
     severity: "warning";

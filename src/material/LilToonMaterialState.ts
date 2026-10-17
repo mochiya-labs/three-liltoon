@@ -14,7 +14,9 @@ export interface SerializedLilToonMaterial {
 	 * @maximum 5000
 	 */
 	renderQueue?: number;
-	renderMode: LilToonRenderMode;
+	/** @deprecated Legacy input fallback when shaderVariant is absent. New writers omit this field. */
+	renderMode?: LilToonRenderMode;
+	/** @deprecated Legacy input fallback when shaderVariant is absent. New writers omit this field. */
 	transparencyMode?: LilToonTransparencyMode;
 	properties: Record<string, LilToonScalarOrVector>;
 	textures: Record<string, string | number | null>;

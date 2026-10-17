@@ -56,7 +56,8 @@ describe("special modes", () => {
 			});
 			const copy = source.clone();
 			expect(copy.transparencyMode).toBe(transparencyMode);
-			expect(source.toLilToonJSON().transparencyMode).toBe(transparencyMode);
+			expect(source.toLilToonJSON().shaderVariant).toBe(source.shaderVariant);
+			expect(source.toLilToonJSON()).not.toHaveProperty("transparencyMode");
 			const restored = new LilToonMaterialFactory().create(
 				source.toLilToonJSON(),
 			);

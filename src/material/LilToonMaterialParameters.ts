@@ -29,7 +29,7 @@ export type LilToonScalarOrVector =
 	number | boolean | number[] | Color | Vector2 | Vector3 | Vector4;
 
 export interface LilToonMaterialParameters {
-	/** Unity shader selection, including outline pass presence. Defaults to the non-outline variant for the selected modes. */
+	/** Authoritative lilToon shader selection, including outline and transparent passes. Defaults to lilToon when no legacy mode is supplied. */
 	shaderVariant?: import("./shaderVariants.js").LilToonShaderVariant;
 	color?: ColorRepresentation;
 	opacity?: number;
@@ -38,8 +38,9 @@ export interface LilToonMaterialParameters {
 	name?: string;
 	/** Effective Unity queue (0–5000). Requires materialRenderQueue sorting opt-in. */
 	renderQueue?: number;
+	/** @deprecated Select shaderVariant instead. Used only when shaderVariant is absent. */
 	renderMode?: LilToonRenderMode;
-	/** Unity transparent pass configuration; additional-light passes remain deferred. */
+	/** @deprecated Select shaderVariant instead. Used only when shaderVariant is absent. */
 	transparencyMode?: LilToonTransparencyMode;
 	properties?: Record<string, LilToonScalarOrVector>;
 	textures?: Record<string, Texture | null>;

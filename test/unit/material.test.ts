@@ -301,7 +301,8 @@ describe("LilToonMaterial", () => {
 		const serialized = material.toLilToonJSON(
 			(_value, property) => `texture:${property}`,
 		);
-		expect(serialized.renderMode).toBe("opaque");
+		expect(serialized.shaderVariant).toBe("lilToon");
+		expect(serialized).not.toHaveProperty("renderMode");
 		expect(serialized.specVersion).toBe(LILTOON_GLTF_SPEC_VERSION);
 		expect(serialized.properties._UseRim).toBe(1);
 		expect(serialized.textures._MainTex).toBe("texture:_MainTex");

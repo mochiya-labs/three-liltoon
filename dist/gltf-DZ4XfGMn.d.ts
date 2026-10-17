@@ -1,4 +1,4 @@
-import { L as LilToonWarning } from './GLTFLilToonExtension-2SkJrHyN.js';
+import { L as LilToonWarning } from './GLTFLilToonExtension-Onocr_71.js';
 import { Color, Vector2, Vector3, Vector4, ColorRepresentation, Texture, Matrix4, RawShaderMaterial, Object3D, WebGLRenderer, Loader, LoadingManager } from 'three';
 
 /** Supported Unity shader names and their pass configurations. */
@@ -27,7 +27,7 @@ type LilToonTransparencyMode = "normal" | "one-pass" | "two-pass";
 type LilToonPass = "forward" | "outline" | "fur" | "fur-pre" | "transparent-pre" | "refraction-blur-pre";
 type LilToonScalarOrVector = number | boolean | number[] | Color | Vector2 | Vector3 | Vector4;
 interface LilToonMaterialParameters {
-    /** Unity shader selection, including outline pass presence. Defaults to the non-outline variant for the selected modes. */
+    /** Authoritative lilToon shader selection, including outline and transparent passes. Defaults to lilToon when no legacy mode is supplied. */
     shaderVariant?: LilToonShaderVariant;
     color?: ColorRepresentation;
     opacity?: number;
@@ -36,8 +36,9 @@ interface LilToonMaterialParameters {
     name?: string;
     /** Effective Unity queue (0–5000). Requires materialRenderQueue sorting opt-in. */
     renderQueue?: number;
+    /** @deprecated Select shaderVariant instead. Used only when shaderVariant is absent. */
     renderMode?: LilToonRenderMode;
-    /** Unity transparent pass configuration; additional-light passes remain deferred. */
+    /** @deprecated Select shaderVariant instead. Used only when shaderVariant is absent. */
     transparencyMode?: LilToonTransparencyMode;
     properties?: Record<string, LilToonScalarOrVector>;
     textures?: Record<string, Texture | null>;
@@ -80,7 +81,9 @@ interface SerializedLilToonMaterial {
      * @maximum 5000
      */
     renderQueue?: number;
-    renderMode: LilToonRenderMode;
+    /** @deprecated Legacy input fallback when shaderVariant is absent. New writers omit this field. */
+    renderMode?: LilToonRenderMode;
+    /** @deprecated Legacy input fallback when shaderVariant is absent. New writers omit this field. */
     transparencyMode?: LilToonTransparencyMode;
     properties: Record<string, LilToonScalarOrVector>;
     textures: Record<string, string | number | null>;
@@ -97,9 +100,13 @@ declare class LilToonMaterial extends RawShaderMaterial {
     set renderQueue(value: number | undefined);
     get shaderVariant(): LilToonShaderVariant;
     set shaderVariant(value: LilToonShaderVariant);
+    /** Derived shader mode. @deprecated Read shaderVariant for shader identity. */
     get renderMode(): LilToonRenderMode;
+    /** @deprecated Set shaderVariant instead. Retained for legacy callers. */
     set renderMode(value: LilToonRenderMode);
+    /** Derived transparent pass mode. @deprecated Read shaderVariant instead. */
     get transparencyMode(): LilToonTransparencyMode;
+    /** @deprecated Set shaderVariant instead. Retained for legacy callers. */
     set transparencyMode(value: LilToonTransparencyMode);
     pass: LilToonPass;
     featureSet: LilToonFeatureSet;
@@ -178,9 +185,13 @@ interface GLTFLilToonMaterialDefinition {
      * @maximum 5000
      */
     renderQueue?: number;
-    /** When omitted, inferred from the shader family. Must agree with a supported shaderVariant. */
+    /** Legacy fallback without a supported shaderVariant. Recognized shader names take precedence; new writers omit this field.
+     * @deprecated
+     */
     renderMode?: LilToonRenderMode;
-    /** Transparent family pass configuration. Inferred from shaderVariant when present; explicit values must agree with supported variants. */
+    /** Legacy fallback without a supported shaderVariant. Recognized shader names take precedence; new writers omit this field.
+     * @deprecated
+     */
     transparencyMode?: LilToonTransparencyMode;
     /** Original property names and linear values, including per-texture <name>_ST transforms. */
     properties?: Record<string, GLTFLilToonPropertyValue>;

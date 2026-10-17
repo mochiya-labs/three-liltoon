@@ -190,51 +190,47 @@ export function applyLilToonRenderState(
 	material.transparent = !["opaque", "cutout", "fur-cutout"].includes(
 		renderMode,
 	);
-	if (material.transparent) {
-		material.blending = CustomBlending;
-		material.blendSrc = mapped(
-			blendFactorMap as Record<string | number, Material["blendSrc"]>,
-			(properties._SrcBlend as Mappable) ?? 5,
-			SrcAlphaFactor,
-		);
-		material.blendDst = mapped(
-			blendFactorMap as unknown as Record<
-				string | number,
-				Material["blendDst"]
-			>,
-			(properties._DstBlend as Mappable) ?? 10,
-			OneMinusSrcAlphaFactor,
-		);
-		material.blendEquation = mapped(
-			equationMap as Record<string | number, Material["blendEquation"]>,
-			(properties._BlendOp as Mappable) ?? 0,
-			AddEquation,
-		);
-		material.blendSrcAlpha = mapped(
-			blendFactorMap as Record<
-				string | number,
-				NonNullable<Material["blendSrcAlpha"]>
-			>,
-			(properties._SrcBlendAlpha as Mappable) ?? 1,
-			OneFactor,
-		);
-		material.blendDstAlpha = mapped(
-			blendFactorMap as unknown as Record<
-				string | number,
-				NonNullable<Material["blendDstAlpha"]>
-			>,
-			(properties._DstBlendAlpha as Mappable) ?? 10,
-			OneMinusSrcAlphaFactor,
-		);
-		material.blendEquationAlpha = mapped(
-			equationMap as Record<
-				string | number,
-				NonNullable<Material["blendEquationAlpha"]>
-			>,
-			(properties._BlendOpAlpha as Mappable) ?? 0,
-			AddEquation,
-		);
-	}
+	// ShaderLab blending is independent of shader family and render-list classification.
+	material.blending = CustomBlending;
+	material.blendSrc = mapped(
+		blendFactorMap as Record<string | number, Material["blendSrc"]>,
+		(properties._SrcBlend as Mappable) ?? (material.transparent ? 5 : 1),
+		SrcAlphaFactor,
+	);
+	material.blendDst = mapped(
+		blendFactorMap as unknown as Record<string | number, Material["blendDst"]>,
+		(properties._DstBlend as Mappable) ?? (material.transparent ? 10 : 0),
+		OneMinusSrcAlphaFactor,
+	);
+	material.blendEquation = mapped(
+		equationMap as Record<string | number, Material["blendEquation"]>,
+		(properties._BlendOp as Mappable) ?? 0,
+		AddEquation,
+	);
+	material.blendSrcAlpha = mapped(
+		blendFactorMap as Record<
+			string | number,
+			NonNullable<Material["blendSrcAlpha"]>
+		>,
+		(properties._SrcBlendAlpha as Mappable) ?? 1,
+		OneFactor,
+	);
+	material.blendDstAlpha = mapped(
+		blendFactorMap as unknown as Record<
+			string | number,
+			NonNullable<Material["blendDstAlpha"]>
+		>,
+		(properties._DstBlendAlpha as Mappable) ?? (material.transparent ? 10 : 0),
+		OneMinusSrcAlphaFactor,
+	);
+	material.blendEquationAlpha = mapped(
+		equationMap as Record<
+			string | number,
+			NonNullable<Material["blendEquationAlpha"]>
+		>,
+		(properties._BlendOpAlpha as Mappable) ?? 0,
+		AddEquation,
+	);
 	material.stencilWrite =
 		numeric(properties, "_StencilRef", 0) !== 0 ||
 		numeric(properties, "_StencilWriteMask", 255) !== 255;

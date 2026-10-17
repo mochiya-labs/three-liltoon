@@ -6,7 +6,8 @@ export type LilToonWarningCode =
 	| "unused-texture"
 	| "texture-type-mismatch"
 	| "spec-version-mismatch"
-	| "unsupported-shader-variant";
+	| "unsupported-shader-variant"
+	| "shader-mode-conflict";
 
 /** Serializable, non-fatal compatibility diagnostic. */
 export interface LilToonWarning {

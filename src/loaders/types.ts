@@ -53,9 +53,13 @@ export interface GLTFLilToonMaterialDefinition {
 	 * @maximum 5000
 	 */
 	renderQueue?: number;
-	/** When omitted, inferred from the shader family. Must agree with a supported shaderVariant. */
+	/** Legacy fallback without a supported shaderVariant. Recognized shader names take precedence; new writers omit this field.
+	 * @deprecated
+	 */
 	renderMode?: LilToonRenderMode;
-	/** Transparent family pass configuration. Inferred from shaderVariant when present; explicit values must agree with supported variants. */
+	/** Legacy fallback without a supported shaderVariant. Recognized shader names take precedence; new writers omit this field.
+	 * @deprecated
+	 */
 	transparencyMode?: LilToonTransparencyMode;
 	/** Original property names and linear values, including per-texture <name>_ST transforms. */
 	properties?: Record<string, GLTFLilToonPropertyValue>;

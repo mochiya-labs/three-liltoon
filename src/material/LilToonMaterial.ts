@@ -137,6 +137,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 		this.#renderQueue = value;
 	}
 	#copying = false;
+	#selectionWarnings: string[] = [];
 	#shaderVariant: LilToonShaderVariant = "lilToon";
 	get shaderVariant(): LilToonShaderVariant {
 		return this.#shaderVariant;
@@ -157,9 +158,11 @@ export class LilToonMaterial extends RawShaderMaterial {
 			);
 		}
 	}
+	/** Derived shader mode. @deprecated Read shaderVariant for shader identity. */
 	get renderMode(): LilToonRenderMode {
 		return shaderVariants[this.#shaderVariant][0];
 	}
+	/** @deprecated Set shaderVariant instead. Retained for legacy callers. */
 	set renderMode(value: LilToonRenderMode) {
 		this.shaderVariant = variantForModes(
 			value,
@@ -167,9 +170,11 @@ export class LilToonMaterial extends RawShaderMaterial {
 			shaderVariants[this.#shaderVariant][2],
 		);
 	}
+	/** Derived transparent pass mode. @deprecated Read shaderVariant instead. */
 	get transparencyMode(): LilToonTransparencyMode {
 		return shaderVariants[this.#shaderVariant][1];
 	}
+	/** @deprecated Set shaderVariant instead. Retained for legacy callers. */
 	set transparencyMode(value: LilToonTransparencyMode) {
 		this.shaderVariant = variantForModes(
 			this.renderMode,
@@ -263,6 +268,19 @@ export class LilToonMaterial extends RawShaderMaterial {
 			program.vertexShader,
 			program.fragmentShader,
 		);
+		if (parameters.shaderVariant !== undefined) {
+			const [mode, transparency] = shaderVariants[shaderVariant];
+			for (const [key, expected] of [
+				["renderMode", mode],
+				["transparencyMode", transparency],
+			] as const) {
+				if (parameters[key] !== undefined && parameters[key] !== expected) {
+					this.#selectionWarnings.push(
+						`Ignored deprecated ${key}=${parameters[key]}; shaderVariant ${shaderVariant} selects ${expected}.`,
+					);
+				}
+			}
+		}
 		this.lilToonProperties = propertyDefaults(renderMode);
 		Object.defineProperty(this, "opacity", {
 			configurable: true,
@@ -406,7 +424,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 					"fur",
 				)
 			: undefined;
-		return collectMaterialWarnings({
+		const warnings = collectMaterialWarnings({
 			materialName: this.name,
 			shaderKey: this.shaderKey,
 			renderMode: this.renderMode,
@@ -421,6 +439,17 @@ export class LilToonMaterial extends RawShaderMaterial {
 			samplerBindings: this.#samplerBindings,
 			cubeSamplers: this.#cubeSamplers,
 		});
+		return [
+			...warnings,
+			...this.#selectionWarnings.map((message): LilToonWarning => ({
+				severity: "warning",
+				code: "shader-mode-conflict",
+				materialName: this.name,
+				shaderKey: this.shaderKey,
+				property: "shaderVariant",
+				message,
+			})),
+		];
 	}
 
 	setProperty(name: string, value: LilToonScalarOrVector): this {
@@ -432,7 +461,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 			this.shaderVariant,
 		);
 		if (
-			/(_Cull|_ZWrite|_ZTest|_Blend|_Stencil|_Offset|_ColorMask|_AlphaToMask)/.test(
+			/_(?:Outline|Pre|Fur)?(?:Cull|ZWrite|ZTest|SrcBlend|DstBlend|Blend|Stencil|Offset|ColorMask|AlphaToMask)/.test(
 				name,
 			)
 		) {
@@ -478,9 +507,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 			shaderVariant: this.shaderVariant,
 			renderQueue: this.renderQueue,
 			lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
-			renderMode: this.renderMode,
 			properties,
-			transparencyMode: this.transparencyMode,
 			textures,
 		};
 	}
@@ -514,6 +541,7 @@ export class LilToonMaterial extends RawShaderMaterial {
 
 	override copy(source: LilToonMaterial): this {
 		source.syncColor();
+		this.#selectionWarnings = [...source.#selectionWarnings];
 		const uniforms = this.uniforms;
 		// Base copy writes aliases before our shader selection/properties are copied.
 		// Their setters must not reapply destination defaults over source render state.

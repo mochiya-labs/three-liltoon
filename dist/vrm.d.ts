@@ -1,5 +1,5 @@
 import { VRMLoaderPlugin, VRM } from '@pixiv/three-vrm';
-import { G as GLTFLilToonExtensionOptions, a as GLTFLilToonExtension } from './GLTFLilToonExtension-2SkJrHyN.js';
+import { G as GLTFLilToonExtensionOptions, a as GLTFLilToonExtension } from './GLTFLilToonExtension-Onocr_71.js';
 import 'three';
 import 'three/examples/jsm/loaders/GLTFLoader.js';
 

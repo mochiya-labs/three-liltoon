@@ -1,7 +1,7 @@
-import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf-E_9UGVqQ.js';
-export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonShaderVariant, j as LilToonTransparencyMode, k as detectLilToonFeatures } from './gltf-E_9UGVqQ.js';
+import { S as SerializedLilToonMaterial, L as LilToonMaterial, a as LilToonGlobalUniforms, b as LilToonMaterialParameters } from './gltf-DZ4XfGMn.js';
+export { c as LILTOON_GLTF_EXTENSION, d as LILTOON_GLTF_SPEC_VERSION, e as LilToonFeatureSet, f as LilToonMaterialLoader, g as LilToonRenderMode, h as LilToonScalarOrVector, i as LilToonShaderVariant, j as LilToonTransparencyMode, k as detectLilToonFeatures } from './gltf-DZ4XfGMn.js';
 import { WebGLRenderer, Texture, Scene, DirectionalLight, Vector3, Color, Material } from 'three';
-export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-2SkJrHyN.js';
+export { a as GLTFLilToonExtension, G as GLTFLilToonExtensionOptions, L as LilToonWarning, b as LilToonWarningCode } from './GLTFLilToonExtension-Onocr_71.js';
 import 'three/examples/jsm/loaders/GLTFLoader.js';
 
 interface EnableLilToonOptions {
@@ -38,17 +38,17 @@ declare class LilToonEnvironmentAdapter {
     bind(scene: Scene, globals: LilToonGlobalUniforms): Texture | null;
 }
 
-/** @deprecated Use LilToonMaterial with renderMode: "refraction" and enableLilToon(renderer). */
+/** @deprecated Use LilToonMaterial with shaderVariant: "Hidden/lilToonRefraction" and enableLilToon(renderer). */
 declare class RefractionPass extends LilToonMaterial {
     constructor(parameters?: Omit<LilToonMaterialParameters, "renderMode" | "pass">);
 }
 
-/** @deprecated Use LilToonMaterial with renderMode: "gem" and enableLilToon(renderer). */
+/** @deprecated Use LilToonMaterial with shaderVariant: "Hidden/lilToonGem" and enableLilToon(renderer). */
 declare class GemPass extends LilToonMaterial {
     constructor(parameters?: Omit<LilToonMaterialParameters, "renderMode" | "pass">);
 }
 
-/** @deprecated Use LilToonMaterial with renderMode: "fur" and enableLilToon(renderer). */
+/** @deprecated Use LilToonMaterial with shaderVariant: "Hidden/lilToonFur" and enableLilToon(renderer). */
 declare class FurPass extends LilToonMaterial {
     constructor(parameters?: Omit<LilToonMaterialParameters, "renderMode" | "pass">);
 }

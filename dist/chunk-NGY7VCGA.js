@@ -1551,11 +1551,6 @@ function resolveShaderVariant(parameters) {
     );
   if (!isShaderVariant(variant))
     throw new Error(`Unsupported lilToon shader: ${variant}`);
-  const [mode, transparency] = shaderVariants[variant];
-  if (parameters.renderMode !== void 0 && parameters.renderMode !== mode || parameters.transparencyMode !== void 0 && parameters.transparencyMode !== transparency)
-    throw new Error(
-      `Conflicting lilToon shaderVariant and render/transparency mode: ${variant}`
-    );
   return variant;
 }
 
@@ -6826,39 +6821,37 @@ function applyLilToonRenderState(material, renderMode, properties) {
   material.transparent = !["opaque", "cutout", "fur-cutout"].includes(
     renderMode
   );
-  if (material.transparent) {
-    material.blending = CustomBlending;
-    material.blendSrc = mapped(
-      blendFactorMap,
-      properties._SrcBlend ?? 5,
-      SrcAlphaFactor
-    );
-    material.blendDst = mapped(
-      blendFactorMap,
-      properties._DstBlend ?? 10,
-      OneMinusSrcAlphaFactor
-    );
-    material.blendEquation = mapped(
-      equationMap,
-      properties._BlendOp ?? 0,
-      AddEquation
-    );
-    material.blendSrcAlpha = mapped(
-      blendFactorMap,
-      properties._SrcBlendAlpha ?? 1,
-      OneFactor
-    );
-    material.blendDstAlpha = mapped(
-      blendFactorMap,
-      properties._DstBlendAlpha ?? 10,
-      OneMinusSrcAlphaFactor
-    );
-    material.blendEquationAlpha = mapped(
-      equationMap,
-      properties._BlendOpAlpha ?? 0,
-      AddEquation
-    );
-  }
+  material.blending = CustomBlending;
+  material.blendSrc = mapped(
+    blendFactorMap,
+    properties._SrcBlend ?? (material.transparent ? 5 : 1),
+    SrcAlphaFactor
+  );
+  material.blendDst = mapped(
+    blendFactorMap,
+    properties._DstBlend ?? (material.transparent ? 10 : 0),
+    OneMinusSrcAlphaFactor
+  );
+  material.blendEquation = mapped(
+    equationMap,
+    properties._BlendOp ?? 0,
+    AddEquation
+  );
+  material.blendSrcAlpha = mapped(
+    blendFactorMap,
+    properties._SrcBlendAlpha ?? 1,
+    OneFactor
+  );
+  material.blendDstAlpha = mapped(
+    blendFactorMap,
+    properties._DstBlendAlpha ?? (material.transparent ? 10 : 0),
+    OneMinusSrcAlphaFactor
+  );
+  material.blendEquationAlpha = mapped(
+    equationMap,
+    properties._BlendOpAlpha ?? 0,
+    AddEquation
+  );
   material.stencilWrite = numeric(properties, "_StencilRef", 0) !== 0 || numeric(properties, "_StencilWriteMask", 255) !== 255;
   material.stencilRef = numeric(properties, "_StencilRef", 0);
   material.stencilFuncMask = numeric(properties, "_StencilReadMask", 255);
@@ -7013,6 +7006,7 @@ var LilToonMaterial = class extends RawShaderMaterial {
     this.#renderQueue = value;
   }
   #copying = false;
+  #selectionWarnings = [];
   #shaderVariant = "lilToon";
   get shaderVariant() {
     return this.#shaderVariant;
@@ -7033,9 +7027,11 @@ var LilToonMaterial = class extends RawShaderMaterial {
       );
     }
   }
+  /** Derived shader mode. @deprecated Read shaderVariant for shader identity. */
   get renderMode() {
     return shaderVariants[this.#shaderVariant][0];
   }
+  /** @deprecated Set shaderVariant instead. Retained for legacy callers. */
   set renderMode(value) {
     this.shaderVariant = variantForModes(
       value,
@@ -7043,9 +7039,11 @@ var LilToonMaterial = class extends RawShaderMaterial {
       shaderVariants[this.#shaderVariant][2]
     );
   }
+  /** Derived transparent pass mode. @deprecated Read shaderVariant instead. */
   get transparencyMode() {
     return shaderVariants[this.#shaderVariant][1];
   }
+  /** @deprecated Set shaderVariant instead. Retained for legacy callers. */
   set transparencyMode(value) {
     this.shaderVariant = variantForModes(
       this.renderMode,
@@ -7129,6 +7127,19 @@ ${program.fragmentShader}`.matchAll(
       program.vertexShader,
       program.fragmentShader
     );
+    if (parameters.shaderVariant !== void 0) {
+      const [mode, transparency] = shaderVariants[shaderVariant];
+      for (const [key, expected] of [
+        ["renderMode", mode],
+        ["transparencyMode", transparency]
+      ]) {
+        if (parameters[key] !== void 0 && parameters[key] !== expected) {
+          this.#selectionWarnings.push(
+            `Ignored deprecated ${key}=${parameters[key]}; shaderVariant ${shaderVariant} selects ${expected}.`
+          );
+        }
+      }
+    }
     this.lilToonProperties = propertyDefaults(renderMode);
     Object.defineProperty(this, "opacity", {
       configurable: true,
@@ -7242,7 +7253,7 @@ ${program.fragmentShader}`.matchAll(
       this.lilToonTextures,
       "fur"
     ) : void 0;
-    return collectMaterialWarnings({
+    const warnings = collectMaterialWarnings({
       materialName: this.name,
       shaderKey: this.shaderKey,
       renderMode: this.renderMode,
@@ -7257,6 +7268,17 @@ ${program.fragmentShader}`.matchAll(
       samplerBindings: this.#samplerBindings,
       cubeSamplers: this.#cubeSamplers
     });
+    return [
+      ...warnings,
+      ...this.#selectionWarnings.map((message) => ({
+        severity: "warning",
+        code: "shader-mode-conflict",
+        materialName: this.name,
+        shaderKey: this.shaderKey,
+        property: "shaderVariant",
+        message
+      }))
+    ];
   }
   setProperty(name, value) {
     this.lilToonProperties[name] = copyValue(value);
@@ -7266,7 +7288,7 @@ ${program.fragmentShader}`.matchAll(
       this.lilToonProperties,
       this.shaderVariant
     );
-    if (/(_Cull|_ZWrite|_ZTest|_Blend|_Stencil|_Offset|_ColorMask|_AlphaToMask)/.test(
+    if (/_(?:Outline|Pre|Fur)?(?:Cull|ZWrite|ZTest|SrcBlend|DstBlend|Blend|Stencil|Offset|ColorMask|AlphaToMask)/.test(
       name
     )) {
       applyLilToonPassState(
@@ -7302,9 +7324,7 @@ ${program.fragmentShader}`.matchAll(
       shaderVariant: this.shaderVariant,
       renderQueue: this.renderQueue,
       lilToonVersion: LILTOON_UPSTREAM_DESCRIPTION,
-      renderMode: this.renderMode,
       properties,
-      transparencyMode: this.transparencyMode,
       textures
     };
   }
@@ -7332,6 +7352,7 @@ ${program.fragmentShader}`.matchAll(
   }
   copy(source) {
     source.syncColor();
+    this.#selectionWarnings = [...source.#selectionWarnings];
     const uniforms = this.uniforms;
     this.#copying = true;
     try {

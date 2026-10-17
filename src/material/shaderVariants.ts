@@ -56,14 +56,5 @@ export function resolveShaderVariant(
 		);
 	if (!isShaderVariant(variant))
 		throw new Error(`Unsupported lilToon shader: ${variant}`);
-	const [mode, transparency] = shaderVariants[variant];
-	if (
-		(parameters.renderMode !== undefined && parameters.renderMode !== mode) ||
-		(parameters.transparencyMode !== undefined &&
-			parameters.transparencyMode !== transparency)
-	)
-		throw new Error(
-			`Conflicting lilToon shaderVariant and render/transparency mode: ${variant}`,
-		);
 	return variant;
 }

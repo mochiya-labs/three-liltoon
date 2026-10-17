@@ -36,11 +36,13 @@
         },
         "renderMode": {
           "$ref": "#/definitions/LilToonRenderMode",
-          "description": "When omitted, inferred from the shader family. Must agree with a supported shaderVariant."
+          "description": "Legacy fallback without a supported shaderVariant. Recognized shader names take precedence; new writers omit this field.",
+          "deprecated": true
         },
         "transparencyMode": {
           "$ref": "#/definitions/LilToonTransparencyMode",
-          "description": "Transparent family pass configuration. Inferred from shaderVariant when present; explicit values must agree with supported variants."
+          "description": "Legacy fallback without a supported shaderVariant. Recognized shader names take precedence; new writers omit this field.",
+          "deprecated": true
         },
         "properties": {
           "type": "object",
