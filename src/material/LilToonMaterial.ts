@@ -185,6 +185,8 @@ export class LilToonMaterial extends RawShaderMaterial {
 	pass: LilToonPass;
 	featureSet: LilToonFeatureSet;
 	readonly #samplerBindings: Map<string, string>;
+	readonly #systemTextures = new Map<string, Texture | null>();
+	#preparingDraw = false;
 	readonly #cubeSamplers: Set<string>;
 	#shaderKey: string;
 	#program: LilToonShaderProgram;
@@ -367,44 +369,50 @@ export class LilToonMaterial extends RawShaderMaterial {
 			_group: Group,
 		) => {
 			this.refreshProgram();
-			updateVertexInputs(this, _geometry);
-			this.bindTextureViews();
-			const elapsed = (performance.now() - this.#startedAt) / 1000;
-			updateObjectCameraUniforms(
-				this.globalUniforms,
-				renderer,
-				camera,
-				object,
-				elapsed,
-			);
-			this.syncColor();
-			rendererContext(renderer).prepareMaterial(this, scene);
-			this.updateDeformationUniforms(object, renderer);
-			checkCubeTextureSizes(renderer, this.uniforms);
-			checkTextureLimits(
-				renderer,
-				this.name,
-				this.#program.resources,
-				Boolean(
-					this.defines.USE_MORPHTARGETS && this.defines.MORPHTARGETS_COUNT,
-				),
-			);
-			updateOutputTransform(
-				this,
-				renderer,
-				this.renderMode === "transparent" &&
-					!(
-						this.pass === "transparent-pre" &&
-						Number(this.lilToonProperties._PreOutType ?? 0) !== 0
+			const preparing = this.#preparingDraw;
+			this.#preparingDraw = true;
+			try {
+				updateVertexInputs(this, _geometry);
+				this.bindTextureViews();
+				const elapsed = (performance.now() - this.#startedAt) / 1000;
+				updateObjectCameraUniforms(
+					this.globalUniforms,
+					renderer,
+					camera,
+					object,
+					elapsed,
+				);
+				this.syncColor();
+				rendererContext(renderer).prepareMaterial(this, scene);
+				this.updateDeformationUniforms(object, renderer);
+				checkCubeTextureSizes(renderer, this.uniforms);
+				checkTextureLimits(
+					renderer,
+					this.name,
+					this.#program.resources,
+					Boolean(
+						this.defines.USE_MORPHTARGETS && this.defines.MORPHTARGETS_COUNT,
 					),
-			);
+				);
+				updateOutputTransform(
+					this,
+					renderer,
+					this.renderMode === "transparent" &&
+						!(
+							this.pass === "transparent-pre" &&
+							Number(this.lilToonProperties._PreOutType ?? 0) !== 0
+						),
+				);
 
-			// The glTF loader intentionally shares one material instance between meshes.
-			// These globals include per-object model, skinning, and morph data, so Three
-			// must upload them for every draw even when the material/program did not
-			// change. This is especially important for transparent meshes because their
-			// draw order changes as the camera moves.
-			this.uniformsNeedUpdate = true;
+				// The glTF loader intentionally shares one material instance between meshes.
+				// These globals include per-object model, skinning, and morph data, so Three
+				// must upload them for every draw even when the material/program did not
+				// change. This is especially important for transparent meshes because their
+				// draw order changes as the camera moves.
+				this.uniformsNeedUpdate = true;
+			} finally {
+				this.#preparingDraw = preparing;
+			}
 		};
 	}
 
@@ -534,12 +542,14 @@ export class LilToonMaterial extends RawShaderMaterial {
 	}
 
 	override dispose(): void {
+		this.#systemTextures.clear();
 		this.#morphWeights.dispose();
 		this.#textureViews.dispose();
 		super.dispose();
 	}
 
 	override copy(source: LilToonMaterial): this {
+		this.#systemTextures.clear();
 		source.syncColor();
 		this.#selectionWarnings = [...source.#selectionWarnings];
 		const uniforms = this.uniforms;
@@ -672,8 +682,9 @@ export class LilToonMaterial extends RawShaderMaterial {
 		for (const [uniform, property] of program.samplerBindings) {
 			this.#samplerBindings.set(uniform, property);
 			this.uniforms[uniform] = {
-				value:
-					property === "__shadow"
+				value: this.#systemTextures.has(property)
+					? this.#systemTextures.get(property)
+					: property === "__shadow"
 						? getNeutralTexture("white")
 						: property.startsWith("__") || this.#cubeSamplers.has(uniform)
 							? null
@@ -697,11 +708,16 @@ export class LilToonMaterial extends RawShaderMaterial {
 			| "__furVertices",
 		texture: Texture | null,
 	): void {
-		this.refreshProgram();
+		// Draw preparation already selected the program before binding lighting and
+		// deformation. Pre/post-draw captures still refresh before setting globals.
+		if (!this.#preparingDraw) this.refreshProgram();
 		// An empty packed-depth sampler must mean far depth, not Three's zero-depth
 		// null fallback. Leave other system samplers' fallback semantics unchanged.
 		const value =
 			binding === "__shadow" && !texture ? getNeutralTexture("white") : texture;
+		// Selection is refreshed by material edits and draw preparation. Captures
+		// can arrive before that preparation; retain them across program changes.
+		this.#systemTextures.set(binding, value);
 		for (const [uniformName, property] of this.#samplerBindings) {
 			if (property === binding) this.uniforms[uniformName]!.value = value;
 		}

@@ -1,14 +1,8 @@
 import {
-	FramebufferTexture,
-	Vector2,
 	Scene,
 	Mesh,
 	SkinnedMesh,
-	NoColorSpace,
 	SRGBColorSpace,
-	HalfFloatType,
-	FloatType,
-	UnsignedByteType,
 	MeshBasicMaterial,
 	type BufferGeometry,
 	CustomBlending,
@@ -20,24 +14,15 @@ import {
 } from "three";
 import { LilToonMaterial } from "../material/LilToonMaterial.js";
 import { AuxiliaryPassDraw } from "./AuxiliaryPassDraw.js";
+import { SceneColorCapture } from "./SceneColorCapture.js";
 import { ownsPassSource } from "./passOwnership.js";
 
 /** Named GrabPass equivalent. Each render invocation owns its capture and restoration. */
 export class SceneColorPasses {
-	private captures: FramebufferTexture[] = [];
-	private grabs: FramebufferTexture[] = [];
+	private captures: SceneColorCapture[] = [];
+	private grabs: SceneColorCapture[] = [];
 	private blur = new AuxiliaryPassDraw();
-	private resolves: {
-		gl: WebGL2RenderingContext;
-		framebuffer: WebGLFramebuffer;
-		color: WebGLRenderbuffer;
-		key: string;
-	}[] = [];
 	private depth = 0;
-	private contextCanvas?: WebGLRenderer["domElement"];
-	private readonly contextLost = () => {
-		this.resolves = [];
-	};
 	private gems = new Map<
 		string,
 		{
@@ -58,7 +43,7 @@ export class SceneColorPasses {
 	): () => void {
 		const slot = this.depth++;
 		this.blur.begin();
-		let captured: FramebufferTexture | undefined;
+		let captured: Texture | undefined;
 		const undo: (() => void)[] = [];
 		scene.traverse((node) => {
 			const mesh = node as Mesh;
@@ -88,27 +73,8 @@ export class SceneColorPasses {
 				)
 					return;
 				if (!captured) {
-					const target = renderer.getRenderTarget();
-					const size = target
-						? new Vector2(target.width, target.height)
-						: renderer.getDrawingBufferSize(new Vector2());
-					const colorSpace = target?.texture.colorSpace ?? NoColorSpace;
-					let texture = this.captures[slot];
-					if (
-						!texture ||
-						texture.image.width !== size.x ||
-						texture.image.height !== size.y ||
-						texture.colorSpace !== colorSpace ||
-						texture.type !== (target?.texture.type ?? UnsignedByteType)
-					) {
-						texture?.dispose();
-						texture = new FramebufferTexture(size.x, size.y);
-						texture.colorSpace = colorSpace;
-						if (target) texture.type = target.texture.type;
-						this.captures[slot] = texture;
-					}
-					this.capture(renderer, texture, slot);
-					captured = texture;
+					const capture = (this.captures[slot] ??= new SceneColorCapture());
+					captured = capture.capture(renderer);
 				}
 				material.setSystemTexture("__background", captured);
 				material.globalUniforms.uBackgroundIsSRGB =
@@ -135,25 +101,8 @@ export class SceneColorPasses {
 								material.globalUniforms.uBackgroundIsSRGB;
 						},
 					);
-					let grab = this.grabs[slot];
-					if (
-						!grab ||
-						grab.image.width !== background.image.width ||
-						grab.image.height !== background.image.height ||
-						grab.type !== background.type ||
-						grab.colorSpace !== background.colorSpace
-					) {
-						grab?.dispose();
-						grab = new FramebufferTexture(
-							background.image.width,
-							background.image.height,
-						);
-						grab.type = background.type;
-						grab.colorSpace = background.colorSpace;
-						this.grabs[slot] = grab;
-					}
-					this.capture(renderer, grab, slot);
-					material.setSystemTexture("__grab", grab);
+					const grab = (this.grabs[slot] ??= new SceneColorCapture());
+					material.setSystemTexture("__grab", grab.capture(renderer));
 				}
 				if (material.renderMode === "gem")
 					this.clearGem(
@@ -296,109 +245,12 @@ export class SceneColorPasses {
 			group as never,
 		);
 	}
-	private capture(
-		renderer: WebGLRenderer,
-		texture: FramebufferTexture,
-		slot: number,
-	) {
-		const gl = renderer.getContext() as WebGL2RenderingContext;
-		if (!this.contextCanvas) {
-			this.contextCanvas = renderer.domElement;
-			this.contextCanvas.addEventListener("webglcontextlost", this.contextLost);
-		}
-		if (!renderer.getRenderTarget() || gl.getParameter(gl.SAMPLES) === 0) {
-			renderer.copyFramebufferToTexture(texture);
-			return;
-		}
-		// Public WebGL2 resolve: no renderer-private framebuffer or texture handles.
-		const read = gl.getParameter(gl.READ_FRAMEBUFFER_BINDING),
-			draw = gl.getParameter(gl.DRAW_FRAMEBUFFER_BINDING),
-			rb = gl.getParameter(gl.RENDERBUFFER_BINDING);
-		const scissorEnabled = gl.isEnabled(gl.SCISSOR_TEST);
-		const { width, height } = texture.image;
-		const format =
-			texture.colorSpace === SRGBColorSpace
-				? gl.SRGB8_ALPHA8
-				: texture.type === HalfFloatType
-					? gl.RGBA16F
-					: texture.type === FloatType
-						? gl.RGBA32F
-						: gl.RGBA8;
-		const key = `${width}:${height}:${format}`;
-		let resolve = this.resolves[slot];
-		try {
-			if (!resolve || resolve.key !== key) {
-				if (resolve) {
-					gl.deleteFramebuffer(resolve.framebuffer);
-					gl.deleteRenderbuffer(resolve.color);
-				}
-				const framebuffer = gl.createFramebuffer(),
-					color = gl.createRenderbuffer();
-				if (!framebuffer || !color)
-					throw new Error(
-						"[three-liltoon] Cannot allocate scene-color resolve",
-					);
-				resolve = { gl, framebuffer, color, key };
-				this.resolves[slot] = resolve;
-				gl.bindRenderbuffer(gl.RENDERBUFFER, color);
-				gl.renderbufferStorage(gl.RENDERBUFFER, format, width, height);
-				gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer);
-				gl.framebufferRenderbuffer(
-					gl.DRAW_FRAMEBUFFER,
-					gl.COLOR_ATTACHMENT0,
-					gl.RENDERBUFFER,
-					color,
-				);
-				if (
-					gl.checkFramebufferStatus(gl.DRAW_FRAMEBUFFER) !==
-					gl.FRAMEBUFFER_COMPLETE
-				)
-					throw new Error(
-						"[three-liltoon] Scene-color resolve format is unsupported",
-					);
-			}
-			// Three's MSAA resolve can leave READ_FRAMEBUFFER at the canvas while
-			// DRAW_FRAMEBUFFER still contains the active scene. Capture that scene.
-			gl.bindFramebuffer(gl.READ_FRAMEBUFFER, draw);
-			gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, resolve.framebuffer);
-			gl.disable(gl.SCISSOR_TEST);
-			gl.blitFramebuffer(
-				0,
-				0,
-				width,
-				height,
-				0,
-				0,
-				width,
-				height,
-				gl.COLOR_BUFFER_BIT,
-				gl.NEAREST,
-			);
-			gl.bindFramebuffer(gl.READ_FRAMEBUFFER, resolve.framebuffer);
-			renderer.copyFramebufferToTexture(texture);
-		} finally {
-			gl.bindFramebuffer(gl.READ_FRAMEBUFFER, read);
-			gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, draw);
-			gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
-			if (scissorEnabled) gl.enable(gl.SCISSOR_TEST);
-		}
-	}
 	dispose() {
-		this.contextCanvas?.removeEventListener(
-			"webglcontextlost",
-			this.contextLost,
-		);
-		this.contextCanvas = undefined;
 		this.blur.dispose();
 		for (const texture of this.grabs) texture.dispose();
 		this.grabs = [];
 		for (const recipe of this.gems.values()) recipe.release();
 		for (const texture of this.captures) texture.dispose();
 		this.captures = [];
-		for (const r of this.resolves) {
-			r.gl.deleteFramebuffer(r.framebuffer);
-			r.gl.deleteRenderbuffer(r.color);
-		}
-		this.resolves = [];
 	}
 }

@@ -1,7 +1,7 @@
-export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-NQJJJ3TF.js';
-import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-NGY7VCGA.js';
-export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-NGY7VCGA.js';
-import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, Scene, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, REVISION, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, BufferGeometry, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry, Vector4 } from 'three';
+export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-WFYRXLGW.js';
+import { LilToonMaterial, setGlobalProperty, applyLilToonPassState, isRenderStateProperty } from './chunk-KNGRDLOZ.js';
+export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-KNGRDLOZ.js';
+import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, Scene, SRGBColorSpace, REVISION, Vector2, UnsignedByteType, NoColorSpace, WebGLRenderTarget, NearestFilter, FramebufferTexture, Vector4, DataTexture, RGBAFormat, FloatType, Float32BufferAttribute, Uint32BufferAttribute, BufferGeometry, Vector3, Matrix4, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
 
 function queue(material, defaultQueue) {
   return material.isLilToonMaterial ? material.renderQueue ?? defaultQueue : defaultQueue;
@@ -34,6 +34,48 @@ function installMaterialRenderQueue(renderer) {
   };
 }
 
+// src/renderer/syncPassMaterial.ts
+function sameValue(a, b) {
+  if (Array.isArray(a))
+    return Array.isArray(b) && a.length === b.length && a.every((v, i) => v === b[i]);
+  if (typeof a === "object")
+    return b !== void 0 && a.constructor === b.constructor && a.equals(b);
+  return a === b;
+}
+function syncPassMaterial(source, target) {
+  source.getProperty("_Color");
+  target.toneMapped = source.toneMapped;
+  target.renderQueue = source.renderQueue;
+  let changed = false, stateChanged = false;
+  for (const key in source.lilToonProperties) {
+    const value = source.lilToonProperties[key];
+    if (sameValue(value, target.lilToonProperties[key])) continue;
+    target.lilToonProperties[key] = Array.isArray(value) ? [...value] : typeof value === "object" ? value.clone() : value;
+    setGlobalProperty(target.globalUniforms, key, value);
+    changed = true;
+    stateChanged ||= isRenderStateProperty(key);
+  }
+  for (const key of /* @__PURE__ */ new Set([
+    ...Object.keys(source.lilToonTextures),
+    ...Object.keys(target.lilToonTextures)
+  ])) {
+    const texture = source.lilToonTextures[key] ?? null;
+    if (target.lilToonTextures[key] === texture) continue;
+    target.lilToonTextures[key] = texture;
+    changed = true;
+  }
+  const selectionChanged = target.shaderVariant !== source.shaderVariant;
+  target.shaderVariant = source.shaderVariant;
+  if (changed) target.setProperty("_Color", source.getProperty("_Color"));
+  if (stateChanged && !selectionChanged)
+    applyLilToonPassState(
+      target,
+      source.renderMode,
+      source.lilToonProperties,
+      target.pass
+    );
+}
+
 // src/renderer/passOwnership.ts
 function ownsPassSource(root, mesh, source) {
   if (source.pass !== "forward") return false;
@@ -45,25 +87,6 @@ function ownsPassSource(root, mesh, source) {
 }
 
 // src/renderer/AuxiliaryPassDraw.ts
-function syncPassMaterial(source, target) {
-  source.getProperty("_Color");
-  target.toneMapped = source.toneMapped;
-  target.renderQueue = source.renderQueue;
-  target.shaderVariant = source.shaderVariant;
-  for (const [key, value] of Object.entries(source.lilToonProperties)) {
-    target.lilToonProperties[key] = value;
-    setGlobalProperty(target.globalUniforms, key, value);
-  }
-  target.setProperty("_Color", source.getProperty("_Color"));
-  for (const [key, value] of Object.entries(source.lilToonTextures))
-    if (target.lilToonTextures[key] !== value) target.setTexture(key, value);
-  applyLilToonPassState(
-    target,
-    source.renderMode,
-    source.lilToonProperties,
-    target.pass
-  );
-}
 var AuxiliaryPassDraw = class {
   recipes = /* @__PURE__ */ new Map();
   depth = 0;
@@ -160,18 +183,128 @@ var AuxiliaryPassDraw = class {
     for (const r of this.recipes.values()) r.release();
   }
 };
+var SceneColorCapture = class {
+  target;
+  canvasTexture;
+  framebuffer;
+  canvas;
+  contextLost = () => {
+    this.target?.dispose();
+    this.canvasTexture?.dispose();
+    this.framebuffer = void 0;
+  };
+  capture(renderer) {
+    if (!this.canvas) {
+      this.canvas = renderer.domElement;
+      this.canvas.addEventListener("webglcontextlost", this.contextLost);
+    }
+    const source = renderer.getRenderTarget();
+    const size = source ? new Vector2(source.width, source.height) : renderer.getDrawingBufferSize(new Vector2());
+    const type = source?.texture.type ?? UnsignedByteType;
+    const colorSpace = source?.texture.colorSpace ?? NoColorSpace;
+    let texture = this.target?.texture ?? this.canvasTexture;
+    if (!texture || Boolean(source) !== Boolean(this.target) || texture.image.width !== size.x || texture.image.height !== size.y || texture.type !== type || texture.colorSpace !== colorSpace) {
+      this.target?.dispose();
+      this.canvasTexture?.dispose();
+      this.target = void 0;
+      this.canvasTexture = void 0;
+      this.framebuffer = void 0;
+      if (source) {
+        this.target = new WebGLRenderTarget(size.x, size.y, {
+          type,
+          colorSpace,
+          minFilter: NearestFilter,
+          magFilter: NearestFilter,
+          depthBuffer: false,
+          stencilBuffer: false,
+          generateMipmaps: false
+        });
+        texture = this.target.texture;
+      } else {
+        texture = this.canvasTexture = new FramebufferTexture(size.x, size.y);
+      }
+    }
+    const gl = renderer.getContext();
+    const read = gl.getParameter(gl.READ_FRAMEBUFFER_BINDING);
+    const draw = gl.getParameter(gl.DRAW_FRAMEBUFFER_BINDING);
+    const scissorEnabled = gl.isEnabled(gl.SCISSOR_TEST);
+    try {
+      if (!source) {
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, draw);
+        renderer.copyFramebufferToTexture(this.canvasTexture);
+      } else {
+        if (!this.framebuffer) this.initialize(renderer, source);
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, draw);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.framebuffer);
+        gl.disable(gl.SCISSOR_TEST);
+        gl.blitFramebuffer(
+          0,
+          0,
+          size.x,
+          size.y,
+          0,
+          0,
+          size.x,
+          size.y,
+          gl.COLOR_BUFFER_BIT,
+          gl.NEAREST
+        );
+      }
+    } finally {
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, read);
+      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, draw);
+      if (scissorEnabled) gl.enable(gl.SCISSOR_TEST);
+      else gl.disable(gl.SCISSOR_TEST);
+    }
+    return texture;
+  }
+  initialize(renderer, source) {
+    const gl = renderer.getContext();
+    const face = renderer.getActiveCubeFace(), level = renderer.getActiveMipmapLevel();
+    const viewport = renderer.getCurrentViewport(new Vector4());
+    const scissor = gl.getParameter(gl.SCISSOR_BOX);
+    const scissorTest = gl.isEnabled(gl.SCISSOR_TEST);
+    const renderbuffer = gl.getParameter(gl.RENDERBUFFER_BINDING);
+    const sourceViewport = source.viewport.clone(), sourceScissor = source.scissor.clone();
+    const sourceScissorTest = source.scissorTest;
+    try {
+      renderer.setRenderTarget(this.target);
+      if (gl.checkFramebufferStatus(gl.DRAW_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE)
+        throw new Error(
+          "[three-liltoon] Scene-color capture format is unsupported"
+        );
+      this.framebuffer = gl.getParameter(gl.DRAW_FRAMEBUFFER_BINDING);
+    } finally {
+      source.viewport.copy(viewport);
+      source.scissor.fromArray(scissor);
+      source.scissorTest = scissorTest;
+      try {
+        renderer.setRenderTarget(source, face, level);
+      } finally {
+        source.viewport.copy(sourceViewport);
+        source.scissor.copy(sourceScissor);
+        source.scissorTest = sourceScissorTest;
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+      }
+    }
+  }
+  dispose() {
+    this.canvas?.removeEventListener("webglcontextlost", this.contextLost);
+    this.canvas = void 0;
+    this.target?.dispose();
+    this.canvasTexture?.dispose();
+    this.target = void 0;
+    this.canvasTexture = void 0;
+    this.framebuffer = void 0;
+  }
+};
 
 // src/renderer/SceneColorPasses.ts
 var SceneColorPasses = class {
   captures = [];
   grabs = [];
   blur = new AuxiliaryPassDraw();
-  resolves = [];
   depth = 0;
-  contextCanvas;
-  contextLost = () => {
-    this.resolves = [];
-  };
   gems = /* @__PURE__ */ new Map();
   prepare(renderer, scene) {
     const slot = this.depth++;
@@ -195,19 +328,8 @@ var SceneColorPasses = class {
         ) || material.pass !== "forward")
           return;
         if (!captured) {
-          const target = renderer.getRenderTarget();
-          const size = target ? new Vector2(target.width, target.height) : renderer.getDrawingBufferSize(new Vector2());
-          const colorSpace = target?.texture.colorSpace ?? NoColorSpace;
-          let texture = this.captures[slot];
-          if (!texture || texture.image.width !== size.x || texture.image.height !== size.y || texture.colorSpace !== colorSpace || texture.type !== (target?.texture.type ?? UnsignedByteType)) {
-            texture?.dispose();
-            texture = new FramebufferTexture(size.x, size.y);
-            texture.colorSpace = colorSpace;
-            if (target) texture.type = target.texture.type;
-            this.captures[slot] = texture;
-          }
-          this.capture(renderer, texture, slot);
-          captured = texture;
+          const capture = this.captures[slot] ??= new SceneColorCapture();
+          captured = capture.capture(renderer);
         }
         material.setSystemTexture("__background", captured);
         material.globalUniforms.uBackgroundIsSRGB = !renderer.getRenderTarget() && renderer.outputColorSpace === SRGBColorSpace ? 1 : 0;
@@ -227,19 +349,8 @@ var SceneColorPasses = class {
               pass.globalUniforms.uBackgroundIsSRGB = material.globalUniforms.uBackgroundIsSRGB;
             }
           );
-          let grab = this.grabs[slot];
-          if (!grab || grab.image.width !== background.image.width || grab.image.height !== background.image.height || grab.type !== background.type || grab.colorSpace !== background.colorSpace) {
-            grab?.dispose();
-            grab = new FramebufferTexture(
-              background.image.width,
-              background.image.height
-            );
-            grab.type = background.type;
-            grab.colorSpace = background.colorSpace;
-            this.grabs[slot] = grab;
-          }
-          this.capture(renderer, grab, slot);
-          material.setSystemTexture("__grab", grab);
+          const grab = this.grabs[slot] ??= new SceneColorCapture();
+          material.setSystemTexture("__grab", grab.capture(renderer));
         }
         if (material.renderMode === "gem")
           this.clearGem(
@@ -362,90 +473,13 @@ var SceneColorPasses = class {
       group
     );
   }
-  capture(renderer, texture, slot) {
-    const gl = renderer.getContext();
-    if (!this.contextCanvas) {
-      this.contextCanvas = renderer.domElement;
-      this.contextCanvas.addEventListener("webglcontextlost", this.contextLost);
-    }
-    if (!renderer.getRenderTarget() || gl.getParameter(gl.SAMPLES) === 0) {
-      renderer.copyFramebufferToTexture(texture);
-      return;
-    }
-    const read = gl.getParameter(gl.READ_FRAMEBUFFER_BINDING), draw = gl.getParameter(gl.DRAW_FRAMEBUFFER_BINDING), rb = gl.getParameter(gl.RENDERBUFFER_BINDING);
-    const scissorEnabled = gl.isEnabled(gl.SCISSOR_TEST);
-    const { width, height } = texture.image;
-    const format = texture.colorSpace === SRGBColorSpace ? gl.SRGB8_ALPHA8 : texture.type === HalfFloatType ? gl.RGBA16F : texture.type === FloatType ? gl.RGBA32F : gl.RGBA8;
-    const key = `${width}:${height}:${format}`;
-    let resolve = this.resolves[slot];
-    try {
-      if (!resolve || resolve.key !== key) {
-        if (resolve) {
-          gl.deleteFramebuffer(resolve.framebuffer);
-          gl.deleteRenderbuffer(resolve.color);
-        }
-        const framebuffer = gl.createFramebuffer(), color = gl.createRenderbuffer();
-        if (!framebuffer || !color)
-          throw new Error(
-            "[three-liltoon] Cannot allocate scene-color resolve"
-          );
-        resolve = { gl, framebuffer, color, key };
-        this.resolves[slot] = resolve;
-        gl.bindRenderbuffer(gl.RENDERBUFFER, color);
-        gl.renderbufferStorage(gl.RENDERBUFFER, format, width, height);
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer);
-        gl.framebufferRenderbuffer(
-          gl.DRAW_FRAMEBUFFER,
-          gl.COLOR_ATTACHMENT0,
-          gl.RENDERBUFFER,
-          color
-        );
-        if (gl.checkFramebufferStatus(gl.DRAW_FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE)
-          throw new Error(
-            "[three-liltoon] Scene-color resolve format is unsupported"
-          );
-      }
-      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, draw);
-      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, resolve.framebuffer);
-      gl.disable(gl.SCISSOR_TEST);
-      gl.blitFramebuffer(
-        0,
-        0,
-        width,
-        height,
-        0,
-        0,
-        width,
-        height,
-        gl.COLOR_BUFFER_BIT,
-        gl.NEAREST
-      );
-      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, resolve.framebuffer);
-      renderer.copyFramebufferToTexture(texture);
-    } finally {
-      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, read);
-      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, draw);
-      gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
-      if (scissorEnabled) gl.enable(gl.SCISSOR_TEST);
-    }
-  }
   dispose() {
-    this.contextCanvas?.removeEventListener(
-      "webglcontextlost",
-      this.contextLost
-    );
-    this.contextCanvas = void 0;
     this.blur.dispose();
     for (const texture of this.grabs) texture.dispose();
     this.grabs = [];
     for (const recipe of this.gems.values()) recipe.release();
     for (const texture of this.captures) texture.dispose();
     this.captures = [];
-    for (const r of this.resolves) {
-      r.gl.deleteFramebuffer(r.framebuffer);
-      r.gl.deleteRenderbuffer(r.color);
-    }
-    this.resolves = [];
   }
 };
 var FurDeformation = class {
@@ -792,16 +826,15 @@ var FurGeometry = class {
 };
 
 // src/renderer/FurPasses.ts
-function sameProperty(value, previous) {
-  if (Array.isArray(value))
-    return Array.isArray(previous) && value.length === previous.length && value.every((v, i) => v === previous[i]);
-  if (typeof value === "object")
-    return previous !== void 0 && value.constructor === previous.constructor && value.equals(previous);
-  return value === previous;
-}
 var FurPasses = class {
   recipes = /* @__PURE__ */ new Map();
   depth = 0;
+  uploaded = /* @__PURE__ */ new WeakSet();
+  uploadMaterial = new MeshBasicMaterial({ visible: false });
+  contextCanvas;
+  contextRestored = () => {
+    this.uploaded = /* @__PURE__ */ new WeakSet();
+  };
   prepare(renderer, scene, render) {
     this.depth++;
     const undo = [];
@@ -819,6 +852,13 @@ var FurPasses = class {
         const source = args[4];
         if (!(source instanceof LilToonMaterial) || !source.renderMode.startsWith("fur") || source.pass !== "forward")
           return;
+        if (!this.contextCanvas) {
+          this.contextCanvas = renderer.domElement;
+          this.contextCanvas.addEventListener(
+            "webglcontextrestored",
+            this.contextRestored
+          );
+        }
         const layers = Number(source.lilToonProperties._FurLayerNum ?? 2);
         if ((mesh.geometry.index?.count ?? mesh.geometry.attributes.position.count) < 3)
           return;
@@ -840,7 +880,7 @@ var FurPasses = class {
           const deformation2 = gpuSkinning ? new FurDeformation(geometry2.texture) : void 0;
           const materials3 = (source.renderMode === "fur-two-pass" ? ["fur-pre", "fur"] : ["fur"]).map(
             (pass) => new LilToonMaterial({
-              renderMode: source.renderMode,
+              shaderVariant: source.shaderVariant,
               pass,
               properties: source.lilToonProperties,
               textures: source.lilToonTextures
@@ -896,35 +936,7 @@ var FurPasses = class {
           geometry.texture,
           args[2]
         );
-        source.getProperty("_Color");
-        for (const material of materials2) {
-          material.toneMapped = source.toneMapped;
-          let changed = false;
-          for (const key2 in source.lilToonProperties) {
-            const value = source.lilToonProperties[key2];
-            const previous = material.lilToonProperties[key2];
-            if (!sameProperty(value, previous)) {
-              material.setProperty(
-                key2,
-                Array.isArray(value) ? [...value] : value
-              );
-              changed = true;
-            }
-          }
-          for (const key2 of /* @__PURE__ */ new Set([
-            ...Object.keys(source.lilToonTextures),
-            ...Object.keys(material.lilToonTextures)
-          ]))
-            if (material.lilToonTextures[key2] !== source.lilToonTextures[key2])
-              material.setTexture(key2, source.lilToonTextures[key2] ?? null);
-          if (changed)
-            applyLilToonPassState(
-              material,
-              source.renderMode,
-              source.lilToonProperties,
-              material.pass
-            );
-        }
+        for (const material of materials2) syncPassMaterial(source, material);
         const group = args[5] ?? mesh.geometry.drawRange;
         const previousRange = { ...geometry.geometry.drawRange };
         if (group) {
@@ -948,29 +960,39 @@ var FurPasses = class {
           renderer.info.autoReset = false;
           renderer.shadowMap.autoUpdate = false;
           renderer.shadowMap.needsUpdate = false;
+          if (!this.uploaded.has(geometry.geometry)) {
+            proxy.material = this.uploadMaterial;
+            render.call(renderer, temporary, args[2]);
+            this.uploaded.add(geometry.geometry);
+          }
+          proxy.matrixWorld.copy(mesh.matrixWorld);
+          proxy.modelViewMatrix.multiplyMatrices(
+            args[2].matrixWorldInverse,
+            proxy.matrixWorld
+          );
+          proxy.normalMatrix.getNormalMatrix(proxy.modelViewMatrix);
           for (const material of materials2) {
             proxy.material = material;
-            const before = material.onBeforeRender;
-            material.onBeforeRender = (...draw) => {
-              before.call(
-                material,
-                draw[0],
-                scene,
-                draw[2],
-                draw[3],
-                draw[4],
-                draw[5]
-              );
-              material.setSystemTexture(
-                "__furVertices",
-                deformation?.target.texture ?? geometry.texture
-              );
-            };
-            try {
-              render.call(renderer, temporary, args[2]);
-            } finally {
-              material.onBeforeRender = before;
-            }
+            material.onBeforeRender(
+              renderer,
+              scene,
+              args[2],
+              geometry.geometry,
+              proxy,
+              null
+            );
+            material.setSystemTexture(
+              "__furVertices",
+              deformation?.target.texture ?? geometry.texture
+            );
+            renderer.renderBufferDirect(
+              args[2],
+              temporary,
+              geometry.geometry,
+              material,
+              proxy,
+              null
+            );
           }
         } finally {
           renderer.autoClear = auto;
@@ -998,6 +1020,13 @@ var FurPasses = class {
     };
   }
   dispose() {
+    this.contextCanvas?.removeEventListener(
+      "webglcontextrestored",
+      this.contextRestored
+    );
+    this.contextCanvas = void 0;
+    this.uploaded = /* @__PURE__ */ new WeakSet();
+    this.uploadMaterial.dispose();
     for (const recipe of this.recipes.values()) recipe.release();
   }
 };
@@ -1067,7 +1096,7 @@ var TransparencyPasses = class {
 };
 
 // src/renderer/enableLilToon.ts
-function sameProperty2(value, before) {
+function sameProperty(value, before) {
   if (Array.isArray(value))
     return Array.isArray(before) && value.length === before.length && value.every((v, i) => v === before[i]);
   if (typeof value === "object")
@@ -1153,7 +1182,7 @@ var AutomaticPasses = class {
     });
     let changed = outline.shaderVariant !== source.shaderVariant;
     for (const [name, value] of Object.entries(source.lilToonProperties)) {
-      if (sameProperty2(value, outline.lilToonProperties[name])) continue;
+      if (sameProperty(value, outline.lilToonProperties[name])) continue;
       outline.lilToonProperties[name] = copyProperty(value);
       setGlobalProperty(outline.globalUniforms, name, value);
       changed = true;

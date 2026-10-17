@@ -55,6 +55,9 @@ export async function verifyInlinePasses() {
 			_OutlineZWrite: 0,
 			_RefractionStrength: 0.1,
 			_Smoothness: 0.5,
+			_FurLayerNum: 3,
+			_FurVector: [0, 0, 0.12, 0],
+			_FurRandomize: 0.1,
 		},
 	});
 	const mesh: SkinnedMesh = new SkinnedMesh(geometry, source),
@@ -86,7 +89,10 @@ export async function verifyInlinePasses() {
 	const direct = renderer.renderBufferDirect.bind(renderer);
 	renderer.renderBufferDirect = (...args) => {
 		const [cam, drawScene, geo, mat, object, group] = args;
-		const auxiliary = object !== mesh && object !== back;
+		const auxiliary =
+			object !== mesh &&
+			object !== back &&
+			(mat instanceof LilToonMaterial || mat instanceof MeshBasicMaterial);
 		if (legacy && auxiliary && !inside) {
 			const proxy = object as Mesh,
 				auto = renderer.autoClear,
@@ -144,6 +150,9 @@ export async function verifyInlinePasses() {
 		"Hidden/lilToonTwoPassTransparentOutline",
 		"Hidden/lilToonGem",
 		"Hidden/lilToonRefractionBlur",
+		"Hidden/lilToonFur",
+		"Hidden/lilToonFurCutout",
+		"Hidden/lilToonFurTwoPass",
 	] as const) {
 		source.shaderVariant = variant;
 		for (const pose of [0, 1]) {
@@ -153,7 +162,7 @@ export async function verifyInlinePasses() {
 			mesh.morphTargetInfluences![0] = pose;
 			camera.position.x = pose * 0.35;
 			camera.lookAt(0, 0, 0);
-			render(false);
+			const first = render(false);
 			render(true);
 			const old = render(true),
 				current = render(false),
@@ -169,6 +178,7 @@ export async function verifyInlinePasses() {
 				variant,
 				pose,
 				difference: diff(old.pixels, current.pixels),
+				firstDifference: diff(first.pixels, current.pixels),
 				separateReadDifference: diff(current.pixels, separateRead.pixels),
 				repeat: diff(current.pixels, repeat.pixels),
 				oldBlits: old.blits,
@@ -178,6 +188,33 @@ export async function verifyInlinePasses() {
 				error: gl.getError(),
 			});
 		}
+	}
+	const rebuilt = [];
+	for (const update of [
+		() => source.setProperty("_FurLayerNum", 4),
+		() => {
+			geometry.index!.needsUpdate = true;
+		},
+		() => {
+			mesh.geometry = geometry.clone();
+			geometry.dispose();
+		},
+	]) {
+		update();
+		const first = render(false),
+			repeated = render(false),
+			old = render(true);
+		rebuilt.push({
+			difference: first.pixels.reduce(
+				(n, v, i) => n + Number(Math.abs(v - old.pixels[i]!) > 2),
+				0,
+			),
+			repeat: first.pixels.reduce(
+				(n, v, i) => n + Number(Math.abs(v - repeated.pixels[i]!) > 2),
+				0,
+			),
+			error: gl.getError(),
+		});
 	}
 	const before = render(false);
 	const restored = new Promise<void>((resolve) =>
@@ -202,10 +239,11 @@ export async function verifyInlinePasses() {
 	target.dispose();
 	source.dispose();
 	geometry.dispose();
+	mesh.geometry.dispose();
 	mesh.skeleton.dispose();
 	back.geometry.dispose();
 	(back.material as MeshBasicMaterial).dispose();
 	const remaining = { ...renderer.info.memory };
 	renderer.dispose();
-	return { results, contextDifference, contextError, remaining };
+	return { results, rebuilt, contextDifference, contextError, remaining };
 }

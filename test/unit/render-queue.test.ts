@@ -13,7 +13,7 @@ import {
 	compareLilToonRenderQueue,
 } from "../../src/index.js";
 import { installMaterialRenderQueue } from "../../src/renderer/materialRenderQueue.js";
-import { syncPassMaterial } from "../../src/renderer/AuxiliaryPassDraw.js";
+import { syncPassMaterial } from "../../src/renderer/syncPassMaterial.js";
 
 const item = (material: Material, z: number, id = 1) => ({
 	material,

@@ -4,8 +4,11 @@ User-facing changes to `@mochiya/three-liltoon`. Package versions and [material 
 
 ## Unreleased
 
-- Reduce GPU overhead with multisampled render targets by submitting transparent auxiliary passes, refraction blur and gem preparation within the active render, without lowering antialiasing quality.
+- Reduce GPU overhead with multisampled render targets by submitting transparent auxiliary passes, fur ribbons, refraction blur and gem preparation within the active render, without lowering antialiasing quality.
 - Capture the active scene framebuffer for refraction and gem effects after auxiliary renders, and recreate capture buffers after WebGL context restoration.
+
+- Reduce material preparation overhead by reusing shader selection during internal texture binding and updating auxiliary material values and render state only when they change.
+- Reduce offscreen refraction and gem capture memory and bandwidth by resolving directly into the sampled texture.
 
 ## 0.1.8
 

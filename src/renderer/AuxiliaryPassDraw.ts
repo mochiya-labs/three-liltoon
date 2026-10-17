@@ -9,32 +9,8 @@ import {
 } from "three";
 import { LilToonMaterial } from "../material/LilToonMaterial.js";
 import type { LilToonPass } from "../material/LilToonMaterialParameters.js";
-import { setGlobalProperty } from "./LilToonUniformBinder.js";
-import { applyLilToonPassState } from "../utils/renderState.js";
+import { syncPassMaterial } from "./syncPassMaterial.js";
 import { ownsPassSource } from "./passOwnership.js";
-
-export function syncPassMaterial(
-	source: LilToonMaterial,
-	target: LilToonMaterial,
-) {
-	source.getProperty("_Color");
-	target.toneMapped = source.toneMapped;
-	target.renderQueue = source.renderQueue;
-	target.shaderVariant = source.shaderVariant;
-	for (const [key, value] of Object.entries(source.lilToonProperties)) {
-		target.lilToonProperties[key] = value;
-		setGlobalProperty(target.globalUniforms, key, value);
-	}
-	target.setProperty("_Color", source.getProperty("_Color")!);
-	for (const [key, value] of Object.entries(source.lilToonTextures))
-		if (target.lilToonTextures[key] !== value) target.setTexture(key, value);
-	applyLilToonPassState(
-		target,
-		source.renderMode,
-		source.lilToonProperties,
-		target.pass,
-	);
-}
 
 /** Cached pass proxy. Borrows source geometry, including Three's morph texture. */
 export class AuxiliaryPassDraw {

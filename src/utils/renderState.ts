@@ -282,13 +282,44 @@ export const renderStateMappings = {
 };
 
 /** ShaderLab pass-local state overrides; properties retain their original shader names. */
+const stateProperties = [
+	"_Cull",
+	"_ZWrite",
+	"_ZTest",
+	"_SrcBlend",
+	"_DstBlend",
+	"_BlendOp",
+	"_SrcBlendAlpha",
+	"_DstBlendAlpha",
+	"_BlendOpAlpha",
+	"_StencilRef",
+	"_StencilReadMask",
+	"_StencilWriteMask",
+	"_StencilComp",
+	"_StencilFail",
+	"_StencilZFail",
+	"_StencilPass",
+	"_OffsetFactor",
+	"_OffsetUnits",
+	"_ColorMask",
+	"_AlphaToMask",
+] as const;
+const statePropertyNames = new Set(
+	["", "Outline", "Pre", "Fur"].flatMap((prefix) =>
+		stateProperties.map((name) => `_${prefix}${name.slice(1)}`),
+	),
+);
+export function isRenderStateProperty(name: string): boolean {
+	return statePropertyNames.has(name);
+}
+
 export function applyLilToonPassState(
 	material: Material,
 	mode: LilToonRenderMode,
 	properties: Record<string, unknown>,
 	pass: import("../material/LilToonMaterialParameters.js").LilToonPass,
 ) {
-	const mappedProperties = { ...properties };
+	const mappedProperties: Record<string, unknown> = Object.create(properties);
 	const prefix =
 		pass === "outline"
 			? "_Outline"
@@ -298,9 +329,10 @@ export function applyLilToonPassState(
 					? "_Fur"
 					: "";
 	if (prefix)
-		for (const [key, value] of Object.entries(properties)) {
-			if (key.startsWith(prefix))
-				mappedProperties[`_${key.slice(prefix.length)}`] = value;
+		for (const key of stateProperties) {
+			const source = `${prefix}${key.slice(1)}`;
+			if (Object.hasOwn(properties, source))
+				mappedProperties[key] = properties[source];
 		}
 	if (pass === "fur-pre")
 		Object.assign(mappedProperties, {

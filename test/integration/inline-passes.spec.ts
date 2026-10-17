@@ -17,6 +17,7 @@ test("inline auxiliary passes preserve MSAA pixels and deformation with fewer re
 	expect(errors).toEqual([]);
 	for (const row of result.results) {
 		expect(row.difference).toBe(0);
+		expect(row.firstDifference).toBe(0);
 		expect(row.separateReadDifference).toBe(0);
 		expect(row.repeat).toBe(0);
 		expect(row.error).toBe(0);
@@ -24,6 +25,8 @@ test("inline auxiliary passes preserve MSAA pixels and deformation with fewer re
 		expect(row.blits).toBeLessThan(row.oldBlits);
 	}
 	expect(result.contextDifference).toBe(0);
+	for (const row of result.rebuilt)
+		expect(row).toEqual({ difference: 0, repeat: 0, error: 0 });
 	expect(result.contextError).toBe(0);
 	expect(result.remaining.geometries).toBe(0);
 	expect(result.remaining.textures).toBe(0);

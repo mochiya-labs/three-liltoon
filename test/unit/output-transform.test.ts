@@ -9,7 +9,7 @@ import {
 } from "three";
 import { LilToonMaterial } from "../../src/material/LilToonMaterial.js";
 import { updateOutputTransform } from "../../src/renderer/outputTransform.js";
-import { syncPassMaterial } from "../../src/renderer/AuxiliaryPassDraw.js";
+import { syncPassMaterial } from "../../src/renderer/syncPassMaterial.js";
 
 describe("raw material output contract", () => {
 	it("follows per-draw renderer, target, exposure and toneMapped state without rebuilding", () => {
