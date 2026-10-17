@@ -1,7 +1,6 @@
 import {
 	FramebufferTexture,
 	Vector2,
-	Vector4,
 	Scene,
 	Mesh,
 	SkinnedMesh,
@@ -11,7 +10,7 @@ import {
 	FloatType,
 	UnsignedByteType,
 	MeshBasicMaterial,
-	BufferGeometry,
+	type BufferGeometry,
 	CustomBlending,
 	OneFactor,
 	ZeroFactor,
@@ -35,6 +34,10 @@ export class SceneColorPasses {
 		key: string;
 	}[] = [];
 	private depth = 0;
+	private contextCanvas?: WebGLRenderer["domElement"];
+	private readonly contextLost = () => {
+		this.resolves = [];
+	};
 	private gems = new Map<
 		string,
 		{
@@ -52,7 +55,6 @@ export class SceneColorPasses {
 	prepare(
 		renderer: WebGLRenderer,
 		scene: import("three").Object3D,
-		render: WebGLRenderer["render"],
 	): () => void {
 		const slot = this.depth++;
 		this.blur.begin();
@@ -118,7 +120,6 @@ export class SceneColorPasses {
 					const background = captured;
 					this.blur.draw(
 						renderer,
-						render,
 						mesh,
 						material,
 						"refraction-blur-pre",
@@ -157,7 +158,6 @@ export class SceneColorPasses {
 				if (material.renderMode === "gem")
 					this.clearGem(
 						renderer,
-						render,
 						mesh,
 						material,
 						scene,
@@ -186,7 +186,6 @@ export class SceneColorPasses {
 	}
 	private clearGem(
 		renderer: WebGLRenderer,
-		render: WebGLRenderer["render"],
 		mesh: Mesh,
 		source: LilToonMaterial,
 		owner: import("three").Object3D,
@@ -212,20 +211,17 @@ export class SceneColorPasses {
 				blendSrcAlpha: ZeroFactor,
 				blendDstAlpha: OneFactor,
 			});
-			const geometry = new BufferGeometry(),
+			const geometry = mesh.geometry,
 				sourceGeometry = mesh.geometry;
 			const proxy: Mesh = (mesh as SkinnedMesh).isSkinnedMesh
 				? new SkinnedMesh(geometry, material)
 				: new Mesh(geometry, material);
+			proxy.matrixAutoUpdate = false;
 			const temporary = new Scene();
 			temporary.add(proxy);
 			const release = () => {
 				sourceGeometry.removeEventListener("dispose", release);
 				source.removeEventListener("dispose", release);
-				geometry.attributes = {};
-				geometry.index = null;
-				geometry.morphAttributes = {};
-				geometry.dispose();
 				material.dispose();
 				this.gems.delete(key);
 			};
@@ -265,24 +261,7 @@ export class SceneColorPasses {
 			"polygonOffsetUnits",
 		] as const)
 			(material as any)[key] = source[key];
-		geometry.index = mesh.geometry.index;
-		geometry.attributes = mesh.geometry.attributes;
-		geometry.morphAttributes = mesh.geometry.morphAttributes;
-		geometry.morphTargetsRelative = mesh.geometry.morphTargetsRelative;
-		const range = mesh.geometry.drawRange;
-		const start = Math.max(range.start, group?.start ?? 0);
-		geometry.setDrawRange(
-			start,
-			Math.max(
-				0,
-				Math.min(
-					range.start + range.count,
-					group ? group.start + group.count : Infinity,
-				) - start,
-			),
-		);
-		proxy.matrixAutoUpdate = false;
-		proxy.matrix.copy(mesh.matrixWorld);
+		proxy.matrixWorld.copy(mesh.matrixWorld);
 		proxy.layers.mask = mesh.layers.mask;
 		proxy.frustumCulled = false;
 		proxy.morphTargetInfluences = mesh.morphTargetInfluences;
@@ -294,28 +273,28 @@ export class SceneColorPasses {
 			out.bindMatrix.copy(skin.bindMatrix);
 			out.bindMatrixInverse.copy(skin.bindMatrixInverse);
 		}
-		const autoClear = renderer.autoClear,
-			autoReset = renderer.info.autoReset;
-		const shadowUpdate = renderer.shadowMap.autoUpdate,
-			shadowNeeds = renderer.shadowMap.needsUpdate;
-		const viewport = renderer.getViewport(new Vector4()),
-			scissor = renderer.getScissor(new Vector4()),
-			scissorTest = renderer.getScissorTest();
-		try {
-			renderer.autoClear = false;
-			renderer.info.autoReset = false;
-			renderer.shadowMap.autoUpdate = false;
-			renderer.shadowMap.needsUpdate = false;
-			render.call(renderer, temporary, camera);
-		} finally {
-			renderer.autoClear = autoClear;
-			renderer.info.autoReset = autoReset;
-			renderer.shadowMap.autoUpdate = shadowUpdate;
-			renderer.shadowMap.needsUpdate = shadowNeeds;
-			renderer.setViewport(viewport);
-			renderer.setScissor(scissor);
-			renderer.setScissorTest(scissorTest);
-		}
+		// Reuse the source's already-uploaded buffers without ending the parent render.
+		proxy.modelViewMatrix.multiplyMatrices(
+			camera.matrixWorldInverse,
+			proxy.matrixWorld,
+		);
+		proxy.normalMatrix.getNormalMatrix(proxy.modelViewMatrix);
+		material.onBeforeRender(
+			renderer,
+			temporary,
+			camera,
+			geometry,
+			proxy,
+			group as never,
+		);
+		renderer.renderBufferDirect(
+			camera,
+			temporary,
+			geometry,
+			material,
+			proxy,
+			group as never,
+		);
 	}
 	private capture(
 		renderer: WebGLRenderer,
@@ -323,6 +302,10 @@ export class SceneColorPasses {
 		slot: number,
 	) {
 		const gl = renderer.getContext() as WebGL2RenderingContext;
+		if (!this.contextCanvas) {
+			this.contextCanvas = renderer.domElement;
+			this.contextCanvas.addEventListener("webglcontextlost", this.contextLost);
+		}
 		if (!renderer.getRenderTarget() || gl.getParameter(gl.SAMPLES) === 0) {
 			renderer.copyFramebufferToTexture(texture);
 			return;
@@ -374,6 +357,9 @@ export class SceneColorPasses {
 						"[three-liltoon] Scene-color resolve format is unsupported",
 					);
 			}
+			// Three's MSAA resolve can leave READ_FRAMEBUFFER at the canvas while
+			// DRAW_FRAMEBUFFER still contains the active scene. Capture that scene.
+			gl.bindFramebuffer(gl.READ_FRAMEBUFFER, draw);
 			gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, resolve.framebuffer);
 			gl.disable(gl.SCISSOR_TEST);
 			gl.blitFramebuffer(
@@ -398,6 +384,11 @@ export class SceneColorPasses {
 		}
 	}
 	dispose() {
+		this.contextCanvas?.removeEventListener(
+			"webglcontextlost",
+			this.contextLost,
+		);
+		this.contextCanvas = undefined;
 		this.blur.dispose();
 		for (const texture of this.grabs) texture.dispose();
 		this.grabs = [];

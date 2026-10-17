@@ -10,11 +10,7 @@ import { AuxiliaryPassDraw } from "./AuxiliaryPassDraw.js";
 /** Unity surface pass order, excluding deferred ForwardAdd and shadow parity. */
 export class TransparencyPasses {
 	private draws = new AuxiliaryPassDraw();
-	prepare(
-		renderer: WebGLRenderer,
-		scene: Object3D,
-		render: WebGLRenderer["render"],
-	) {
+	prepare(renderer: WebGLRenderer, scene: Object3D) {
 		this.draws.begin();
 		const undo: (() => void)[] = [];
 		scene.traverse((node) => {
@@ -44,7 +40,6 @@ export class TransparencyPasses {
 				if (isSurface(source) && source.transparencyMode === "two-pass")
 					this.draws.draw(
 						renderer,
-						render,
 						mesh,
 						source,
 						"transparent-pre",
@@ -64,7 +59,6 @@ export class TransparencyPasses {
 				if (isSurface(source) && !manual && source.featureSet.outline)
 					this.draws.draw(
 						renderer,
-						render,
 						mesh,
 						source,
 						"outline",

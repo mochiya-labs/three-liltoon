@@ -5,6 +5,7 @@ import {
 	PlaneGeometry,
 	PerspectiveCamera,
 	Vector4,
+	Vector2,
 	type WebGLRenderer,
 } from "three";
 import { AuxiliaryPassDraw } from "../../src/renderer/AuxiliaryPassDraw.js";
@@ -27,7 +28,10 @@ describe("auxiliary pass lifetime", () => {
 			const draws = new AuxiliaryPassDraw();
 			const renderer = {
 				autoClear: true,
-				info: { autoReset: true },
+				info: { autoReset: true, render: { frame: 0 } },
+				getContext: () => ({ getParameter: () => 32 }),
+				getRenderTarget: () => null,
+				getDrawingBufferSize: (v: Vector2) => v.set(32, 32),
 				shadowMap: { autoUpdate: true, needsUpdate: false },
 				getViewport: (v: Vector4) => v.set(0, 0, 32, 32),
 				getScissor: (v: Vector4) => v.set(0, 0, 32, 32),
@@ -39,15 +43,27 @@ describe("auxiliary pass lifetime", () => {
 			let auxiliary: Mesh | undefined;
 			let fail = false;
 			mesh.geometry.setDrawRange(1, 4);
-			const render: WebGLRenderer["render"] = (current) => {
-				auxiliary = current.children[0] as Mesh;
-				expect(auxiliary.geometry).toBe(mesh.geometry);
-				expect(auxiliary.geometry.drawRange).toEqual({ start: 2, count: 3 });
+			renderer.render = vi.fn(() => {
+				throw new Error("unexpected nested render");
+			});
+			renderer.renderBufferDirect = (
+				_camera,
+				_scene,
+				geometry,
+				_material,
+				object,
+				group,
+			) => {
+				auxiliary = object as Mesh;
+				expect(geometry).toBe(mesh.geometry);
+				expect(geometry.drawRange).toEqual({ start: 1, count: 4 });
+				expect(group).toEqual({ start: 2, count: 4 });
+				expect(auxiliary.matrixWorld.equals(mesh.matrixWorld)).toBe(true);
 				if (fail) throw new Error("draw failed");
 			};
 			const draw = () => {
 				draws.begin();
-				draws.draw(renderer, render, mesh, source, pass, scene, camera, {
+				draws.draw(renderer, mesh, source, pass, scene, camera, {
 					start: 2,
 					count: 4,
 				});
@@ -55,6 +71,7 @@ describe("auxiliary pass lifetime", () => {
 				expect(mesh.geometry.drawRange).toEqual({ start: 1, count: 4 });
 			};
 			draw();
+			expect(renderer.render).not.toHaveBeenCalled();
 			const first = auxiliary!,
 				material = first.material as LilToonMaterial;
 			const disposed = vi.spyOn(material, "dispose"),

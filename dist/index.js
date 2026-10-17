@@ -1,7 +1,7 @@
 export { LilToonMaterialFactory, LilToonMaterialLoader } from './chunk-NQJJJ3TF.js';
 import { LilToonMaterial, setGlobalProperty, applyLilToonPassState } from './chunk-NGY7VCGA.js';
 export { GLTFLilToonExtension, LILTOON_DEFAULTS, LILTOON_GLTF_EXTENSION, LILTOON_GLTF_SPEC_VERSION, LILTOON_TEXTURE_SEMANTICS, LILTOON_UPSTREAM_COMMIT, LILTOON_UPSTREAM_VERSION, LilToonEnvironmentAdapter, LilToonLightAdapter, LilToonMaterial, LilToonShadowAdapter, THREE_VERSION_RANGE, UnsupportedFeatureError, detectLilToonFeatures } from './chunk-NGY7VCGA.js';
-import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, BufferGeometry, Scene, Vector4, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, REVISION, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry } from 'three';
+import { MeshBasicMaterial, MeshDepthMaterial, RGBADepthPacking, MeshDistanceMaterial, SkinnedMesh, Mesh, OneFactor, ZeroFactor, CustomBlending, Scene, SRGBColorSpace, HalfFloatType, FloatType, Vector2, NoColorSpace, UnsignedByteType, FramebufferTexture, REVISION, DataTexture, RGBAFormat, Float32BufferAttribute, Uint32BufferAttribute, BufferGeometry, Vector3, Matrix4, WebGLRenderTarget, NearestFilter, RawShaderMaterial, GLSL3, PlaneGeometry, Vector4 } from 'three';
 
 function queue(material, defaultQueue) {
   return material.isLilToonMaterial ? material.renderQueue ?? defaultQueue : defaultQueue;
@@ -77,7 +77,7 @@ var AuxiliaryPassDraw = class {
           r.release();
     }
   }
-  draw(renderer, render, mesh, source, pass, scene, camera, group, configure) {
+  draw(renderer, mesh, source, pass, scene, camera, group, configure) {
     const key = `${mesh.uuid}:${mesh.geometry.uuid}:${source.uuid}:${pass}`;
     let r = this.recipes.get(key);
     if (r && (r.mode !== source.renderMode || r.transparencyMode !== source.transparencyMode)) {
@@ -123,16 +123,7 @@ var AuxiliaryPassDraw = class {
     r.owner = scene;
     const { geometry, material, proxy } = r;
     syncPassMaterial(source, material);
-    const { start: originalStart, count: originalCount } = geometry.drawRange;
-    const start = Math.max(originalStart, group?.start ?? 0);
-    const count = Math.max(
-      0,
-      Math.min(
-        originalStart + originalCount,
-        group ? group.start + group.count : Infinity
-      ) - start
-    );
-    proxy.matrix.copy(mesh.matrixWorld);
+    proxy.matrixWorld.copy(mesh.matrixWorld);
     proxy.layers.mask = mesh.layers.mask;
     proxy.morphTargetInfluences = mesh.morphTargetInfluences;
     if (proxy.isSkinnedMesh) {
@@ -142,31 +133,28 @@ var AuxiliaryPassDraw = class {
       out.bindMatrix.copy(skin.bindMatrix);
       out.bindMatrixInverse.copy(skin.bindMatrixInverse);
     }
-    const before = material.onBeforeRender;
-    material.onBeforeRender = (renderer2, _scene, camera2, geometry2, object, group2) => {
-      before.call(material, renderer2, scene, camera2, geometry2, object, group2);
-      configure?.(material);
-    };
-    const auto = renderer.autoClear, info = renderer.info.autoReset, shadows = renderer.shadowMap.autoUpdate, needs = renderer.shadowMap.needsUpdate;
-    const viewport = renderer.getViewport(new Vector4()), scissor = renderer.getScissor(new Vector4()), scissorTest = renderer.getScissorTest();
-    try {
-      renderer.autoClear = false;
-      renderer.info.autoReset = false;
-      renderer.shadowMap.autoUpdate = false;
-      renderer.shadowMap.needsUpdate = false;
-      geometry.setDrawRange(start, count);
-      render.call(renderer, r.scene, camera);
-    } finally {
-      geometry.setDrawRange(originalStart, originalCount);
-      material.onBeforeRender = before;
-      renderer.autoClear = auto;
-      renderer.info.autoReset = info;
-      renderer.shadowMap.autoUpdate = shadows;
-      renderer.shadowMap.needsUpdate = needs;
-      renderer.setViewport(viewport);
-      renderer.setScissor(scissor);
-      renderer.setScissorTest(scissorTest);
-    }
+    proxy.modelViewMatrix.multiplyMatrices(
+      camera.matrixWorldInverse,
+      proxy.matrixWorld
+    );
+    proxy.normalMatrix.getNormalMatrix(proxy.modelViewMatrix);
+    material.onBeforeRender(
+      renderer,
+      scene,
+      camera,
+      geometry,
+      proxy,
+      group
+    );
+    configure?.(material);
+    renderer.renderBufferDirect(
+      camera,
+      r.scene,
+      geometry,
+      material,
+      proxy,
+      group
+    );
   }
   dispose() {
     for (const r of this.recipes.values()) r.release();
@@ -180,8 +168,12 @@ var SceneColorPasses = class {
   blur = new AuxiliaryPassDraw();
   resolves = [];
   depth = 0;
+  contextCanvas;
+  contextLost = () => {
+    this.resolves = [];
+  };
   gems = /* @__PURE__ */ new Map();
-  prepare(renderer, scene, render) {
+  prepare(renderer, scene) {
     const slot = this.depth++;
     this.blur.begin();
     let captured;
@@ -223,7 +215,6 @@ var SceneColorPasses = class {
           const background = captured;
           this.blur.draw(
             renderer,
-            render,
             mesh,
             material,
             "refraction-blur-pre",
@@ -253,7 +244,6 @@ var SceneColorPasses = class {
         if (material.renderMode === "gem")
           this.clearGem(
             renderer,
-            render,
             mesh,
             material,
             scene,
@@ -276,7 +266,7 @@ var SceneColorPasses = class {
       }
     };
   }
-  clearGem(renderer, render, mesh, source, owner, camera, group) {
+  clearGem(renderer, mesh, source, owner, camera, group) {
     const key = `${mesh.uuid}:${source.uuid}`;
     let recipe = this.gems.get(key);
     if (recipe && (recipe.sourceGeometry !== mesh.geometry || recipe.source !== source)) {
@@ -292,17 +282,14 @@ var SceneColorPasses = class {
         blendSrcAlpha: ZeroFactor,
         blendDstAlpha: OneFactor
       });
-      const geometry2 = new BufferGeometry(), sourceGeometry = mesh.geometry;
+      const geometry2 = mesh.geometry, sourceGeometry = mesh.geometry;
       const proxy2 = mesh.isSkinnedMesh ? new SkinnedMesh(geometry2, material2) : new Mesh(geometry2, material2);
+      proxy2.matrixAutoUpdate = false;
       const temporary2 = new Scene();
       temporary2.add(proxy2);
       const release = () => {
         sourceGeometry.removeEventListener("dispose", release);
         source.removeEventListener("dispose", release);
-        geometry2.attributes = {};
-        geometry2.index = null;
-        geometry2.morphAttributes = {};
-        geometry2.dispose();
         material2.dispose();
         this.gems.delete(key);
       };
@@ -342,24 +329,7 @@ var SceneColorPasses = class {
       "polygonOffsetUnits"
     ])
       material[key2] = source[key2];
-    geometry.index = mesh.geometry.index;
-    geometry.attributes = mesh.geometry.attributes;
-    geometry.morphAttributes = mesh.geometry.morphAttributes;
-    geometry.morphTargetsRelative = mesh.geometry.morphTargetsRelative;
-    const range = mesh.geometry.drawRange;
-    const start = Math.max(range.start, group?.start ?? 0);
-    geometry.setDrawRange(
-      start,
-      Math.max(
-        0,
-        Math.min(
-          range.start + range.count,
-          group ? group.start + group.count : Infinity
-        ) - start
-      )
-    );
-    proxy.matrixAutoUpdate = false;
-    proxy.matrix.copy(mesh.matrixWorld);
+    proxy.matrixWorld.copy(mesh.matrixWorld);
     proxy.layers.mask = mesh.layers.mask;
     proxy.frustumCulled = false;
     proxy.morphTargetInfluences = mesh.morphTargetInfluences;
@@ -370,27 +340,34 @@ var SceneColorPasses = class {
       out.bindMatrix.copy(skin.bindMatrix);
       out.bindMatrixInverse.copy(skin.bindMatrixInverse);
     }
-    const autoClear = renderer.autoClear, autoReset = renderer.info.autoReset;
-    const shadowUpdate = renderer.shadowMap.autoUpdate, shadowNeeds = renderer.shadowMap.needsUpdate;
-    const viewport = renderer.getViewport(new Vector4()), scissor = renderer.getScissor(new Vector4()), scissorTest = renderer.getScissorTest();
-    try {
-      renderer.autoClear = false;
-      renderer.info.autoReset = false;
-      renderer.shadowMap.autoUpdate = false;
-      renderer.shadowMap.needsUpdate = false;
-      render.call(renderer, temporary, camera);
-    } finally {
-      renderer.autoClear = autoClear;
-      renderer.info.autoReset = autoReset;
-      renderer.shadowMap.autoUpdate = shadowUpdate;
-      renderer.shadowMap.needsUpdate = shadowNeeds;
-      renderer.setViewport(viewport);
-      renderer.setScissor(scissor);
-      renderer.setScissorTest(scissorTest);
-    }
+    proxy.modelViewMatrix.multiplyMatrices(
+      camera.matrixWorldInverse,
+      proxy.matrixWorld
+    );
+    proxy.normalMatrix.getNormalMatrix(proxy.modelViewMatrix);
+    material.onBeforeRender(
+      renderer,
+      temporary,
+      camera,
+      geometry,
+      proxy,
+      group
+    );
+    renderer.renderBufferDirect(
+      camera,
+      temporary,
+      geometry,
+      material,
+      proxy,
+      group
+    );
   }
   capture(renderer, texture, slot) {
     const gl = renderer.getContext();
+    if (!this.contextCanvas) {
+      this.contextCanvas = renderer.domElement;
+      this.contextCanvas.addEventListener("webglcontextlost", this.contextLost);
+    }
     if (!renderer.getRenderTarget() || gl.getParameter(gl.SAMPLES) === 0) {
       renderer.copyFramebufferToTexture(texture);
       return;
@@ -428,6 +405,7 @@ var SceneColorPasses = class {
             "[three-liltoon] Scene-color resolve format is unsupported"
           );
       }
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, draw);
       gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, resolve.framebuffer);
       gl.disable(gl.SCISSOR_TEST);
       gl.blitFramebuffer(
@@ -452,6 +430,11 @@ var SceneColorPasses = class {
     }
   }
   dispose() {
+    this.contextCanvas?.removeEventListener(
+      "webglcontextlost",
+      this.contextLost
+    );
+    this.contextCanvas = void 0;
     this.blur.dispose();
     for (const texture of this.grabs) texture.dispose();
     this.grabs = [];
@@ -1022,7 +1005,7 @@ var FurPasses = class {
 // src/renderer/TransparencyPasses.ts
 var TransparencyPasses = class {
   draws = new AuxiliaryPassDraw();
-  prepare(renderer, scene, render) {
+  prepare(renderer, scene) {
     this.draws.begin();
     const undo = [];
     scene.traverse((node) => {
@@ -1041,7 +1024,6 @@ var TransparencyPasses = class {
         if (isSurface(source) && source.transparencyMode === "two-pass")
           this.draws.draw(
             renderer,
-            render,
             mesh,
             source,
             "transparent-pre",
@@ -1059,7 +1041,6 @@ var TransparencyPasses = class {
         if (isSurface(source) && !manual && source.featureSet.outline)
           this.draws.draw(
             renderer,
-            render,
             mesh,
             source,
             "outline",
@@ -1325,18 +1306,18 @@ function enableLilToon(renderer, options = {}) {
     const hook = function(...args) {
       original.apply(this, args);
       restore ??= passes.prepare(scene);
-      restoreColors ??= sceneColors.prepare(renderer, scene, render);
+      restoreColors ??= sceneColors.prepare(renderer, scene);
       restoreFur ??= fur.prepare(renderer, scene, render);
-      restoreTransparency ??= transparency.prepare(renderer, scene, render);
+      restoreTransparency ??= transparency.prepare(renderer, scene);
     };
     originalHooks.set(hook, original);
     scene.onBeforeRender = hook;
     try {
       if (!scene.isScene) {
         restore = passes.prepare(scene);
-        restoreColors = sceneColors.prepare(renderer, scene, render);
+        restoreColors = sceneColors.prepare(renderer, scene);
         restoreFur = fur.prepare(renderer, scene, render);
-        restoreTransparency = transparency.prepare(renderer, scene, render);
+        restoreTransparency = transparency.prepare(renderer, scene);
       }
       render.call(renderer, scene, camera);
     } finally {

@@ -3,7 +3,6 @@ import {
 	Mesh,
 	SkinnedMesh,
 	Scene,
-	Vector4,
 	type Camera,
 	type WebGLRenderer,
 	type Object3D,
@@ -73,7 +72,6 @@ export class AuxiliaryPassDraw {
 	}
 	draw(
 		renderer: WebGLRenderer,
-		render: WebGLRenderer["render"],
 		mesh: Mesh,
 		source: LilToonMaterial,
 		pass: LilToonPass,
@@ -134,16 +132,7 @@ export class AuxiliaryPassDraw {
 		r.owner = scene;
 		const { geometry, material, proxy } = r;
 		syncPassMaterial(source, material);
-		const { start: originalStart, count: originalCount } = geometry.drawRange;
-		const start = Math.max(originalStart, group?.start ?? 0);
-		const count = Math.max(
-			0,
-			Math.min(
-				originalStart + originalCount,
-				group ? group.start + group.count : Infinity,
-			) - start,
-		);
-		proxy.matrix.copy(mesh.matrixWorld);
+		proxy.matrixWorld.copy(mesh.matrixWorld);
 		proxy.layers.mask = mesh.layers.mask;
 		proxy.morphTargetInfluences = mesh.morphTargetInfluences;
 		if ((proxy as SkinnedMesh).isSkinnedMesh) {
@@ -154,44 +143,31 @@ export class AuxiliaryPassDraw {
 			out.bindMatrix.copy(skin.bindMatrix);
 			out.bindMatrixInverse.copy(skin.bindMatrixInverse);
 		}
-		const before = material.onBeforeRender;
-		material.onBeforeRender = (
+		// The source was uploaded during the enclosing render-list collection.
+		// Draw in that invocation: a nested render would resolve the entire MSAA
+		// target after each small auxiliary pass. Three intersects group/drawRange.
+		proxy.modelViewMatrix.multiplyMatrices(
+			camera.matrixWorldInverse,
+			proxy.matrixWorld,
+		);
+		proxy.normalMatrix.getNormalMatrix(proxy.modelViewMatrix);
+		material.onBeforeRender(
 			renderer,
-			_scene,
+			scene,
 			camera,
 			geometry,
-			object,
-			group,
-		) => {
-			before.call(material, renderer, scene, camera, geometry, object, group);
-			configure?.(material);
-		};
-		const auto = renderer.autoClear,
-			info = renderer.info.autoReset,
-			shadows = renderer.shadowMap.autoUpdate,
-			needs = renderer.shadowMap.needsUpdate;
-		const viewport = renderer.getViewport(new Vector4()),
-			scissor = renderer.getScissor(new Vector4()),
-			scissorTest = renderer.getScissorTest();
-		try {
-			renderer.autoClear = false;
-			renderer.info.autoReset = false;
-			renderer.shadowMap.autoUpdate = false;
-			renderer.shadowMap.needsUpdate = false;
-			// A single-material proxy ignores source groups; narrow only this nested draw.
-			geometry.setDrawRange(start, count);
-			render.call(renderer, r.scene, camera);
-		} finally {
-			geometry.setDrawRange(originalStart, originalCount);
-			material.onBeforeRender = before;
-			renderer.autoClear = auto;
-			renderer.info.autoReset = info;
-			renderer.shadowMap.autoUpdate = shadows;
-			renderer.shadowMap.needsUpdate = needs;
-			renderer.setViewport(viewport);
-			renderer.setScissor(scissor);
-			renderer.setScissorTest(scissorTest);
-		}
+			proxy,
+			group as never,
+		);
+		configure?.(material);
+		renderer.renderBufferDirect(
+			camera,
+			r.scene,
+			geometry,
+			material,
+			proxy,
+			group as never,
+		);
 	}
 	dispose() {
 		for (const r of this.recipes.values()) r.release();

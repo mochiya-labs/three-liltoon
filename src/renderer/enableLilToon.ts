@@ -360,9 +360,9 @@ export function enableLilToon(
 		) {
 			original.apply(this, args);
 			restore ??= passes.prepare(scene);
-			restoreColors ??= sceneColors.prepare(renderer, scene, render);
+			restoreColors ??= sceneColors.prepare(renderer, scene);
 			restoreFur ??= fur.prepare(renderer, scene, render);
-			restoreTransparency ??= transparency.prepare(renderer, scene, render);
+			restoreTransparency ??= transparency.prepare(renderer, scene);
 		};
 		originalHooks.set(hook, original);
 		scene.onBeforeRender = hook;
@@ -370,9 +370,9 @@ export function enableLilToon(
 			// Three invokes the scene hook before collecting render lists and shadows.
 			if (!(scene as { isScene?: boolean }).isScene) {
 				restore = passes.prepare(scene);
-				restoreColors = sceneColors.prepare(renderer, scene, render);
+				restoreColors = sceneColors.prepare(renderer, scene);
 				restoreFur = fur.prepare(renderer, scene, render);
-				restoreTransparency = transparency.prepare(renderer, scene, render);
+				restoreTransparency = transparency.prepare(renderer, scene);
 			}
 			render.call(renderer, scene, camera);
 		} finally {
