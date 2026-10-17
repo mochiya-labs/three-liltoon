@@ -26,7 +26,7 @@ Enabled assigned inputs are not removed by a texture-priority profile. Actual pe
 
 ## Rendering modes
 
-All nine regular selector modes have implementations; their pass sequences and defaults are detailed in [Rendering modes](RENDERING_MODES.md).
+Supported `shaderVariant` names and pass configurations are listed in the [API reference](API.md#supported-shader-variants).
 
 | Unity mode or setting             | Status      | Behavior and limits                                                                                                                                                                    |
 | --------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

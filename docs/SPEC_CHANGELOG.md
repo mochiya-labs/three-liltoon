@@ -4,9 +4,11 @@ History of `MOCHIYA_materials_liltoon`, independently of the [npm package versio
 
 ## 1.3 — current
 
-### Shader selection clarification
+### Shader selection
 
-- Supported regular `shaderVariant` names determine outline presence and transparent pass configuration. Explicit mode fields must agree with the selected shader; absent shader names do not imply outline support. This clarifies existing fields without adding fields or changing the specification version.
+- Use `shaderVariant` as the authoritative selection for shader mode, outline presence and transparent passes.
+- Deprecate `renderMode` and `transparencyMode`. New writers omit them; readers retain legacy mode-based selection when no supported shader name is available. Supported shader names take precedence over conflicting legacy fields.
+- Preserve original material properties independently of selection metadata, including dormant properties and authored render state. These compatibility rules remain within specification 1.3.
 
 ### Embedded cubemaps — shipped in package 0.1.5
 

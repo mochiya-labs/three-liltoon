@@ -2,6 +2,10 @@
 
 User-facing changes to `@mochiya/three-liltoon`. Package versions and [material specification versions](docs/SPEC_CHANGELOG.md) are independent. Publication dates below are UTC, verified against the [npm registry](https://registry.npmjs.org/@mochiya%2fthree-liltoon). Historical entries are reconstructed from repository history and published package contents; they summarize meaningful changes rather than every commit.
 
+## 0.1.8
+
+- Make `shaderVariant` authoritative and deprecate `renderMode` and `transparencyMode` selection inputs. Legacy inputs remain supported; conflicting mode metadata no longer prevents supported shader variants from loading. Standalone JSON writes shader identity without redundant mode fields.
+
 ## 0.1.7
 
 - Reduce automatic pass CPU overhead by preparing ordinary outlines only when needed and synchronizing shared outline materials once per render preparation. Shadow casting and live material updates remain supported.

@@ -5,7 +5,7 @@ New to the package? Start with the [overview, installation and tutorials](../REA
 ## Using three-liltoon
 
 - [API and integration](API.md): materials, renderer lifetime, React Three Fiber, VRM expressions and diagnostics.
-- [Rendering modes](RENDERING_MODES.md): mode selection and the transparent, refraction, fur and gem sequences.
+- [Shader variants](API.md#supported-shader-variants): supported shader names and their pass configurations.
 - [Feature matrix](FEATURE_MATRIX.md): supported features, known differences and verification scope.
 - [Material and glTF format](MATERIAL_FORMAT.md): the `MOCHIYA_materials_liltoon` contract, standalone JSON and validation.
 - [Model viewer](../examples/mochiya-liltoon-viewer/README.md): inspect local GLB/VRM files and their textures/settings.

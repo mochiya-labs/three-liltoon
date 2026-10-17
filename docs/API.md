@@ -17,7 +17,7 @@ The root entry also exports `LILTOON_TEXTURE_SEMANTICS` and `LilToonTextureSeman
 
 ## Materials
 
-`LilToonMaterial` extends Three.js `RawShaderMaterial`. Constructor inputs include `name`, `color`, `opacity`, `map`, `alphaTest`, `renderQueue`, `shaderVariant`, `renderMode`, `transparencyMode`, `properties` and `textures`. Original property names are case-sensitive. Shader selection defaults to `lilToon` (opaque, without outlines). Mode-only construction selects the corresponding regular non-outline shader; transparent configuration defaults to normal. See [rendering modes](RENDERING_MODES.md) for valid values and authored render-state defaults.
+`LilToonMaterial` extends Three.js `RawShaderMaterial`. Constructor inputs include `name`, `color`, `opacity`, `map`, `alphaTest`, `renderQueue`, `shaderVariant`, `properties` and `textures`. Original property names are case-sensitive. Shader selection defaults to `lilToon` (opaque, without outlines). See [shader selection and outlines](#shader-selection-and-outlines) for supported shader names.
 
 | Familiar property               | Original lilToon value                                         |
 | ------------------------------- | -------------------------------------------------------------- |
@@ -30,8 +30,7 @@ The root entry also exports `LILTOON_TEXTURE_SEMANTICS` and `LilToonTextureSeman
 import { LilToonMaterial } from "@mochiya/three-liltoon";
 
 const material = new LilToonMaterial({
-	renderMode: "transparent",
-	transparencyMode: "two-pass",
+	shaderVariant: "Hidden/lilToonTwoPassTransparent",
 	properties: { _Color: [1, 1, 1, 0.5], _UseEmission: 1 },
 });
 material.setProperty("_EmissionColor", [0.5, 0.1, 0.2, 1]);
@@ -61,7 +60,7 @@ The material remains a `RawShaderMaterial`: this integration does not automatica
 
 ## Shader selection and outlines
 
-`shaderVariant` uses the original Unity shader name. When supplying `shaderVariant`, you can omit `renderMode` and `transparencyMode`; both are determined by the selected shader. If you also supply either mode field, it must agree with that shader. The same selection controls surface mode, transparent pass configuration and outline presence when constructing a material, loading glTF/VRM, or restoring standalone JSON. Supported names are listed in [rendering modes](RENDERING_MODES.md#unity-shader-selection).
+`shaderVariant` selects the lilToon shader by its original name, including its surface behavior, outline and transparent passes. This selection applies when constructing a material, loading glTF/VRM, or restoring standalone JSON. The supported shader names are listed below.
 
 ```ts
 const material = new LilToonMaterial({
@@ -76,9 +75,42 @@ Call `enableLilToon(renderer)` to draw the selected shader's additional passes. 
 
 Select an outline `shaderVariant`, such as `Hidden/lilToonOutline`, and configure its appearance with `_Outline*` properties. `_OutlineWidth` alone does not enable an outline. `_UseOutline` applies to lilToon’s Multi shader family, which three-liltoon does not currently support; the property is preserved as material data but has no rendering effect.
 
-`renderMode` and `transparencyMode` reflect the selected shader. Changing these convenience properties selects the corresponding Unity variant, retaining outlines where that variant supports them. Selecting Fur, Refraction or Gem removes outline selection. `alphaTest` switches ordinary opaque/cutout/transparent variants while retaining outline presence. Constructor fields that contradict an explicit `shaderVariant` throw an error; unsupported direct shader names also throw. The glTF loader reports unsupported shader families through its warning callback and loads a non-outline fallback.
+`renderMode` and `transparencyMode` are deprecated. Use `shaderVariant` instead; the deprecated APIs are retained only for backward compatibility.
+
+`alphaTest` retains its Three.js convenience behavior of switching ordinary opaque/cutout/transparent variants while retaining outline presence. Unsupported direct shader names throw; the glTF loader reports unsupported shader families through its warning callback and loads a non-outline fallback.
+
+Shader selection does not replace authored pass state. Blend factors and equations, culling, depth state and material queue remain independent, including custom blending on ordinary opaque shaders.
 
 Cloning, copying and `toLilToonJSON()` preserve `shaderVariant`. `detectLilToonFeatures(properties, shaderVariant)` accepts the same selection; omitting its second argument uses `lilToon`.
+
+### Supported shader variants
+
+| Surface configuration | Without outline                    | With outline                              |
+| --------------------- | ---------------------------------- | ----------------------------------------- |
+| Opaque                | `lilToon`                          | `Hidden/lilToonOutline`                   |
+| Cutout                | `Hidden/lilToonCutout`             | `Hidden/lilToonCutoutOutline`             |
+| Transparent Normal    | `Hidden/lilToonTransparent`        | `Hidden/lilToonTransparentOutline`        |
+| Transparent OnePass   | `Hidden/lilToonOnePassTransparent` | `Hidden/lilToonOnePassTransparentOutline` |
+| Transparent TwoPass   | `Hidden/lilToonTwoPassTransparent` | `Hidden/lilToonTwoPassTransparentOutline` |
+
+| `shaderVariant`                | Behavior                                                             |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `Hidden/lilToonRefraction`     | Scene-color capture and refraction                                   |
+| `Hidden/lilToonRefractionBlur` | Horizontal blur, a second capture, then vertical blur and refraction |
+| `Hidden/lilToonFur`            | Surface and transparent fur ribbons                                  |
+| `Hidden/lilToonFurCutout`      | Alpha-tested surface and fur ribbons                                 |
+| `Hidden/lilToonFurTwoPass`     | Surface, fur prepass and transparent ribbons                         |
+| `Hidden/lilToonGem`            | Scene-color capture, black prepass and gem surface                   |
+
+These six variants have no regular outline pass. See the [feature matrix](FEATURE_MATRIX.md) for fidelity limits and unsupported families.
+
+### Shader pass behavior
+
+`Hidden/lilToonTransparent` and `Hidden/lilToonOnePassTransparent` currently share their surface/outline sequence because additional-light passes are deferred; their shader identities remain distinct. `Hidden/lilToonTwoPassTransparent` draws a prepass using `_Pre*` state before the surface. Each corresponding outline variant draws its outline after the surface using `_Outline*` state. These sequences apply per material group and follow skinning and morph deformation. Three's implicit double-sided split is disabled.
+
+Transparent variants use upstream ShaderLab defaults, including `_ZWrite: 1` and `_SrcBlend: 1`; authored properties override them. The upstream FORWARD_BACK pass uses configurable `_PreCull` rather than always culling front faces. `Hidden/lilToonFurCutout` uses the glTF alpha-mask fallback when exported without extension-aware rendering.
+
+Refraction, fur and gem variants require the additional passes installed by `enableLilToon(renderer)`. See [special shader passes](ARCHITECTURE.md#special-shader-passes) for capture, deformation, device requirements and implementation limits.
 
 ## Renderer lifetime and React Three Fiber
 
@@ -107,7 +139,7 @@ Remove models from the scene and dispose their owned geometries, materials and t
 - The first visible directional light is the main light. Ambient/hemisphere colors provide an approximate ambient term; additional Unity light passes are unavailable.
 - Set renderer shadow support, the light's `castShadow`, and mesh `castShadow`/`receiveShadow` as in Three.js. This is approximate shadow integration, separate from `_UseShadow` toon-band shading.
 - `scene.environment` supports a `CubeTexture`; raw equirectangular textures and private PMREM state are not consumed.
-- Standard surfaces use Three GPU skinning and position/normal morph transport. Device limits still apply; fur has a separate deformation path described in [rendering modes](RENDERING_MODES.md).
+- Standard surfaces use Three GPU skinning and position/normal morph transport. Device limits still apply; fur has a separate deformation path described in [special shader passes](ARCHITECTURE.md#special-shader-passes).
 - Shader UV/time animation uses the material's rendering path; skeletal animation, VRMA retargeting and avatar updates remain host responsibilities.
 
 ## VRM material expressions
@@ -144,7 +176,7 @@ Texture-unit capacity is checked against vertex, fragment and combined context l
 
 ## Compatibility exports
 
-Low-level light/shadow/environment adapters remain exported, but ordinary applications need only the renderer and loader helpers. `RefractionPass`, `FurPass` and `GemPass` are deprecated material conveniences; use `LilToonMaterial({ renderMode })` with `enableLilToon` instead. Internal pass identifiers are not additional user-facing rendering modes.
+Low-level light/shadow/environment adapters remain exported, but ordinary applications need only the renderer and loader helpers. `RefractionPass`, `FurPass` and `GemPass` are deprecated material conveniences; use `LilToonMaterial({ shaderVariant })` with `enableLilToon` instead. Internal pass identifiers are not additional user-facing rendering modes.
 
 ## Material render queue sorting
 
@@ -153,11 +185,11 @@ Low-level light/shadow/environment adapters remain exported, but ordinary applic
 ```ts
 const release = enableLilToon(renderer, { materialRenderQueue: true });
 const inner = new LilToonMaterial({
-	renderMode: "transparent",
+	shaderVariant: "Hidden/lilToonTransparent",
 	renderQueue: 2450,
 });
 const outer = new LilToonMaterial({
-	renderMode: "transparent",
+	shaderVariant: "Hidden/lilToonTransparent",
 	renderQueue: 3000,
 });
 // Release when this renderer integration is no longer needed.

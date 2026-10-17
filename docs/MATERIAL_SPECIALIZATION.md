@@ -4,7 +4,7 @@ The runtime selects and specializes translated GLSL from a material's rendering 
 
 ## Template selection
 
-The build produces nine surface templates and their outline, ribbon and prepass programs. These represent [rendering modes](RENDERING_MODES.md), not fixed texture-priority profiles. Generated guards keep optional upstream feature branches through DXC optimization.
+The build produces nine surface templates and their outline, ribbon and prepass programs. These implement the [supported shader variants](API.md#supported-shader-variants). Generated guards keep optional upstream feature branches through DXC optimization.
 
 At runtime, `src/shader/ShaderProgramLibrary.ts` selects a template, `src/shader/features.ts` derives feature gates, and resource specialization replaces dormant/unassigned texture reads with their upstream neutral values. It removes unused declarations and aliases compatible bindings. `LilToonMaterial` installs the resulting shaders and asks Three.js to update the GPU program.
 
